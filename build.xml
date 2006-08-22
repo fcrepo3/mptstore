@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="mptstore" default="dist" basedir=".">
+
+  <loadproperties srcFile="build.properties"/>
+
+  <!-- defines mptstore.version -->
+  <loadproperties srcFile="src/java/org/nsdl/mptstore/MPTStore.properties"/>
+
+  <path id="compile.path">
+    <pathelement location="${lib.log4j}"/>
+    <pathelement location="${lib.postgres-driver}"/>
+  </path>
+  <path id="test.path">
+    <path refid="compile.path"/>
+    <pathelement location="${lib.junit}"/>
+    <pathelement location="build/classes"/>
+    <pathelement location="build/testclasses"/>
+    <pathelement location="src/config"/>
+  </path>
+
+  <target name="classes" 
+          depends="prep"
+          description="build all java classes into build/classes">
+    <mkdir dir="build/classes"/>
+    <javac srcdir="src/java" destdir="build/classes" 
+           includes="**" 
+           classpathref="compile.path"
+           optimize="${optimize}" debug="${debug}"/>
+    <copy file="src/java/org/nsdl/mptstore/MPTStore.properties" tofile="build/classes/org/nsdl/mptstore/MPTStore.properties"/>
+    <propertyfile file="build/version.properties">
+      <entry key="buildDate" type="date" value="now"/>
+    </propertyfile>
+    <replace file="build/classes/org/nsdl/mptstore/MPTStore.properties"
+             value="value not found in version.properties"
+             propertyFile="build/version.properties">
+      <replacefilter token="@buildDate@" property="buildDate"/>
+    </replace>
+  </target>
+
+  <target name="testclasses"
+          depends="classes"
+          description="build all test classes into build/testclasses">
+    <mkdir dir="build/testclasses"/>
+    <javac srcdir="src/test" destdir="build/testclasses"
+           includes="org/nsdl/mptstore/**"
+           classpathref="test.path"
+           optimize="${optimize}" debug="${debug}"/>
+  </target>
+
+  <target name="dist" depends="classes" description="Build the distribution in dist/">
+    <mkdir dir="dist/lib"/>
+    <copy todir="dist/lib">
+      <fileset dir="lib">
+        <exclude name="junit.jar"/>
+      </fileset>
+    </copy>
+    <copy todir="dist">
+      <fileset dir="src/config"/>
+    </copy>
+    <jar jarfile="dist/mptstore.jar" basedir="build/classes"/>
+  </target>
+
+  <target name="srcrelease" depends="clean">
+    <copy todir="dist/release/mptstore-${mptstore.version}-src">
+      <fileset dir=".">
+        <exclude name="dist/**"/>
+      </fileset>
+    </copy>
+    <replace file="dist/release/mptstore-${mptstore.version}-src/README.txt"
+             value="value not found in version.properties"
+             propertyFile="src/java/org/nsdl/mptstore/MPTStore.properties">
+      <replacefilter token="@mptstore.version@" property="mptstore.version"/>
+    </replace>
+    <zip zipfile="dist/release/mptstore-${mptstore.version}-src.zip" basedir="dist/release" includes="mptstore-${mptstore.version}-src/**"/>
+    <delete dir="dist/release/mptstore-${mptstore.version}-src"/>
+  </target>
+
+  <target name="binrelease" depends="dist,doc">
+    <copy todir="dist/release/mptstore-${mptstore.version}">
+      <fileset dir="dist">
+        <exclude name="release/**"/>
+      </fileset>
+    </copy>
+    <zip zipfile="dist/release/mptstore-${mptstore.version}.zip" basedir="dist/release" includes="mptstore-${mptstore.version}/**"/>
+    <delete dir="dist/release/mptstore-${mptstore.version}"/>
+  </target>
+
+  <target name="release" depends="srcrelease,binrelease" description="Build the source and binary distributions in dist/release">
+    <checksum fileext=".md5">
+      <fileset dir="dist/release">
+        <include name="*.zip"/>
+      </fileset>
+    </checksum>
+  </target>
+
+  <target name="doc"
+          depends="prep"
+          description="Build the documentation in dist/doc">
+    <copy todir="dist/doc">
+      <fileset dir="src/doc"/>
+    </copy>
+    <replace file="dist/doc/index.html"
+             value="value not found in version.properties"
+             propertyFile="src/java/org/nsdl/mptstore/MPTStore.properties">
+      <replacefilter token="@mptstore.version@" property="mptstore.version"/>
+    </replace>
+    <javadoc packagenames="org.nsdl.mptstore.core, org.nsdl.mptstore.impl.postgres, org.nsdl.mptstore.query"
+             classpathref="compile.path"
+             sourcepath="src/java"
+             defaultexcludes="yes"
+             destdir="dist/doc/api"
+             windowtitle="MPTStore Java API">
+      <doctitle><![CDATA[<h1>MPTStore Java API</h1>]]></doctitle>
+    </javadoc>
+  </target>
+
+  <target name="test" description="Run tests" depends="testclasses">
+    <junit printsummary="no" haltonfailure="yes" showoutput="true" filtertrace="true">
+      <formatter type="plain" usefile="false"/>
+      <classpath refid="test.path"/>
+      <sysproperty key="jetty.fork" value="false"/>
+      <test name="org.nsdl.mptstore.MPTStorePackageTestSuite"/>
+    </junit>
+  </target>
+
+  <target name="itest" description="Run tests interactively" depends="testclasses">
+    <java classname="org.nsdl.mptstore.MPTStorePackageTestSuite" fork="yes">
+      <classpath refid="test.path"/>
+      <sysproperty key="org.apache.commons.logging.LogFactory"
+                   value="org.apache.commons.logging.impl.Log4jFactory"/>
+      <sysproperty key="org.apache.commons.logging.Log"
+                   value="org.apache.commons.logging.impl.Log4JLogger"/>
+      <sysproperty key="log4j.ignoreTCL" value="true"/>
+    </java>
+  </target>
+
+  <target name="prep"
+          description="prepare for a build">
+    <mkdir dir="build"/>
+    <mkdir dir="dist"/>
+  </target>
+
+  <target name="clean"
+          description="remove all build-generated stuff">
+      <delete dir="build"/>
+      <delete dir="dist"/>
+  </target>
+</project>
