@@ -11,12 +11,12 @@ import org.nsdl.mptstore.query.QueryResults;
 
 public interface DatabaseAdaptor {
 
-    public void add(Connection conn, 
-                    Iterator<List<String>> triples) 
+    public void addTriples(Connection conn, 
+                           Iterator<List<String>> triples) 
             throws ModificationException;
 
-    public void delete(Connection conn, 
-                       Iterator<List<String>> triples) 
+    public void deleteTriples(Connection conn, 
+                              Iterator<List<String>> triples) 
             throws ModificationException;
 
     public QueryResults query(Connection conn, 
