@@ -12,7 +12,7 @@ public class QueryPackageTestSuite extends TestCase {
         TestSuite suite = new TestSuite(QueryPackageTestSuite.class.getName());
    
         // classes in this package
-        //suite.addTestSuite(Whatever.class);
+        suite.addTestSuite(SPOQueryCompilerTest.class);
 
         return suite;
 
