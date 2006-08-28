@@ -3,6 +3,8 @@ package org.nsdl.mptstore.query;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.nsdl.mptstore.core.TableManager;
+
 /**
  * Compiler for SPO queries.
  *
@@ -27,10 +29,20 @@ import java.util.List;
  */
 public class SPOQueryCompiler implements QueryCompiler {
 
+    private TableManager _tableManager;
+
+    public SPOQueryCompiler(TableManager tableManager) {
+        _tableManager = tableManager;
+    }
+
     // Implements QueryCompiler.compile(String)
     public SQLProvider compile(String query) 
             throws QueryException {
-        return null;
+        List<String> parsedQuery = parse(query);
+        return new SPOSQLProvider(_tableManager, 
+                                  parsedQuery.get(0),
+                                  parsedQuery.get(1),
+                                  parsedQuery.get(2));
     }
 
     /**

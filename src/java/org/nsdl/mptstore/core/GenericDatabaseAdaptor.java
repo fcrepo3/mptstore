@@ -26,7 +26,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
         _tableManager = tableManager;
         _compilerMap = new HashMap<QueryLanguage, QueryCompiler>();
         _compilerMap.put(QueryLanguage.SPO, 
-                         new SPOQueryCompiler());
+                         new SPOQueryCompiler(_tableManager));
     }
 
     /**
