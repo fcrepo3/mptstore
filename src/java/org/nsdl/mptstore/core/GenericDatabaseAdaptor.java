@@ -22,11 +22,13 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     /**
      * Get an instance supporting the built-in query languages.
      */
-    public GenericDatabaseAdaptor(TableManager tableManager) {
+    public GenericDatabaseAdaptor(TableManager tableManager,
+                                  boolean backslashIsEscape) {
         _tableManager = tableManager;
         _compilerMap = new HashMap<QueryLanguage, QueryCompiler>();
         _compilerMap.put(QueryLanguage.SPO, 
-                         new SPOQueryCompiler(_tableManager));
+                         new SPOQueryCompiler(_tableManager,
+                                              backslashIsEscape));
     }
 
     /**

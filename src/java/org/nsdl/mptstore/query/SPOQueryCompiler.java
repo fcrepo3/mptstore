@@ -30,16 +30,20 @@ import org.nsdl.mptstore.core.TableManager;
 public class SPOQueryCompiler implements QueryCompiler {
 
     private TableManager _tableManager;
+    private boolean _backslashIsEscape;
 
-    public SPOQueryCompiler(TableManager tableManager) {
+    public SPOQueryCompiler(TableManager tableManager,
+                            boolean backslashIsEscape) {
         _tableManager = tableManager;
+        _backslashIsEscape = backslashIsEscape;
     }
 
     // Implements QueryCompiler.compile(String)
     public SQLProvider compile(String query) 
             throws QueryException {
         List<String> parsedQuery = parse(query);
-        return new SPOSQLProvider(_tableManager, 
+        return new SPOSQLProvider(_tableManager,
+                                  _backslashIsEscape,
                                   parsedQuery.get(0),
                                   parsedQuery.get(1),
                                   parsedQuery.get(2));

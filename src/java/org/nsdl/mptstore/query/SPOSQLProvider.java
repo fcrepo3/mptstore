@@ -18,17 +18,19 @@ public class SPOSQLProvider implements SQLProvider {
     }
 
     private TableManager _tableManager;
-
+    private boolean _backslashIsEscape;
     private String _subject;
     private String _object;
 
     private List<String> _sql;
 
     public SPOSQLProvider(TableManager tableManager,
+                          boolean backslashIsEscape,
                           String subject,
                           String predicate,
                           String object) {
         _tableManager = tableManager;
+        _backslashIsEscape = backslashIsEscape;
         _subject = subject;
         _object = object;
 
@@ -81,7 +83,25 @@ public class SPOSQLProvider implements SQLProvider {
     }
 
     private String quotedString(String s) {
-        return s.replaceAll("'", "''");
+
+        StringBuffer out = new StringBuffer();
+
+        out.append('\'');
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\'') {
+                out.append("''");
+            } else if (c == '\\' && _backslashIsEscape) {
+                out.append("\\\\");
+            } else {
+                out.append(c);
+            }
+        }
+
+        out.append('\'');
+
+        return out.toString();
     }
 
     public List<String> getTargets() {
