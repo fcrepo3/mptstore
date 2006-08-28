@@ -6,6 +6,6 @@ import org.nsdl.mptstore.core.ClosableIterator;
 
 public interface QueryResults extends ClosableIterator<List<String>> {
 
-    public List getTargets();
+    public List<String> getTargets();
 
 }
