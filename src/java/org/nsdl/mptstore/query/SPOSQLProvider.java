@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.util.DBUtil;
 
 public class SPOSQLProvider implements SQLProvider {
 
@@ -59,7 +60,7 @@ public class SPOSQLProvider implements SQLProvider {
             StringBuffer select = new StringBuffer();
 
             select.append("SELECT s, ");
-            select.append(quotedString(predicate));
+            select.append(DBUtil.quotedString(predicate, _backslashIsEscape));
             select.append(", o\nFROM ");
             select.append(table);
 
@@ -67,41 +68,19 @@ public class SPOSQLProvider implements SQLProvider {
                 select.append("\nWHERE ");
                 if (_subject != null) {
                     select.append("s = ");
-                    select.append(quotedString(_subject));
+                    select.append(DBUtil.quotedString(_subject, _backslashIsEscape));
                     if (_object != null) {
                         select.append("\nAND ");
                     }
                 }
                 if (_object != null) {
                     select.append("o = ");
-                    select.append(quotedString(_object));
+                    select.append(DBUtil.quotedString(_object, _backslashIsEscape));
                 }
             }
 
             _sql.add(select.toString());
         }
-    }
-
-    private String quotedString(String s) {
-
-        StringBuffer out = new StringBuffer();
-
-        out.append('\'');
-
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '\'') {
-                out.append("''");
-            } else if (c == '\\' && _backslashIsEscape) {
-                out.append("\\\\");
-            } else {
-                out.append(c);
-            }
-        }
-
-        out.append('\'');
-
-        return out.toString();
     }
 
     public List<String> getTargets() {
