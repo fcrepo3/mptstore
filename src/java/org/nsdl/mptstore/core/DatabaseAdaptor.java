@@ -24,6 +24,7 @@ public interface DatabaseAdaptor {
 
     public QueryResults query(Connection conn, 
                               QueryLanguage lang,
+                              int fetchSize,
                               String queryText) 
             throws QueryException;
 

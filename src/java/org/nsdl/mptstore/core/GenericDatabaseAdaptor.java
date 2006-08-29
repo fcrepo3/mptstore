@@ -12,6 +12,8 @@ import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.query.QueryLanguage;
 import org.nsdl.mptstore.query.QueryResults;
 import org.nsdl.mptstore.query.SPOQueryCompiler;
+import org.nsdl.mptstore.query.SQLProvider;
+import org.nsdl.mptstore.query.SQLUnionQueryResults;
 
 public class GenericDatabaseAdaptor implements DatabaseAdaptor {
 
@@ -61,9 +63,16 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     // Implements DatabaseAdaptor.query(Connection, QueryLanguage, String)
     public QueryResults query(Connection conn, 
                               QueryLanguage lang,
-                              String queryText) 
+                              int fetchSize,
+                              String query) 
             throws QueryException {
-        return null;
+        QueryCompiler compiler = _compilerMap.get(lang);
+        if (compiler != null) {
+            SQLProvider provider = compiler.compile(query);
+            return new SQLUnionQueryResults(conn, fetchSize, provider);
+        } else {
+            throw new QueryException("Query language not supported: " + lang.getName());
+        }
     }
 
 }
