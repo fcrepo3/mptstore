@@ -3,11 +3,19 @@ package org.nsdl.mptstore.query;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.SQLException;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.List;
 
+import org.nsdl.mptstore.util.DBUtil;
+
+/**
+ * Query results that wrap a set of SQL database queries,
+ * run back-to-back on a single connection.
+ */
 public class SQLUnionQueryResults implements QueryResults {
 
     private Connection _conn;
@@ -36,29 +44,56 @@ public class SQLUnionQueryResults implements QueryResults {
 
         try {
             _queries = sqlProvider.getSQL().iterator();
-            if (startNextQuery()) {
-                readNextTuple();
+            try {
+                startNextQuery();
+            } catch (SQLException e) {
+                throw new QueryException("Error querying database", e);
             }
+            readNextTuple();
         } catch (QueryException e) {
             close();
             throw e;
         }
     }
 
-    private boolean startNextQuery() {
-        // todo: cleanup from previous here?
-        return true; // if the next query was started
-    }
-
     /**
      * Set _nextTuple to the next tuple,
-     * or <code>null</code> if no more results.
+     * If there are no more tuples, proactively close
+     * and set _nextTuple to null.
      */
     private void readNextTuple() throws QueryException {
 
-        if (_results != null) {
+        try {
+            while (_results != null && !_results.next()) {
+                startNextQuery();
+            }
 
-        
+            if (_results == null) {
+                _nextTuple = null;
+            } else {
+                int tupleSize = _sqlProvider.getTargets().size();
+                _nextTuple = new ArrayList<String>(tupleSize);
+                for (int i = 1; i <= tupleSize; i++) {
+                    _nextTuple.add(DBUtil.getLongString(_results, i));
+                }
+            }
+        } catch (SQLException e) {
+            throw new QueryException("Error querying database", e);
+        }
+    }
+
+    private void startNextQuery() throws SQLException {
+        if (_queries.hasNext()) {
+            if (_results != null) {
+                // close previous query
+                _results.close();
+                _statement.close();
+            }
+            _statement = _conn.createStatement();
+            _results = _statement.executeQuery(_queries.next());
+        } else {
+            close(); // proactively close if no more queries
+            _results = null;
         }
     }
 
@@ -74,7 +109,7 @@ public class SQLUnionQueryResults implements QueryResults {
 
     // Implements Iterator.next()
     public List<String> next() {
-        if (_closed) {
+        if (!hasNext()) {
             throw new NoSuchElementException();
         } else {
             List<String> thisTuple = _nextTuple;
@@ -82,6 +117,7 @@ public class SQLUnionQueryResults implements QueryResults {
                 readNextTuple();
                 return thisTuple;
             } catch (QueryException e) {
+                close(); // proactively close on error
                 throw new RuntimeQueryException(e);
             }
         }
@@ -111,6 +147,10 @@ public class SQLUnionQueryResults implements QueryResults {
         }
     }
 
+    /**
+     * In the event of garbage collection, make sure close()
+     * has occurred.
+     */
     public void finalize() {
         close();
     }
