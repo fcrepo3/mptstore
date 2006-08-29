@@ -52,6 +52,12 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
             throws ModificationException {
     }
 
+    // Implements DatabaseAdaptor.deleteAllTriples(Connection)
+    public void deleteAllTriples(Connection conn) 
+            throws ModificationException {
+    }
+
+
     // Implements DatabaseAdaptor.query(Connection, QueryLanguage, String)
     public QueryResults query(Connection conn, 
                               QueryLanguage lang,
