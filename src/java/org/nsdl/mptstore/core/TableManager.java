@@ -7,8 +7,7 @@ import java.util.Set;
 
 public interface TableManager {
 
-    public String getOrMapTableFor(String predicate,
-                                   Connection conn) throws SQLException;
+    public String getOrMapTableFor(String predicate) throws SQLException;
 
     public String getTableFor(String predicate);
 
