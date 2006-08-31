@@ -28,7 +28,9 @@
     <javac srcdir="src/java" destdir="build/classes" 
            includes="**" 
            classpathref="compile.path"
-           optimize="${optimize}" debug="${debug}"/>
+           optimize="${optimize}" debug="${debug}">
+        <compilerarg value="-Xlint:-serial"/>
+    </javac>
     <copy file="src/java/org/nsdl/mptstore/MPTStore.properties" tofile="build/classes/org/nsdl/mptstore/MPTStore.properties"/>
     <propertyfile file="build/version.properties">
       <entry key="buildDate" type="date" value="now"/>

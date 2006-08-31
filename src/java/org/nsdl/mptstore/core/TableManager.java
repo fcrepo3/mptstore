@@ -17,6 +17,8 @@ public interface TableManager {
 
     public Set<String> getPredicates();
 
-    public int dropEmptyTables() throws SQLException;
+    public int dropEmptyPredicateTables() throws SQLException;
+
+    public int dropAllPredicateTables() throws SQLException;
 
 }

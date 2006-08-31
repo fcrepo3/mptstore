@@ -112,8 +112,8 @@ public class BasicTableManager implements TableManager {
     }
 
     private void loadMapTable(Connection conn) throws SQLException {
-        _map = new HashMap();
-        _reverseMap = new HashMap();
+        _map = new HashMap<String,String>();
+        _reverseMap = new HashMap<String,String>();
         Statement st = conn.createStatement();
         ResultSet results = null;
         try {
@@ -285,18 +285,22 @@ public class BasicTableManager implements TableManager {
 
     public Set<String> getTables() {
         synchronized (_map) {
-            return new HashSet(_reverseMap.keySet());
+            return new HashSet<String>(_reverseMap.keySet());
         }
     }
 
     public Set<String> getPredicates() {
         synchronized (_map) {
-            return new HashSet(_map.keySet());
+            return new HashSet<String>(_map.keySet());
         }
     }
 
-    // Implements TableManager.dropEmptyTables()
-    public synchronized int dropEmptyTables() throws SQLException {
+    // Implements TableManager.dropEmptyPredicateTables()
+    public int dropEmptyPredicateTables() throws SQLException {
+        return dropPredicateTables(false);
+    }
+
+    private synchronized int dropPredicateTables(boolean all) throws SQLException {
 
         int dropCount = 0;
         Connection conn = _dataSource.getConnection();
@@ -304,7 +308,7 @@ public class BasicTableManager implements TableManager {
             Iterator<String> tables = getTables().iterator();
             while (tables.hasNext()) {
                 String table = tables.next();
-                if (isPredicateTableEmpty(table, conn)) {
+                if (all || isPredicateTableEmpty(table, conn)) {
                     String predicate = getPredicateFor(table);
                     unmapPredicate(predicate, table, conn);
                     dropCount++;
@@ -318,6 +322,11 @@ public class BasicTableManager implements TableManager {
                 // warn: can't close connection
             }
         }
+    }
+
+    // Implements Tablemanager.dropAllPredicateTables()
+    public int dropAllPredicateTables() throws SQLException {
+        return dropPredicateTables(true);
     }
 
     private boolean isPredicateTableEmpty(String table, 
