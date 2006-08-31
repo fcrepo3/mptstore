@@ -28,7 +28,10 @@
     <javac srcdir="src/java" destdir="build/classes" 
            includes="**" 
            classpathref="compile.path"
-           optimize="${optimize}" debug="${debug}">
+           optimize="${optimize}" 
+           debug="${debug}"
+           source="${source}"
+           target="${target}">
         <compilerarg value="-Xlint:-serial"/>
     </javac>
     <copy file="src/java/org/nsdl/mptstore/MPTStore.properties" tofile="build/classes/org/nsdl/mptstore/MPTStore.properties"/>
@@ -66,7 +69,7 @@
     <copy todir="dist">
       <fileset dir="src/config"/>
     </copy>
-    <jar jarfile="dist/mptstore.jar" basedir="build/classes"/>
+    <jar jarfile="dist/mptstore-${mptstore.version}.jar" basedir="build/classes"/>
   </target>
 
   <target name="srcrelease" depends="clean">
