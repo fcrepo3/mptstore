@@ -1,6 +1,8 @@
 package org.nsdl.mptstore.core;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,17 +48,74 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     public void addTriples(Connection conn, 
                            Iterator<List<String>> triples) 
             throws ModificationException {
+        updateTriples(conn, triples, false);
     }
 
     // Implements DatabaseAdaptor.deleteTriples(Connection, Iterator<List<String>>)
     public void deleteTriples(Connection conn, 
                               Iterator<List<String>> triples) 
             throws ModificationException {
+        updateTriples(conn, triples, true);
+    }
+
+    private void updateTriples(Connection conn,
+                               Iterator<List<String>> triples,
+                               boolean delete)
+            throws ModificationException {
+
+        Map<String,PreparedStatement> statements = 
+                new HashMap<String,PreparedStatement>();
+
+        try {
+            while (triples.hasNext()) {
+
+                List<String> triple = triples.next();
+                String subject = triple.get(0);
+                String predicate = triple.get(1);
+                String object = triple.get(2);
+
+                PreparedStatement statement = statements.get(predicate);
+                if (statement == null) {
+                    String table = _tableManager.getTableFor(predicate);
+                    String sql;
+                    if (delete) {
+                        sql = "DELETE FROM " + table + " WHERE s = ? AND o = ?";
+                    } else {
+                        sql = "INSERT INTO " + table + " (s, o) VALUES (?, ?)";
+                    }
+                    statement = conn.prepareStatement(sql);
+                    statements.put(predicate, statement);
+                }
+
+                statement.setString(1, subject);
+                statement.setString(2, object);
+                statement.execute();
+            }
+        } catch (SQLException e) {
+            throw new ModificationException("Database update failed", e);
+        } finally {
+
+            // close all statements we created for this update
+            Iterator<PreparedStatement> iter = statements.values().iterator();
+            while (iter.hasNext()) {
+                PreparedStatement statement = iter.next();
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    // warn: can't close statement
+                }
+            }
+        }
     }
 
     // Implements DatabaseAdaptor.deleteAllTriples(Connection)
     public void deleteAllTriples(Connection conn) 
             throws ModificationException {
+        try {
+            _tableManager.dropAllPredicateTables();
+        } catch (SQLException e) {
+            throw new ModificationException("Failed to delete all triples", e);
+        }
     }
 
 
