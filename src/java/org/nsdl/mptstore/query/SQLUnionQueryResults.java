@@ -90,6 +90,7 @@ public class SQLUnionQueryResults implements QueryResults {
                 _statement.close();
             }
             _statement = _conn.createStatement();
+            _statement.setFetchSize(_fetchSize);
             _results = _statement.executeQuery(_queries.next());
         } else {
             close(); // proactively close if no more queries
