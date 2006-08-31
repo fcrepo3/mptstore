@@ -8,7 +8,6 @@
 
   <path id="compile.path">
     <pathelement location="${lib.log4j}"/>
-    <pathelement location="${lib.postgres-driver}"/>
   </path>
   <path id="test.path">
     <path refid="compile.path"/>
@@ -16,7 +15,7 @@
     <pathelement location="${lib.commons-dbcp}"/>
     <pathelement location="${lib.commons-collections}"/>
     <pathelement location="${lib.commons-pool}"/>
-    <pathelement location="${lib.junit}"/>
+    <pathelement location="${lib.postgres-driver}"/>
     <pathelement location="build/classes"/>
     <pathelement location="build/testclasses"/>
     <pathelement location="src/config"/>
@@ -56,6 +55,10 @@
     <copy todir="dist/lib">
       <fileset dir="lib">
         <exclude name="junit.jar"/>
+        <exclude name="commons-collections-3.1.jar"/>
+        <exclude name="commons-dbcp-1.2.1.jar"/>
+        <exclude name="commons-pool-1.2.jar"/>
+        <exclude name="postgresql-8.1-407.jdbc3.jar"/>
       </fileset>
     </copy>
     <copy todir="dist">
