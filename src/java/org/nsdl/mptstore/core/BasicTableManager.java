@@ -6,14 +6,14 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 /**
  * This implementation of TableManager creates predicate tables
- * as needed.  It assumes that DDL can occur in the same
- * transaction as updates.
+ * and map entries as needed, using a separate connection provided
+ * from a JDBC DataSource.
  *
- * This is true for Postgres, but may not be true for other
- * databases.  An alternate implementation might proactively
- * create tables on a different connection in the background.
+ * It never attempts to execute DDL on the same transaction as DML.
  */
 public class BasicTableManager implements TableManager {
 
@@ -24,7 +24,7 @@ public class BasicTableManager implements TableManager {
      * if it doesn't yet exist, and populating the in-memory
      * map with the content of the map table.
      */
-    public BasicTableManager(Connection conn,
+    public BasicTableManager(DataSource dataSource,
                              DDLGenerator ddlGenerator,
                              String mapTable,
                              String soTablePrefix) throws SQLException {

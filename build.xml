@@ -13,6 +13,10 @@
   <path id="test.path">
     <path refid="compile.path"/>
     <pathelement location="${lib.junit}"/>
+    <pathelement location="${lib.commons-dbcp}"/>
+    <pathelement location="${lib.commons-collections}"/>
+    <pathelement location="${lib.commons-pool}"/>
+    <pathelement location="${lib.junit}"/>
     <pathelement location="build/classes"/>
     <pathelement location="build/testclasses"/>
     <pathelement location="src/config"/>
