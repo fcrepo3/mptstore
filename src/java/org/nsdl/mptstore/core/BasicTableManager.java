@@ -140,7 +140,7 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    // Implements TableManager.getOrMapTableFor(String, Connection)
+    // Implements TableManager.getOrMapTableFor(String)
     public String getOrMapTableFor(String predicate) throws SQLException {
         String table = getTableFor(predicate);
         if (table != null) {
@@ -293,6 +293,84 @@ public class BasicTableManager implements TableManager {
         synchronized (_map) {
             return new HashSet(_map.keySet());
         }
+    }
+
+    // Implements TableManager.dropEmptyTables()
+    public synchronized int dropEmptyTables() throws SQLException {
+
+        int dropCount = 0;
+        Connection conn = _dataSource.getConnection();
+        try {
+            Iterator<String> tables = getTables().iterator();
+            while (tables.hasNext()) {
+                String table = tables.next();
+                if (isPredicateTableEmpty(table, conn)) {
+                    String predicate = getPredicateFor(table);
+                    unmapPredicate(predicate, table, conn);
+                    dropCount++;
+                }
+            }
+            return dropCount;
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                // warn: can't close connection
+            }
+        }
+    }
+
+    private boolean isPredicateTableEmpty(String table, 
+                                          Connection conn) throws SQLException {
+        Statement st = conn.createStatement();
+        try {
+            ResultSet results = st.executeQuery("SELECT MAX(s) FROM " + table);
+            try {
+                return !results.next();
+            } finally {
+                try {
+                    results.close();
+                } catch (SQLException e) {
+                    // warn: can't close result set
+                }
+            }
+        } finally {
+            try {
+                st.close();
+            } catch (SQLException e) {
+                // warn: can't close statement
+            }
+        }
+    }
+
+    /**
+     * Remove the predicate from the memory and database maps,
+     * then drop the associated table.
+     */
+    private void unmapPredicate(String predicate,
+                                String table,
+                                Connection conn) 
+            throws SQLException {
+
+        _map.remove(predicate);
+        _reverseMap.remove(table);
+
+        PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM " + _mapTable + " WHERE p = ?");
+        try {
+            ps.setString(1, predicate);
+            ps.execute();
+        } finally {
+            try {
+                ps.close();
+            } catch (SQLException e) {
+                // warn: can't close statement
+            }
+        }
+
+        executeDDL(conn,
+                   _ddlGenerator.getDropSOTableDDL(table).iterator());
+         
     }
 
 }

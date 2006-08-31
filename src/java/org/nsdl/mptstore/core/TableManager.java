@@ -17,4 +17,6 @@ public interface TableManager {
 
     public Set<String> getPredicates();
 
+    public int dropEmptyTables() throws SQLException;
+
 }
