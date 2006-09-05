@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.nsdl.mptstore.util.DBUtil;
 
 /**
@@ -17,6 +19,8 @@ import org.nsdl.mptstore.util.DBUtil;
  * run back-to-back on a single connection.
  */
 public class SQLUnionQueryResults implements QueryResults {
+
+    private static final Logger _LOG = Logger.getLogger(SQLUnionQueryResults.class.getName());
 
     private Connection _conn;
     private int _fetchSize;
@@ -91,8 +95,11 @@ public class SQLUnionQueryResults implements QueryResults {
             }
             _statement = _conn.createStatement();
             _statement.setFetchSize(_fetchSize);
-            _results = _statement.executeQuery(_queries.next());
+            String query = _queries.next();
+            _LOG.info("Executing query:\n" + query);
+            _results = _statement.executeQuery(query);
         } else {
+            _LOG.info("Finished executing all queries");
             close(); // proactively close if no more queries
             _results = null;
         }
@@ -119,6 +126,7 @@ public class SQLUnionQueryResults implements QueryResults {
                 return thisTuple;
             } catch (QueryException e) {
                 close(); // proactively close on error
+                _LOG.error(e);
                 throw new RuntimeQueryException(e);
             }
         }

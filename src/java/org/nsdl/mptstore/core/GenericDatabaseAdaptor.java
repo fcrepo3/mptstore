@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.nsdl.mptstore.query.QueryCompiler;
 import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.query.QueryLanguage;
@@ -18,6 +20,8 @@ import org.nsdl.mptstore.query.SQLProvider;
 import org.nsdl.mptstore.query.SQLUnionQueryResults;
 
 public class GenericDatabaseAdaptor implements DatabaseAdaptor {
+
+    private static final Logger _LOG = Logger.getLogger(GenericDatabaseAdaptor.class.getName());
 
     private TableManager _tableManager;
 
@@ -83,6 +87,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
                     } else {
                         sql = "INSERT INTO " + table + " (s, o) VALUES (?, ?)";
                     }
+                    _LOG.info("Preparing update: " + sql);
                     statement = conn.prepareStatement(sql);
                     statements.put(predicate, statement);
                 }
@@ -102,7 +107,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    // warn: can't close statement
+                    _LOG.warn("unable to close statement", e);
                 }
             }
         }

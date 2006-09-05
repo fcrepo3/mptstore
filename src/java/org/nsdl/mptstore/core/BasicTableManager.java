@@ -14,6 +14,8 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
+
 /**
  * This implementation of TableManager creates predicate tables
  * and map entries as needed, using a separate connection provided
@@ -22,6 +24,8 @@ import javax.sql.DataSource;
  * It never attempts to execute DDL on the same transaction as DML.
  */
 public class BasicTableManager implements TableManager {
+
+    private static final Logger _LOG = Logger.getLogger(BasicTableManager.class.getName());
 
     private DataSource _dataSource;
 
@@ -55,6 +59,7 @@ public class BasicTableManager implements TableManager {
         Connection conn = dataSource.getConnection();
         try {
             if (!mapTableExists(conn)) {
+                _LOG.info("Creating map table");
                 executeDDL(conn,
                            _ddlGenerator.getCreateMapTableDDL(_mapTable).iterator());
             }
@@ -63,7 +68,7 @@ public class BasicTableManager implements TableManager {
             try {
                 conn.close();
             } catch (SQLException e) {
-                // warn: can't close connection
+                _LOG.warn("unable to close/release connection", e);
             }
         }
 
@@ -75,13 +80,14 @@ public class BasicTableManager implements TableManager {
                                                          _mapTable, null);
         try {
             if (results.next()) {
+                _LOG.info("Found pre-existing map table");
                 return true;
             }
         } finally {
             try {
                 results.close();
             } catch (SQLException e) {
-                // warn: can't close result set
+                _LOG.warn("unable to close result set", e);
             }
         }
 
@@ -89,29 +95,36 @@ public class BasicTableManager implements TableManager {
         // so if false, do another check
         Statement st = conn.createStatement();
         try {
+            boolean exists = false;
             try {
                 results = null;
                 results = st.executeQuery("SELECT COUNT(*) FROM " + _mapTable);
-                return results.next();
+                exists = results.next();
             } catch (SQLException e) {
-                return false;
             } finally {
                 try {
                     if (results != null) results.close();
                 } catch (SQLException e) {
-                    // warn: can't close result set
+                    _LOG.warn("unable to close result set", e);
                 }
             }
+            if (exists) {
+                _LOG.info("Found pre-existing map table");
+            } else {
+                _LOG.info("Map table does not yet exist");
+            }
+            return exists;
         } finally {
             try {
                 st.close();
             } catch (SQLException e) {
-                // warn: can't close statement
+                _LOG.warn("unable to close statement", e);
             }
         }
     }
 
     private void loadMapTable(Connection conn) throws SQLException {
+        _LOG.info("Loading map table");
         _map = new HashMap<String,String>();
         _reverseMap = new HashMap<String,String>();
         Statement st = conn.createStatement();
@@ -129,13 +142,13 @@ public class BasicTableManager implements TableManager {
                 try {
                     results.close();
                 } catch (SQLException e) {
-                    // warn: can't close result set
+                    _LOG.warn("unable to close result set", e);
                 }
             }
             try {
                 st.close();
             } catch (SQLException e) {
-                // warn: can't close statement
+                _LOG.warn("unable to close statement", e);
             }
         }
     }
@@ -153,7 +166,7 @@ public class BasicTableManager implements TableManager {
                 try { 
                     conn.close(); 
                 } catch (SQLException e) { 
-                    // warn: unable to release/close connection
+                    _LOG.warn("unable to close/release connection", e);
                 }
             }
         }
@@ -169,6 +182,7 @@ public class BasicTableManager implements TableManager {
         if (table != null) {
             return table;
         } else {
+            _LOG.info("Mapping new table for predicate: " + predicate);
             int id = addPredicateToMapTable(predicate, conn);
             try {
                 table = _soTablePrefix + id;
@@ -180,7 +194,8 @@ public class BasicTableManager implements TableManager {
                     // back out the prior INSERT into the map table
                     deletePredicateFromMapTable(predicate, conn);
                 } catch (SQLException e2) {
-                    // warn: unable to clean up map table after failed CREATE TABLE
+                    _LOG.warn("unable to clean up entry from map table after "
+                            + "failure to create predicate table", e2);
                 }
                 throw e;
             }
@@ -205,7 +220,7 @@ public class BasicTableManager implements TableManager {
             try {
                 ps.close();
             } catch (SQLException e) {
-                // warn: unable to close statement
+                _LOG.warn("unable to close statement", e);
             }
         }
 
@@ -222,14 +237,14 @@ public class BasicTableManager implements TableManager {
                 try {
                     rs.close();
                 } catch (SQLException e) {
-                    // warn: unable to close resultset
+                    _LOG.warn("unable to close result set", e);
                 }
             }
         } finally {
             try {
                 ps.close();
             } catch (SQLException e) {
-                // warn: unable to close statement
+                _LOG.warn("unable to close statement", e);
             }
         }
 
@@ -246,7 +261,7 @@ public class BasicTableManager implements TableManager {
             try {
                 ps.close();
             } catch (SQLException e) {
-                // warn: unable to close statement
+                _LOG.warn("unable to close statement", e);
             }
         }
     }
@@ -260,13 +275,15 @@ public class BasicTableManager implements TableManager {
         Statement st = conn.createStatement();
         try {
             while (ddlIter.hasNext()) {
-                st.executeUpdate(ddlIter.next());
+                String ddl = ddlIter.next();
+                _LOG.info("Executing DDL: " + ddl);
+                st.executeUpdate(ddl);
             }
         } finally {
             try {
                 st.close();
             } catch (SQLException e) {
-                // warn: unable to close statement
+                _LOG.warn("unable to close statement", e);
             }
         }
     }
@@ -297,6 +314,7 @@ public class BasicTableManager implements TableManager {
 
     // Implements TableManager.dropEmptyPredicateTables()
     public int dropEmptyPredicateTables() throws SQLException {
+        _LOG.info("Dropping empty predicate tables");
         return dropPredicateTables(false);
     }
 
@@ -319,13 +337,14 @@ public class BasicTableManager implements TableManager {
             try {
                 conn.close();
             } catch (SQLException e) {
-                // warn: can't close connection
+                _LOG.warn("unable to close/release connection", e);
             }
         }
     }
 
     // Implements Tablemanager.dropAllPredicateTables()
     public int dropAllPredicateTables() throws SQLException {
+        _LOG.info("Dropping all predicate tables");
         return dropPredicateTables(true);
     }
 
@@ -340,14 +359,14 @@ public class BasicTableManager implements TableManager {
                 try {
                     results.close();
                 } catch (SQLException e) {
-                    // warn: can't close result set
+                    _LOG.warn("unable to close result set", e);
                 }
             }
         } finally {
             try {
                 st.close();
             } catch (SQLException e) {
-                // warn: can't close statement
+                _LOG.warn("unable to close statement", e);
             }
         }
     }
@@ -361,6 +380,9 @@ public class BasicTableManager implements TableManager {
                                 Connection conn) 
             throws SQLException {
 
+        _LOG.info("Unmapping " + predicate + " and dropping associated "
+                + "table: " + table);
+
         _map.remove(predicate);
         _reverseMap.remove(table);
 
@@ -373,7 +395,7 @@ public class BasicTableManager implements TableManager {
             try {
                 ps.close();
             } catch (SQLException e) {
-                // warn: can't close statement
+                _LOG.warn("unable to close statement", e);
             }
         }
 

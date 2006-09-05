@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.util.DBUtil;
 
 public class SPOSQLProvider implements SQLProvider {
+
+    private static final Logger _LOG = Logger.getLogger(SPOSQLProvider.class.getName());
 
     public static final List<String> SPO_TARGETS;
 
@@ -79,7 +83,9 @@ public class SPOSQLProvider implements SQLProvider {
                 }
             }
 
-            _sql.add(select.toString());
+            String sqlString = select.toString();
+            _LOG.info("Generated query:\n" + sqlString);
+            _sql.add(sqlString);
         }
     }
 
