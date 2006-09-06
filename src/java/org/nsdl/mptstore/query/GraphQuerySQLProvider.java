@@ -40,7 +40,6 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     private final MappingManager manager;
 	private List<String> targets;
     
-    private HashMap<String, String> variableBindings = new HashMap<String,String>();
     private HashMap<String, Set<String>> valueBindings    = new HashMap<String, Set<String>>();
      
 
@@ -56,6 +55,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
 
     public List<String> getSQL() throws QueryException {
         
+        HashMap<String, String> requiredBindings = new HashMap<String,String>();
+        HashMap<String, String> allBindings = new HashMap<String, String>();
         JoinSequence joinSeq = null;
         
         /* Process required elements first */
@@ -70,14 +71,18 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             }
             
             if (joinSeq == null) {
-                joinSeq = new JoinSequence(parseGraphPattern((GraphPattern) e));
+                joinSeq = new JoinSequence(parseGraphPattern((GraphPattern) e, requiredBindings));
             } else {
-                joinSeq.addJoin(JoinType.innerJoin, parseGraphPattern((GraphPattern) e));
+                joinSeq.addJoin(JoinType.innerJoin, parseGraphPattern((GraphPattern) e,requiredBindings), requiredBindings);
             }
         }
         
+		allBindings.putAll(requiredBindings);
         
         for (QueryElement e : query.getOptional()) {
+            
+            HashMap<String, String> optionalBindings = new HashMap<String, String>(requiredBindings);
+            
             /* Disallow subqueries for the time being */
             if (e.getType().equals(QueryElement.Type.GraphQuery)) {
                 throw new QueryException("Currently, we do not support subqueries");
@@ -86,12 +91,16 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                 throw new QueryException("Unknown query element type " + e.getType());
             }
             
-            joinSeq.addJoin(JoinType.leftOuterJoin, parseGraphPattern((GraphPattern) e));
+            joinSeq.addJoin(JoinType.leftOuterJoin, 
+                    parseGraphPattern((GraphPattern) e, optionalBindings), requiredBindings);
+            
+            addNewMappings(optionalBindings, allBindings);
+            
         }
 	    
         StringBuilder sql = new StringBuilder();
         
-        sql.append("SELECT " + generateTargets() + " FROM " + joinSeq);
+        sql.append("SELECT " + generateTargets(allBindings) + " FROM " + joinSeq);
         
         /* 
          * If there are any values or constraints that remain to be added to the query,
@@ -122,7 +131,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         return new ArrayList<String>(targets);
     }
     
-    private Joinable parseGraphPattern(GraphPattern g) throws QueryException {
+    private Joinable parseGraphPattern(GraphPattern g, HashMap<String, String> variableBindings) throws QueryException {
         
         /* First, organize the filters by variable so that we can map them */
         HashMap<String, Set<TripleFilter>> filters = new HashMap<String, Set<TripleFilter>>();
@@ -152,29 +161,30 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         LinkedList<TriplePattern> steps = new LinkedList<TriplePattern>(g.getTriplePatterns());
         TriplePattern step = steps.removeFirst();
         
-        bindPattern(step);
+        bindPattern(step, variableBindings);
         JoinSequence joins = new JoinSequence(new JoinTable(step));
         
         Set<TriplePatternNode>joinableVars = joins.joinVars();
         
         while (!steps.isEmpty()) {
-            step = getJoinablePattern(steps);
+            step = getJoinablePattern(steps, variableBindings);
             if (step == null) {
                 throw new QueryException("Cannot bind all query steps!");
             }
             steps.remove(step);
             
-            bindPattern(step);
+            bindPattern(step, variableBindings);
             JoinTable table = new JoinTable(step);
+            
             joinableVars.addAll(table.joinVars());
             JoinConditions conditions = new JoinConditions();
             
             for (TriplePatternNode p : step.getNodes()) {
-                if (isBound(p)) {
+                if (isBound(p, variableBindings)) {
                     /* Join this variable's column with the corresponding bound column */
                     
-                    if (!p.mappedName().equals(getBoundValue(p))) {
-                        conditions.addCondition(p.mappedName(), "=", getBoundValue(p));
+                    if (!p.mappedName().equals(getBoundValue(p, variableBindings))) {
+                        conditions.addCondition(p.mappedName(), "=", getBoundValue(p, variableBindings));
                     }
                 }
             }
@@ -188,17 +198,17 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                             String left;
                             
                             if (f.s.isVariable() && f.s.value().equals(filterVar)) {
-                                left = getBoundValue(joinableVar);
+                                left = getBoundValue(joinableVar, variableBindings);
                             } else if (f.s.isVariable()) {
-                                left = getBoundValue(f.s);
+                                left = getBoundValue(f.s, variableBindings);
                             } else {
                                 left = "'" + f.s.value() + "'";
                             }
                             
                             if (f.o.isVariable() && f.o.value().equals(filterVar)) {
-                                right = getBoundValue(joinableVar);
+                                right = getBoundValue(joinableVar, variableBindings);
                             } else if (f.o.isVariable()) {
-                                right = getBoundValue(f.o);
+                                right = getBoundValue(f.o, variableBindings);
                             } else {
                                 right = "'" + f.o.value() + "'";
                             }
@@ -261,9 +271,9 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         return joins;
     }
     
-    private TriplePattern getJoinablePattern(List<TriplePattern> l) {
+    private TriplePattern getJoinablePattern(List<TriplePattern> l, HashMap<String, String> variableBinsings) {
         for (TriplePattern p : l) {
-            if (isBound(p.subject) || isBound(p.object)) {
+            if (isBound(p.subject, variableBinsings) || isBound(p.object, variableBinsings)) {
                 return p;
             }
         }
@@ -274,11 +284,11 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      * Determine if a variable has been apped to a literal or 
      * specific column of a table
      */
-    private boolean isBound(TriplePatternNode n) {
+    private boolean isBound(TriplePatternNode n, HashMap<String, String> variableBindings) {
         return variableBindings.containsKey(n.value());
     }
     
-    private String getBoundValue(TriplePatternNode n) {
+    private String getBoundValue(TriplePatternNode n, HashMap<String, String> variableBindings) {
         return variableBindings.get(n.value());
     }
     
@@ -287,14 +297,14 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      * - Placing any new variables into the master bings map,
      * - Placing any literal values into the literals map
      */
-    private void bindPattern(TriplePattern t) {
+    private void bindPattern(TriplePattern t, HashMap<String, String>variableBindings) {
         t.bindTo(manager.mapPredicateTable(t.predicate));
         for (TriplePatternNode p : t.getNodes()) {
-            bindNode(p);
+            bindNode(p, variableBindings);
         }
     }
     
-    private void bindNode(TriplePatternNode p) {
+    private void bindNode(TriplePatternNode p, HashMap<String, String>variableBindings) {
         if (p.isVariable()) {
             if (! variableBindings.containsKey(p.value())) {
                 variableBindings.put(p.value(), p.mappedName());
@@ -321,13 +331,21 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         }
     }
     
-    private String generateTargets() {
+    private String generateTargets(HashMap<String, String> variableBindings) {
         String selects = "";
         for (int i = 0; i < targets.size(); i++) {
             selects += variableBindings.get(targets.get(i));
             if (i < targets.size() - 1) {selects += ", ";}
         }
         return selects;
+    }
+    
+    private <K, V> void addNewMappings(Map<K,V> from, Map<K,V> to) {
+        for (K key : from.keySet()) {
+            if (!to.containsKey(key)) {
+                to.put(key, from.get(key));
+            }
+        }
     }
     
     private interface Joinable {
@@ -394,12 +412,15 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             addJoin(joinType, j, conditions.toString());
         }
         
-        public void addJoin(String joinType, Joinable j) {
+        public void addJoin(String joinType, Joinable j, HashMap<String, String> variableBindings) {
             
             JoinConditions conditions = new JoinConditions();
+            
+            
             for (TriplePatternNode existingVar : this.joinVars()) {
                 for (TriplePatternNode candidateVar : j.joinVars()) {
-                    if (existingVar.value().equals(candidateVar.value())) {
+                    if (existingVar.value().equals(candidateVar.value()) 
+                            && variableBindings.get(candidateVar.value()).equals(existingVar.mappedName())) {
                         conditions.addCondition(existingVar.mappedName(), "=", candidateVar.mappedName());
                     }
                 }
