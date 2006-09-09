@@ -17,6 +17,8 @@ public abstract class DBUtil {
             return s;
         } else {
             Clob c = rs.getClob(pos);
+            
+            if (c == null) {return null;}
             return c.getSubString(1, (int) c.length());
         }
     }
