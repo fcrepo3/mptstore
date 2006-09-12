@@ -19,6 +19,7 @@
         
     <ol>
 		<li><a href="#intro">What is MPTStore?</a></li>
+		<li><a href="#diff">How does it differ from existing approaches?</a></li>
 		<li><a href="#inst">Downloading and Installing</a></li>
 		<li><a href="#api">API Documentation</a></li>
 		<li><a href="#issues">Known Issues / Bugs</a></li>
@@ -30,13 +31,44 @@
 <div class="sec2">
   <h2><a name="intro">1. What is MPTStore?</a></h2>
   <p>
-    MPTStore is 
+    MPTStore is a Java library for projects that need persistent, 
+    transaction-capable storage and querying of very large quantities 
+    of RDF data.
   </p>
   <p>
-    Distinguishing features:
-    <ul>
-      <li> ...</li>
-    </ul>
+    MPTStore is implemented as a lightweight layer on top of JDBC.
+    It was developed and tested using Postgres as the underlying
+    database, but can be easily adapted to work with other RDBMS 
+    engines.
+  </p>
+</div>
+
+<div class="sec2">
+  <h2><a name="diff">2. How does it differ from existing approaches?</a></h2>
+  <p>
+The traditional way of storing RDF in a relational database
+is to use a "big table of triples".  Variations on this basic 
+approach are employed by popular RDF storage engines including 
+<a href="http://jena.sourceforge.net/">Jena</a>, 
+<a href="http://www.openrdf.org/">Sesame</a>,
+and <a href="http://sourceforge.net/projects/threestore/">3store</a>.
+  </p>
+  <p>
+Our approach, MPT ("Mapped Predicate Tables"),
+is different.  Recognizing that the number of
+relationship types in real RDF data is much
+lower than the number of nodes, MPT distributes
+triples across several tables, each holding all
+the relationships of a certain type.  This offers
+an obvious opportunity to scale across multiple
+storage devices.
+  </p>
+  <p>
+Although we have initially focused on supporting
+simple queries, we believe that the efficiency
+of query plans for complex RDF queries can be
+much higher with MPT than with the "big table
+of triples" approach.
   </p>
 </div>
 
@@ -46,10 +78,6 @@
   <p>
     The latest distribution (source and binary) can be downloaded from
     <a href="http://www.sf.net/projects/mptstore">http://www.sf.net/projects/mptstore</a>
-  </p>
-  <p>
-    To begin using bvalid in your own projects, you'll need the required
-    jars (included in the lib/ directory) in your CLASSPATH.
   </p>
   <p>
     Note: The binary distribution is compiled for Java 1.5.

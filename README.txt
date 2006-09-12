@@ -22,7 +22,7 @@ DOCUMENTATION
 Online documentation for the latest version of MPTStore can be found at 
 http://mptstore.sf.net/
 
-Offline documentation for this version of BValid can be found in the 
+Offline documentation for this version of MPTStore can be found in the 
 dist/doc/ directory after doing a documentation build. (see below)
 
 
