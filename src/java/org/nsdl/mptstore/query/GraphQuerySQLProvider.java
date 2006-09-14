@@ -12,9 +12,9 @@ import org.nsdl.mptstore.core.TableManager;
 
 /** Translates a {@link GraphQuery} into a series of SQL statements
  * <p>
- * Produces ANSI SQL-92 queries by converting each {@link GaphPattern} leaf
+ * Produces ANSI SQL-92 queries by converting each {@link GraphPattern} leaf
  * of the query tree into a series of JOINs.   Each join condition is formed by 
- * matching variables between {@link TriplePatterns} in the appripriate 
+ * matching variables between {@link TriplePattern}s in the appripriate 
  * GraphPatterns.
  * </p>
  * <p>

@@ -98,6 +98,26 @@ of triples" approach.
   <li>
     Unbound predicate queries are relatively slow when the graph
     contains statements using many distinct predicates.
+    In the future, this might be addressed in one of the following ways:
+    <ul>
+      <li> Storage of every triple in a complete triple
+           table in addition to the predicate-specific tables.
+           This would increase storage requirements 2x to 3x.
+           In addition, update throughput would be reduced
+           to at least half to a third.  
+      </li>
+      <li> In an environment where the number of triples is
+           expected to exceed a few billion, another option
+           is to parallelize the queries on each table.
+           In the general case, this requires a connection per
+           execution thread and thus, consistency would
+           be difficult to enforce at the database level
+           using transactions.  Possible scenarios
+           In this scenario, the increased disk contention could be 
+           reduced by putting different tables on different storage 
+           devices.
+        </li>
+    </ul>
   </li>
   </ul>
 </div>
