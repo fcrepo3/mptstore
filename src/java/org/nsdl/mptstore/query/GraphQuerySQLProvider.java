@@ -40,6 +40,9 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     private final MappingManager manager;
 	private List<String> targets;
     
+    private String ordering;
+    private String orderingDirection;
+    
     private HashMap<String, Set<String>> valueBindings    = new HashMap<String, Set<String>>();
      
 
@@ -49,10 +52,59 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         this.query = query;
     }
     
+    
+    /** Choose the variables that define result tuples
+     * <p>
+     * The given list of variables are used for determining
+     * which bound values are included in result tuples, and in 
+     * what order.  If a variable is specified as a target, it
+     * <em>must</em> be present somewhere in the query.  Any 
+     * unmatched target will result in error
+     * </p>
+     * 
+     * @param targets List containing names of query variables
+     */
     public void setTargets(List<String> targets) {
         this.targets = new ArrayList<String>(targets);
+        
+        this.ordering = null;
     }
 
+    /** Force an order on the results
+     * <p>
+     * Given the name of a target variable, results will be ordered by its
+     * bound value.  Results may be specified to return in ascending or
+     * descending order
+     * </p>
+     * 
+     * @param target Name of the target variable whose value will be the sort key
+     * @param desc True if results are to be in desceiding order, false otherwise
+     */
+    public void orderBy(String target, boolean desc) {
+        if (this.targets == null || !this.targets.contains(target)) {
+            throw new IllegalArgumentException ("Cannot group by variable '" + 
+                    target + "' since it is not in the target list " + targets);
+        }
+        
+        this.ordering = target;
+        if (desc) {
+            this.orderingDirection = "DESC";
+        } else {
+            this.orderingDirection = "ASC";
+        }
+    }
+    
+    /** Returns a query in ANSI SQL
+     * <p>
+     * Translates the GraphQuery defined in the constructor, along with
+     * any specified orderings , into a set of SQL statements.  The 
+     * union of all SQL statement results, executed in order, will
+     * represent the entire result set. 
+     * </p>
+     * 
+     * @return list of SQL statements
+     * @throws QueryException if there is some error translating the query to SQL
+     */
     public List<String> getSQL() throws QueryException {
         
         HashMap<String, String> requiredBindings = new HashMap<String,String>();
@@ -122,11 +174,19 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             }
         }
         
+        if (ordering != null) {
+            sql.append(" ORDER BY " + allBindings.get(ordering) + " " + orderingDirection);
+            
+        }
+        
         ArrayList<String> sqlList = new ArrayList<String>();
         sqlList.add(sql.toString());
         return sqlList;
     }
 
+    /** Return the list of variables that represent this query's targets
+     * 
+     */
     public List<String> getTargets() {
         return new ArrayList<String>(targets);
     }
