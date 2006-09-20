@@ -116,7 +116,7 @@
              propertyFile="src/java/org/nsdl/mptstore/MPTStore.properties">
       <replacefilter token="@mptstore.version@" property="mptstore.version"/>
     </replace>
-    <javadoc packagenames="org.nsdl.mptstore.core, org.nsdl.mptstore.impl.postgres, org.nsdl.mptstore.query"
+    <javadoc packagenames="org.nsdl.mptstore.core, org.nsdl.mptstore.impl.postgres, org.nsdl.mptstore.query, org.nsdl.mptstore.rdf"
              classpathref="compile.path"
              sourcepath="src/java"
              defaultexcludes="yes"

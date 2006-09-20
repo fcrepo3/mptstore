@@ -36,6 +36,13 @@
     of RDF data.
   </p>
   <p>
+    The primary areas of focus are scalability and transaction
+    safety with simple query support.  Complex query support
+    (a subset of SPARQL features) is in development and looks
+    very promising.  Out of scope features include reasoning 
+    (inference) and quads.
+  </p>
+  <p>
     MPTStore is implemented as a lightweight layer on top of JDBC.
     It was developed and tested using Postgres as the underlying
     database, but can be easily adapted to work with other RDBMS 
@@ -61,7 +68,7 @@ lower than the number of nodes, MPT distributes
 triples across several tables, each holding all
 the relationships of a certain type.  This offers
 an obvious opportunity to scale across multiple
-storage devices.
+storage devices.  
   </p>
   <p>
 Although we have initially focused on supporting
@@ -96,6 +103,20 @@ of triples" approach.
   <h2><a name="issues">5. Known Issues / Bugs</a></h2>
   <ul>
   <li>
+    Lack of validation for RDF strings.
+    RDF nodes are represented within the API and in 
+    the database as N-Triple strings, without unicode
+    ("\u") escaping.  
+  </li>
+  <li>
+    Blank nodes are not supported.
+  </li>
+  <li>
+    Literal values are not normalized.  Applications should take
+    care to pre-normalize the value part of the literal before
+    adding it, if normalization is required.
+  </li>
+  <li>
     Unbound predicate queries are relatively slow when the graph
     contains statements using many distinct predicates.
     In the future, this might be addressed in one of the following ways:
@@ -104,18 +125,21 @@ of triples" approach.
            table in addition to the predicate-specific tables.
            This would increase storage requirements 2x to 3x.
            In addition, update throughput would be reduced
-           to at least half to a third.  
+           to at least half to a third.  Portions of queries
+           with unbound predicates would use this table,
+           while bound predicate portions would still get
+           the performance benefit of going against the
+           predicate-specific tables.
       </li>
-      <li> In an environment where the number of triples is
-           expected to exceed a few billion, another option
-           is to parallelize the queries on each table.
+      <li> In an environment where overhead of a complete triple 
+           table is not desired, another option is to parallelize the 
+           queries on each table.
            In the general case, this requires a connection per
            execution thread and thus, consistency would
            be difficult to enforce at the database level
-           using transactions.  Possible scenarios
-           In this scenario, the increased disk contention could be 
-           reduced by putting different tables on different storage 
-           devices.
+           using transactions.  One solution to this problem
+           is to block writes while the necessary group of 
+           reading connections are beginning their transactions.
         </li>
     </ul>
   </li>
