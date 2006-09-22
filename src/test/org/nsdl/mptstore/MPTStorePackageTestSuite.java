@@ -8,6 +8,7 @@ import junit.swingui.TestRunner;
 import org.nsdl.mptstore.core.CorePackageTestSuite;
 import org.nsdl.mptstore.impl.ImplPackageTestSuite;
 import org.nsdl.mptstore.query.QueryPackageTestSuite;
+import org.nsdl.mptstore.rdf.RDFPackageTestSuite;
 
 public class MPTStorePackageTestSuite extends TestCase {
 
@@ -22,6 +23,7 @@ public class MPTStorePackageTestSuite extends TestCase {
         suite.addTest(CorePackageTestSuite.suite());
         suite.addTest(ImplPackageTestSuite.suite());
         suite.addTest(QueryPackageTestSuite.suite());
+        suite.addTest(RDFPackageTestSuite.suite());
 
         return suite;
 

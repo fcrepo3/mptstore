@@ -85,6 +85,12 @@ public class SPOQueryCompilerTest extends TestCase {
         assertTrue(isValidToken("'" + token + "'"));
     }
 
+    public void testValidateSimplePlainLiteralWithSpace() {
+        String token = "te st";
+        assertTrue(isValidToken("\"" + token + "\""));
+        assertTrue(isValidToken("'" + token + "'"));
+    }
+
     public void testValidatePlainLiteralWithGoodEscaping() {
         String token = "Here is a quote: \\\", and a forward slash: \\\\";
         assertTrue(isValidToken("\"" + token + "\""));

@@ -120,7 +120,7 @@ of triples" approach.
     Unbound predicate queries are relatively slow when the graph
     contains statements using many distinct predicates.
     In the future, this might be addressed in one of the following ways:
-    <ul>
+    <ol>
       <li> Storage of every triple in a complete triple
            table in addition to the predicate-specific tables.
            This would increase storage requirements 2x to 3x.
@@ -140,8 +140,19 @@ of triples" approach.
            using transactions.  One solution to this problem
            is to block writes while the necessary group of 
            reading connections are beginning their transactions.
-        </li>
-    </ul>
+      </li>
+      <li>
+        Another idea is to have something like a complete triple table,
+        except it would contain references to predicates (not the actual
+        text), and references to the row# in the predicate for each triple.
+        This information could be used to know the exact subset of 
+        predicate tables that need to be queried to form the list of
+        triples for a particular subject.
+        Call this the "S,P,row" approach.  The advantage over #1
+        would be reduced storage space.  The disadvantage would be
+        more overhead for updates.
+      </li>
+    </ol>
   </li>
   </ul>
 </div>

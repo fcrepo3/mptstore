@@ -3,6 +3,8 @@ package org.nsdl.mptstore.rdf;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.text.ParseException;
+
 /**
  * An RDF Literal.
  * 
@@ -37,10 +39,39 @@ public class Literal implements ObjectNode {
      * As per "RDF Concepts and Abstract Syntax", the
      * language tag will be normalized to lowercase.
      * </p>
+     *
+     * @throws ParseException if the language is syntactically
+     *         invalid according to RFC3066.
      */
-    public Literal(String value, String language) {
+    public Literal(String value, String language) throws ParseException {
         _value = value;
         if (language != null) {
+            if (language.length() == 0) {
+                throw new ParseException("Expected [A-Za-z]", 0);
+            }
+            if (language.indexOf(" ") != -1) {
+                throw new ParseException("Space character not allowed", 
+                        language.indexOf(" "));
+            }
+
+            String[] parts = language.split("-");
+            for (int i = 0; i < parts.length; i++) {
+                if (parts[i].length() < 1 || parts[i].length() > 8) {
+                    throw new ParseException("Subtags must be between 1 and 8 chars", 0);
+                }
+                for (int j = 0; j < parts[i].length(); j++) {
+                    char c = parts[i].charAt(j);
+                    if (   (c >= 'a' && c <= 'z') 
+                        || (c >= 'A' && c <= 'Z')) {
+                    } else if (    (i > 0) 
+                                && (c >= '0' && c <= '9') ) {
+                    } else {
+                        throw new ParseException("Subtag cannot contain character '" 
+                                + c + "'", 0);
+                    }
+                }
+            }
+
             _language = language.toLowerCase();
         }
     }
