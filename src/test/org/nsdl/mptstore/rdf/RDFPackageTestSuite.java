@@ -12,7 +12,7 @@ public class RDFPackageTestSuite extends TestCase {
         TestSuite suite = new TestSuite(RDFPackageTestSuite.class.getName());
    
         // classes in this package
-        suite.addTestSuite(RDFUtilTest.class);
+        suite.addTestSuite(NTParserTest.class);
 
         return suite;
 

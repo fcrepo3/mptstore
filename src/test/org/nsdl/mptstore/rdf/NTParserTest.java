@@ -5,9 +5,9 @@ import java.text.ParseException;
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
-public class RDFUtilTest extends TestCase {
+public class NTParserTest extends TestCase {
 
-    public RDFUtilTest(String name) { super (name); }
+    public NTParserTest(String name) { super (name); }
 
     public void setUp() {
     }
@@ -21,7 +21,7 @@ public class RDFUtilTest extends TestCase {
 
     private String checkTriple(String ntTriple) {
         try {
-            RDFUtil.parseTriple(ntTriple);
+            NTParser.parseTriple(ntTriple);
             return null;
         } catch (ParseException e) {
             return e.getMessage() + " at character " + e.getErrorOffset() 
@@ -118,7 +118,7 @@ public class RDFUtilTest extends TestCase {
     }
 
     public static void main(String[] args) {
-        TestRunner.run(RDFUtilTest.class);
+        TestRunner.run(NTParserTest.class);
     }   
 
 }

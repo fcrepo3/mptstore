@@ -98,7 +98,7 @@ public class Literal implements ObjectNode {
     public String toString() {
         StringBuffer out = new StringBuffer();
         out.append('"');
-        out.append(RDFUtil.escape(_value));
+        out.append(NTParser.escape(_value));
         out.append('"');
         if (_language != null) {
             out.append("@" + _language);

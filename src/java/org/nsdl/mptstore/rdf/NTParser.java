@@ -8,26 +8,24 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 /**
- * Utility methods for working with RDF.
- *
- * <p>
- *   This class implements several methods for parsing, reading,
- *   and writing RDF in N-Triples format.
- * </p>
+ * Parses RDF in N-Triples format.
  *
  * @author cwilper@cs.cornell.edu
  */
-public abstract class RDFUtil {
+public abstract class NTParser {
 
     private static final String _EXPECTED_ABS_URI = "Expected absolute URI";
     private static final String _EXPECTED_ACE = "Expected '@', '^', or EOF";
     private static final String _EXPECTED_C = "Expected '^'";
+    private static final String _EXPECTED_EOS = "Expected end of query string";
     private static final String _EXPECTED_G = "Expected '>'";
     private static final String _EXPECTED_L = "Expected '<'";
+    private static final String _EXPECTED_ALST = "Expected '*', '<', ' ', or TAB";
     private static final String _EXPECTED_LST = "Expected '<', ' ', or TAB";
     private static final String _EXPECTED_PST = "Expected '.', ' ', or TAB";
     private static final String _EXPECTED_Q = "Expected '\"'";
     private static final String _EXPECTED_QL = "Expected '\"' or '<'";
+    private static final String _EXPECTED_AQLST = "Expected '*', '\"', '<', ' ', or TAB";
     private static final String _EXPECTED_QLST = "Expected '\"', '<', ' ', or TAB";
     private static final String _EXPECTED_ST = "Expected ' ' or TAB";
     private static final String _NON_ASCII_CHAR = "Non-ASCII character";
@@ -37,6 +35,111 @@ public abstract class RDFUtil {
     private static final String _UNESCAPED_CR = "Unescaped carriage return";
     private static final String _UNESCAPED_LF = "Unescaped linefeed";
     private static final String _UNESCAPED_TAB = "Unescaped tab";
+
+    /**
+     * Parse an RDF triple pattern in SPO format.
+     */
+    public static Triple parseTriplePattern(String spoTriple)
+            throws ParseException {
+
+        StringReader reader = new StringReader(spoTriple);
+
+        try {
+
+            int i = 0;
+            int c = reader.read();
+
+            // start with subject
+            SubjectNode subject;
+            if (c == '*') {
+                subject = null;
+            } else {
+                StringBuffer sBuf = new StringBuffer();
+                while (c != '>') {
+                    if (c == -1) {
+                        throw new ParseException(_EXPECTED_G, i);
+                    }
+                    sBuf.append((char) c);
+                    i++;
+                    c = reader.read();
+                }
+                sBuf.append((char) c);
+                subject = parseSubject(sBuf.toString());
+            }
+
+            // followed by one or more whitespace
+            i++;
+            c = reader.read();
+            if (c != ' ' && c != '\t') {
+                throw new ParseException(_EXPECTED_ST, i);
+            }
+            while (c == ' ' || c == '\t') {
+                if (c == -1) {
+                    throw new ParseException(_EXPECTED_ALST, i);
+                }
+                i++;
+                c = reader.read();
+            }
+
+            // followed by predicate
+            PredicateNode predicate;
+            if (c == '*') {
+                predicate = null;
+            } else {
+                StringBuffer pBuf = new StringBuffer();
+                while (c != '>') {
+                    if (c == -1) {
+                        throw new ParseException(_EXPECTED_G, i);
+                    }
+                    pBuf.append((char) c);
+                    i++;
+                    c = reader.read();
+                }
+                pBuf.append((char) c);
+                try {
+                    predicate = parsePredicate(pBuf.toString());
+                } catch (ParseException e) {
+                    throw new ParseException(e.getMessage(), e.getErrorOffset() + i);
+                }
+            }
+
+            // followed by one or more whitespace
+            i++;
+            c = reader.read();
+            if (c != ' ' && c != '\t') {
+                throw new ParseException(_EXPECTED_ST, i);
+            }
+            while (c == ' ' || c == '\t') {
+                if (c == -1) {
+                    throw new ParseException(_EXPECTED_AQLST, i);
+                }
+                i++;
+                c = reader.read();
+            }
+
+            // followed by object
+            ObjectNode o;
+            if (c == '*') {
+                o = null;
+                if (reader.read() != -1) {
+                    throw new ParseException(_EXPECTED_EOS, i + 1);
+                }
+            } else {
+                try {
+                    o = parseObject(spoTriple.substring(i));
+                } catch (ParseException e) {
+                    throw new ParseException(e.getMessage(), e.getErrorOffset() + i);
+                }
+            }
+            reader.close();
+
+            return new Triple(subject, predicate, o);
+
+        } catch (IOException e) {
+            // should not happen -- we're using a StringReader
+            throw new RuntimeException("Unexpected IO error", e);
+        }
+    }
 
     /**
      * Parse an RDF triple in N-Triples format.
