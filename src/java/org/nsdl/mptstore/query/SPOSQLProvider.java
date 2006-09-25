@@ -7,6 +7,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.rdf.ObjectNode;
+import org.nsdl.mptstore.rdf.PredicateNode;
+import org.nsdl.mptstore.rdf.SubjectNode;
+import org.nsdl.mptstore.rdf.Triple;
 import org.nsdl.mptstore.util.DBUtil;
 
 public class SPOSQLProvider implements SQLProvider {
@@ -24,25 +28,34 @@ public class SPOSQLProvider implements SQLProvider {
 
     private TableManager _tableManager;
     private boolean _backslashIsEscape;
-    private String _subject;
-    private String _object;
+    private String _subjectString;
+    private String _objectString;
 
     private List<String> _sql;
 
     public SPOSQLProvider(TableManager tableManager,
                           boolean backslashIsEscape,
-                          String subject,
-                          String predicate,
-                          String object) {
+                          Triple pattern) {
+
         _tableManager = tableManager;
         _backslashIsEscape = backslashIsEscape;
-        _subject = subject;
-        _object = object;
+
+        SubjectNode subject = pattern.getSubject();
+        PredicateNode predicate = pattern.getPredicate();
+        ObjectNode object = pattern.getObject();
+
+        if (subject != null) {
+            _subjectString = subject.toString();
+        }
+
+        if (object != null) {
+            _objectString = object.toString();
+        }
 
         _sql = new ArrayList<String>();
 
         if (predicate != null) {
-            addSelect(predicate);
+            addSelect(predicate.toString());
         } else {
             Iterator<String> preds = _tableManager.getPredicates().iterator();
             while (preds.hasNext()) {
@@ -68,18 +81,18 @@ public class SPOSQLProvider implements SQLProvider {
             select.append(", o\nFROM ");
             select.append(table);
 
-            if (_subject != null || _object != null) {
+            if (_subjectString != null || _objectString != null) {
                 select.append("\nWHERE ");
-                if (_subject != null) {
+                if (_subjectString != null) {
                     select.append("s = ");
-                    select.append(DBUtil.quotedString(_subject, _backslashIsEscape));
-                    if (_object != null) {
+                    select.append(DBUtil.quotedString(_subjectString, _backslashIsEscape));
+                    if (_objectString != null) {
                         select.append("\nAND ");
                     }
                 }
-                if (_object != null) {
+                if (_objectString != null) {
                     select.append("o = ");
-                    select.append(DBUtil.quotedString(_object, _backslashIsEscape));
+                    select.append(DBUtil.quotedString(_objectString, _backslashIsEscape));
                 }
             }
 

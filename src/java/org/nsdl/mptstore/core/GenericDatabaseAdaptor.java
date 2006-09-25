@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -18,6 +17,8 @@ import org.nsdl.mptstore.query.QueryResults;
 import org.nsdl.mptstore.query.SPOQueryCompiler;
 import org.nsdl.mptstore.query.SQLProvider;
 import org.nsdl.mptstore.query.SQLUnionQueryResults;
+import org.nsdl.mptstore.rdf.PredicateNode;
+import org.nsdl.mptstore.rdf.Triple;
 
 public class GenericDatabaseAdaptor implements DatabaseAdaptor {
 
@@ -48,39 +49,37 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
         _compilerMap = compilerMap;
     }
 
-    // Implements DatabaseAdaptor.addTriples(Connection, Iterator<List<String>>)
+    // Implements DatabaseAdaptor.addTriples(Connection, Iterator<Triple>)
     public void addTriples(Connection conn, 
-                           Iterator<List<String>> triples) 
+                           Iterator<Triple> triples) 
             throws ModificationException {
         updateTriples(conn, triples, false);
     }
 
-    // Implements DatabaseAdaptor.deleteTriples(Connection, Iterator<List<String>>)
+    // Implements DatabaseAdaptor.deleteTriples(Connection, Iterator<Triple>)
     public void deleteTriples(Connection conn, 
-                              Iterator<List<String>> triples) 
+                              Iterator<Triple> triples) 
             throws ModificationException {
         updateTriples(conn, triples, true);
     }
 
     private void updateTriples(Connection conn,
-                               Iterator<List<String>> triples,
+                               Iterator<Triple> triples,
                                boolean delete)
             throws ModificationException {
 
-        Map<String,PreparedStatement> statements = 
-                new HashMap<String,PreparedStatement>();
+        Map<PredicateNode,PreparedStatement> statements = 
+                new HashMap<PredicateNode,PreparedStatement>();
 
         try {
             while (triples.hasNext()) {
 
-                List<String> triple = triples.next();
-                String subject = triple.get(0);
-                String predicate = triple.get(1);
-                String object = triple.get(2);
+                Triple triple = triples.next();
+                PredicateNode predicate = triple.getPredicate();
 
                 PreparedStatement statement = statements.get(predicate);
                 if (statement == null) {
-                    String table = _tableManager.getOrMapTableFor(predicate);
+                    String table = _tableManager.getOrMapTableFor(predicate.toString());
                     String sql;
                     if (delete) {
                         sql = "DELETE FROM " + table + " WHERE s = ? AND o = ?";
@@ -92,8 +91,8 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
                     statements.put(predicate, statement);
                 }
 
-                statement.setString(1, subject);
-                statement.setString(2, object);
+                statement.setString(1, triple.getSubject().toString());
+                statement.setString(2, triple.getObject().toString());
                 statement.execute();
             }
         } catch (SQLException e) {

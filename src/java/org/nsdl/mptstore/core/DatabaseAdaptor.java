@@ -3,20 +3,20 @@ package org.nsdl.mptstore.core;
 import java.sql.Connection;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.query.QueryLanguage;
 import org.nsdl.mptstore.query.QueryResults;
+import org.nsdl.mptstore.rdf.Triple;
 
 public interface DatabaseAdaptor {
 
     public void addTriples(Connection conn,
-                           Iterator<List<String>> triples) 
+                           Iterator<Triple> triples) 
             throws ModificationException;
 
     public void deleteTriples(Connection conn, 
-                              Iterator<List<String>> triples) 
+                              Iterator<Triple> triples) 
             throws ModificationException;
 
     public void deleteAllTriples(Connection conn)

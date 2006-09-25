@@ -37,51 +37,13 @@ public class SPOQueryCompiler implements QueryCompiler {
     // Implements QueryCompiler.compile(String)
     public SQLProvider compile(String query) 
             throws QueryException {
-        List<String> parsedQuery = parse(query);
-        return new SPOSQLProvider(_tableManager,
-                                  _backslashIsEscape,
-                                  parsedQuery.get(0),
-                                  parsedQuery.get(1),
-                                  parsedQuery.get(2));
-    }
-
-    /**
-     * Parse the given query.
-     *
-     * @return a list of three normalized strings representing rdf nodes.
-     */
-    protected static List<String> parse(String query)
-            throws QuerySyntaxException {
-
-        List<String> tokens = new ArrayList<String>();
-
         try {
-            Triple t = NTParser.parseTriplePattern(query);
-
-            if (t.getSubject() == null) {
-                tokens.add(null);
-            } else {
-                tokens.add(t.getSubject().toString());
-            }
-
-            if (t.getPredicate() == null) {
-                tokens.add(null);
-            } else {
-                tokens.add(t.getPredicate().toString());
-            }
-
-            if (t.getObject() == null) {
-                tokens.add(null);
-            } else {
-                tokens.add(t.getObject().toString());
-            }
-
-
+            return new SPOSQLProvider(_tableManager,
+                                      _backslashIsEscape,
+                                      NTParser.parseTriplePattern(query));
         } catch (ParseException e) {
             throw new QuerySyntaxException("Error parsing SPO query", e);
         }
-
-        return tokens;
     }
 
 }
