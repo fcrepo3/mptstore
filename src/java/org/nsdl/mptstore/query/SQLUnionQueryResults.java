@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
 
+import java.text.ParseException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -12,6 +14,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.nsdl.mptstore.rdf.Node;
+import org.nsdl.mptstore.rdf.NTParser;
 import org.nsdl.mptstore.util.DBUtil;
 
 /**
@@ -33,7 +37,7 @@ public class SQLUnionQueryResults implements QueryResults {
     private ResultSet _results;
     private Statement _statement;
 
-    private List<String> _nextTuple;
+    private List<Node> _nextTuple;
 
     public SQLUnionQueryResults(Connection conn,
                                 int fetchSize,
@@ -76,9 +80,20 @@ public class SQLUnionQueryResults implements QueryResults {
                 _nextTuple = null;
             } else {
                 int tupleSize = _sqlProvider.getTargets().size();
-                _nextTuple = new ArrayList<String>(tupleSize);
+                _nextTuple = new ArrayList<Node>(tupleSize);
                 for (int i = 1; i <= tupleSize; i++) {
-                    _nextTuple.add(DBUtil.getLongString(_results, i));
+                    String nodeString = DBUtil.getLongString(_results, i);
+                    try {
+                        if (nodeString != null) {
+                            _nextTuple.add(NTParser.parseNode(nodeString));
+                        } else {
+                            _nextTuple.add(null);
+                        }
+                    } catch (ParseException e) {
+                        throw new QueryException("Error parsing RDF node ("
+                                + nodeString + ") from database: " 
+                                + e.getMessage(), e);
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -116,11 +131,11 @@ public class SQLUnionQueryResults implements QueryResults {
     }
 
     // Implements Iterator.next()
-    public List<String> next() {
+    public List<Node> next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         } else {
-            List<String> thisTuple = _nextTuple;
+            List<Node> thisTuple = _nextTuple;
             try {
                 readNextTuple();
                 return thisTuple;
