@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.rdf.PredicateNode;
 
 public class SPOQueryCompilerTest extends TestCase {
 
@@ -56,24 +57,24 @@ public class SPOQueryCompilerTest extends TestCase {
 
 private class FakeTableManager implements TableManager {
 
-    public String getOrMapTableFor(String predicate) {
+    public String getOrMapTableFor(PredicateNode predicate) {
         return null;
     }
 
-    public String getTableFor(String predicate) {
+    public String getTableFor(PredicateNode predicate) {
         return null;
     }
 
-    public String getPredicateFor(String table) {
+    public PredicateNode getPredicateFor(String table) {
         return null;
     }
 
     public java.util.Set<String> getTables() {
-        return new java.util.HashSet();
+        return new java.util.HashSet<String>();
     }
 
-    public java.util.Set<String> getPredicates() {
-        return new java.util.HashSet();
+    public java.util.Set<PredicateNode> getPredicates() {
+        return new java.util.HashSet<PredicateNode>();
     }
 
     public int dropEmptyPredicateTables() {

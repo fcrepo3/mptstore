@@ -55,9 +55,9 @@ public class SPOSQLProvider implements SQLProvider {
         _sql = new ArrayList<String>();
 
         if (predicate != null) {
-            addSelect(predicate.toString());
+            addSelect(predicate);
         } else {
-            Iterator<String> preds = _tableManager.getPredicates().iterator();
+            Iterator<PredicateNode> preds = _tableManager.getPredicates().iterator();
             while (preds.hasNext()) {
                 addSelect(preds.next());
             }
@@ -68,7 +68,7 @@ public class SPOSQLProvider implements SQLProvider {
      * If a table exists for the given predicate, add the appropriate
      * SELECT query to the list.
      */
-    private void addSelect(String predicate) {
+    private void addSelect(PredicateNode predicate) {
 
         String table = _tableManager.getTableFor(predicate);
 
@@ -77,7 +77,8 @@ public class SPOSQLProvider implements SQLProvider {
             StringBuffer select = new StringBuffer();
 
             select.append("SELECT s, ");
-            select.append(DBUtil.quotedString(predicate, _backslashIsEscape));
+            select.append(DBUtil.quotedString(predicate.toString(), 
+                                             _backslashIsEscape));
             select.append(", o\nFROM ");
             select.append(table);
 

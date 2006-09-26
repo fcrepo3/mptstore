@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
 
+import java.text.ParseException;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,6 +17,9 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+
+import org.nsdl.mptstore.rdf.NTParser;
+import org.nsdl.mptstore.rdf.PredicateNode;
 
 /**
  * This implementation of TableManager creates predicate tables
@@ -36,10 +41,10 @@ public class BasicTableManager implements TableManager {
     private String _soTablePrefix;
 
     /** Map of predicates to tables */
-    private Map<String,String> _map;
+    private Map<PredicateNode,String> _map;
 
     /** Map of tables to predicates */
-    private Map<String,String> _reverseMap;
+    private Map<String,PredicateNode> _reverseMap;
 
     /**
      * Initialize the table manager, creating the map table
@@ -125,18 +130,23 @@ public class BasicTableManager implements TableManager {
 
     private void loadMapTable(Connection conn) throws SQLException {
         _LOG.info("Loading map table");
-        _map = new HashMap<String,String>();
-        _reverseMap = new HashMap<String,String>();
+        _map = new HashMap<PredicateNode,String>();
+        _reverseMap = new HashMap<String,PredicateNode>();
         Statement st = conn.createStatement();
         ResultSet results = null;
+        String pString = null;
         try {
             results = st.executeQuery("SELECT pKey, p FROM " + _mapTable);
             while (results.next()) {
                 String table = _soTablePrefix + results.getInt(1);
-                String predicate = results.getString(2);
+                pString = results.getString(2);
+                PredicateNode predicate = NTParser.parsePredicate(pString);
                 _map.put(predicate, table);
                 _reverseMap.put(table, predicate);
             }
+        } catch (ParseException e) {
+            throw new SQLException("Unable to parse predicate ("
+                    + pString + ") from map table. " + e.getMessage());
         } finally {
             if (results != null) {
                 try {
@@ -153,8 +163,8 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    // Implements TableManager.getOrMapTableFor(String)
-    public String getOrMapTableFor(String predicate) throws SQLException {
+    // Implements TableManager.getOrMapTableFor(PredicateNode)
+    public String getOrMapTableFor(PredicateNode predicate) throws SQLException {
         String table = getTableFor(predicate);
         if (table != null) {
             return table;
@@ -172,8 +182,8 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    private synchronized String mapTableFor(String predicate,
-                             Connection conn)
+    private synchronized String mapTableFor(PredicateNode predicate,
+                                            Connection conn)
             throws SQLException {
 
         // re-check map in case the predicate was added
@@ -182,7 +192,7 @@ public class BasicTableManager implements TableManager {
         if (table != null) {
             return table;
         } else {
-            _LOG.info("Mapping new table for predicate: " + predicate);
+            _LOG.info("Mapping new table for predicate: " + predicate.toString());
             int id = addPredicateToMapTable(predicate, conn);
             try {
                 table = _soTablePrefix + id;
@@ -207,14 +217,17 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    private int addPredicateToMapTable(String predicate, Connection conn) 
+    private int addPredicateToMapTable(PredicateNode predicate, 
+                                       Connection conn) 
             throws SQLException {
+
+        String pString = predicate.toString();
 
         // add to map table
         PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO " + _mapTable + " (p) VALUES (?)");
         try {
-            ps.setString(1, predicate);
+            ps.setString(1, pString);
             ps.execute();
         } finally {
             try {
@@ -228,7 +241,7 @@ public class BasicTableManager implements TableManager {
         ps = conn.prepareStatement(
                 "SELECT pKey from " + _mapTable + " WHERE p = ?");
         try {
-            ps.setString(1, predicate);
+            ps.setString(1, pString);
             ResultSet rs = ps.executeQuery();
             try {
                 rs.next();
@@ -250,12 +263,13 @@ public class BasicTableManager implements TableManager {
 
     }
 
-    private void deletePredicateFromMapTable(String predicate, Connection conn) 
+    private void deletePredicateFromMapTable(PredicateNode predicate, 
+                                             Connection conn) 
             throws SQLException {
         PreparedStatement ps = conn.prepareStatement(
                 "DELETE FROM " + _mapTable + " WHERE p = ?");
         try {
-            ps.setString(1, predicate);
+            ps.setString(1, predicate.toString());
             ps.execute();
         } finally {
             try {
@@ -288,13 +302,13 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    public String getTableFor(String predicate) {
+    public String getTableFor(PredicateNode predicate) {
         synchronized (_map) {
             return _map.get(predicate);
         }
     }
 
-    public String getPredicateFor(String table) {
+    public PredicateNode getPredicateFor(String table) {
         synchronized (_map) {
             return _reverseMap.get(table);
         }
@@ -306,9 +320,9 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    public Set<String> getPredicates() {
+    public Set<PredicateNode> getPredicates() {
         synchronized (_map) {
-            return new HashSet<String>(_map.keySet());
+            return new HashSet<PredicateNode>(_map.keySet());
         }
     }
 
@@ -327,7 +341,7 @@ public class BasicTableManager implements TableManager {
             while (tables.hasNext()) {
                 String table = tables.next();
                 if (all || isPredicateTableEmpty(table, conn)) {
-                    String predicate = getPredicateFor(table);
+                    PredicateNode predicate = getPredicateFor(table);
                     unmapPredicate(predicate, table, conn);
                     dropCount++;
                 }
@@ -375,13 +389,15 @@ public class BasicTableManager implements TableManager {
      * Remove the predicate from the memory and database maps,
      * then drop the associated table.
      */
-    private void unmapPredicate(String predicate,
+    private void unmapPredicate(PredicateNode predicate,
                                 String table,
                                 Connection conn) 
             throws SQLException {
 
-        _LOG.info("Unmapping " + predicate + " and dropping associated "
-                + "table: " + table);
+        String pString = predicate.toString();
+
+        _LOG.info("Unmapping " + pString
+                + " and dropping associated table: " + table);
 
         _map.remove(predicate);
         _reverseMap.remove(table);
@@ -389,7 +405,7 @@ public class BasicTableManager implements TableManager {
         PreparedStatement ps = conn.prepareStatement(
                 "DELETE FROM " + _mapTable + " WHERE p = ?");
         try {
-            ps.setString(1, predicate);
+            ps.setString(1, pString);
             ps.execute();
         } finally {
             try {

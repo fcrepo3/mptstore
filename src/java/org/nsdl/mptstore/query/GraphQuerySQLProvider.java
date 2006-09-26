@@ -546,8 +546,19 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             this.adaptor = adaptor;
         }
         public MPTable mapPredicateTable(TriplePatternNode predicate) {
-            
-            String tableName = adaptor.getTableFor(predicate.value());
+           
+            // FIXME: currently I'm re-parsing predicate.value() here
+            //        in order to make the correct call to TableManager,
+            //        but this will be unnecessary later
+            org.nsdl.mptstore.rdf.PredicateNode predNode;
+            try {
+                predNode = org.nsdl.mptstore.rdf.NTParser.parsePredicate(predicate.value());
+            } catch (java.text.ParseException e) {
+                throw new RuntimeException("Error parsing predicate: "
+                        + predicate.value(), e);
+            }
+            String tableName = adaptor.getTableFor(predNode);
+
             String alias;
             if (predicateMap.containsKey(predicate.value())) {
                 List<String> aliases = predicateMap.get(predicate.value());

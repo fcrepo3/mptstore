@@ -4,17 +4,19 @@ import java.sql.SQLException;
 
 import java.util.Set;
 
+import org.nsdl.mptstore.rdf.PredicateNode;
+
 public interface TableManager {
 
-    public String getOrMapTableFor(String predicate) throws SQLException;
+    public String getOrMapTableFor(PredicateNode predicate) throws SQLException;
 
-    public String getTableFor(String predicate);
+    public String getTableFor(PredicateNode predicate);
 
-    public String getPredicateFor(String table);
+    public PredicateNode getPredicateFor(String table);
 
     public Set<String> getTables();
 
-    public Set<String> getPredicates();
+    public Set<PredicateNode> getPredicates();
 
     public int dropEmptyPredicateTables() throws SQLException;
 

@@ -79,7 +79,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
 
                 PreparedStatement statement = statements.get(predicate);
                 if (statement == null) {
-                    String table = _tableManager.getOrMapTableFor(predicate.toString());
+                    String table = _tableManager.getOrMapTableFor(predicate);
                     String sql;
                     if (delete) {
                         sql = "DELETE FROM " + table + " WHERE s = ? AND o = ?";
