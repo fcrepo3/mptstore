@@ -116,13 +116,17 @@
              propertyFile="src/java/org/nsdl/mptstore/MPTStore.properties">
       <replacefilter token="@mptstore.version@" property="mptstore.version"/>
     </replace>
-    <javadoc packagenames="org.nsdl.mptstore.core, org.nsdl.mptstore.impl.postgres, org.nsdl.mptstore.query, org.nsdl.mptstore.rdf"
+    <javadoc packagenames="org.nsdl.mptstore.core, 
+                           org.nsdl.mptstore.impl.postgres,
+                           org.nsdl.mptstore.query,
+                           org.nsdl.mptstore.rdf,
+                           org.nsdl.mptstore.util"
              classpathref="compile.path"
              sourcepath="src/java"
              defaultexcludes="yes"
              destdir="dist/doc/api"
              windowtitle="MPTStore Java API">
-      <doctitle><![CDATA[<h1>MPTStore Java API</h1>]]></doctitle>
+        <doctitle><![CDATA[<h1>MPTStore Java API</h1>]]></doctitle>
     </javadoc>
   </target>
 
