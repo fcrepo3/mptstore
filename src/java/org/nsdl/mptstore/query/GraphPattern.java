@@ -6,15 +6,15 @@ import java.util.List;
 /** A set of concrete triple patterns and value constraints defining an 
  *  RDF subgraph
  * <p>
- * Triple patterns and filters ({@link TripleFilter} coonstraints on triple
- * value ranges) are added one by one to create a graph pattern 
+ * Triple patterns and filters ({@link NodeFilter} constraints on triple
+ * value ranges) are as necessary to build a graph pattern
  * </p>
  * @author birkland
  *
  */
 public class GraphPattern implements QueryElement {
 	private ArrayList<TriplePattern> steps = new ArrayList<TriplePattern>();
-	private ArrayList<TripleFilter> filters = new ArrayList<TripleFilter>();
+	private ArrayList<NodeFilter> filters = new ArrayList<NodeFilter>();
 	
 	
 	public QueryElement.Type getType() {
@@ -27,8 +27,8 @@ public class GraphPattern implements QueryElement {
 	}
 	
 	
-	public List<TripleFilter> getFilters() {
-		return new ArrayList<TripleFilter>(filters);
+	public List<NodeFilter> getFilters() {
+		return new ArrayList<NodeFilter>(filters);
 	}
 	
 	
@@ -40,7 +40,7 @@ public class GraphPattern implements QueryElement {
 		steps.remove(s);
 	}
 	
-	public void addFilter(TripleFilter filter) {
+	public void addFilter(NodeFilter filter) {
 		filters.add(filter);
 	}
 	

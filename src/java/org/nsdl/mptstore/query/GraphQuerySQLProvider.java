@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.rdf.PredicateNode;
 
 /** Translates a {@link GraphQuery} into a series of SQL statements
  * <p>
@@ -35,6 +37,9 @@ import org.nsdl.mptstore.core.TableManager;
  *
  */
 public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
+    
+    private static final Logger _LOG = Logger.getLogger(GraphQuerySQLProvider.class.getName());
+    
     private final GraphQuery query;
     
     private final MappingManager manager;
@@ -194,42 +199,55 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     private Joinable parseGraphPattern(GraphPattern g, HashMap<String, String> variableBindings) throws QueryException {
         
         /* First, organize the filters by variable so that we can map them */
-        HashMap<String, Set<TripleFilter>> filters = new HashMap<String, Set<TripleFilter>>();
-        for (TripleFilter f : g.getFilters()) {
-            if (f.s.isVariable()) {
-                if (!filters.containsKey(f.s.value())) {
-                    filters.put(f.s.value(), new HashSet<TripleFilter>());
+        HashMap<String, Set<MappableNodeFilter>> filters = new HashMap<String, Set<MappableNodeFilter>>();
+        
+        Set<MappableNodeFilter>givenFilters = new HashSet<MappableNodeFilter>();
+        for (NodeFilter filter : g.getFilters()) {
+            givenFilters.add(new MappableNodeFilter(filter));
+        }
+        
+        for (MappableNodeFilter f : givenFilters) {
+            if (f.getNode().isVariable()) {
+                if (!filters.containsKey(f.getNode().getVarName())) {
+                    _LOG.debug("Adding " + f.getNode().getVarName() + " To filter pool..\n");
+                    filters.put(f.getNode().getVarName(), new HashSet<MappableNodeFilter>());
                 }
-                filters.get(f.s.value()).add(f);
+                filters.get(f.getNode().getVarName()).add(f);
+                _LOG.debug("Filter pool contains " + filters.get(f.getNode().getVarName()) + "\n");
             } 
-            if (f.o.isVariable()) {
-               if (!filters.containsKey(f.o.value())) {
+            if (f.getConstraint().isVariable()) {
+               if (!filters.containsKey(f.getConstraint().getVarName())) {
                    
-                    filters.put(f.o.value(), new HashSet<TripleFilter>());
+                    filters.put(f.getConstraint().getVarName(), new HashSet<MappableNodeFilter>());
                 }
-               filters.get(f.o.value()).add(f);
+               filters.get(f.getConstraint().getVarName()).add(f);
             } 
             
-            if (!(f.s.isVariable() || f.o.isVariable())) {
+            if (!(f.getNode().isVariable() || f.getConstraint().isVariable())) {
                 throw new IllegalArgumentException("Triple filters must contain a variable.  Neither " + 
-                        f.s.value() + " nor " + f.o.value() + " is a variable!");
+                        f.getNode().getVarName() + " nor " + f.getConstraint().getVarName() + " is a variable!");
             }
         }
         
         
         /* Next, process each triple pattern in this graph pattern */
-        LinkedList<TriplePattern> steps = new LinkedList<TriplePattern>(g.getTriplePatterns());
-        TriplePattern step = steps.removeFirst();
+        LinkedList<MappableTriplePattern> steps = new LinkedList<MappableTriplePattern>();
+        for (TriplePattern p : g.getTriplePatterns()) {
+            steps.add(new MappableTriplePattern(p));
+        }
+
+        MappableTriplePattern step = steps.removeFirst();
         
         bindPattern(step, variableBindings);
         JoinSequence joins = new JoinSequence(new JoinTable(step));
         
-        Set<TriplePatternNode>joinableVars = joins.joinVars();
+        Set<MappableNodePattern>joinableVars = joins.joinVars();
         
         while (!steps.isEmpty()) {
             step = getJoinablePattern(steps, variableBindings);
             if (step == null) {
-                throw new QueryException("Cannot bind all query steps!");
+                throw new QueryException("Cannot bind all query steps! \n remaining:\n" + steps + 
+                        "\nvariables already bound:\n " + variableBindings.keySet() + "\n");
             }
             steps.remove(step);
             
@@ -239,41 +257,47 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             joinableVars.addAll(table.joinVars());
             JoinConditions conditions = new JoinConditions();
             
-            for (TriplePatternNode p : step.getNodes()) {
+            
+            for (MappableNodePattern p : step.getNodes()) {
                 if (isBound(p, variableBindings)) {
                     /* Join this variable's column with the corresponding bound column */
-                    
+                    /* Note: may result in adding redundant join conditions, but that's not 
+                     * a real problem */
                     if (!p.mappedName().equals(getBoundValue(p, variableBindings))) {
-                        conditions.addCondition(p.mappedName(), "=", getBoundValue(p, variableBindings));
+                        _LOG.debug("parseGraphPattern: Adding Join Condition " + 
+                                p.mappedName() +  " = " +  getBoundValue(p, variableBindings) + "'"+ "\n");
+                        conditions.addCondition(p.mappedName(), " = ", "'" + getBoundValue(p, variableBindings) + "'");
                     }
                 }
-            }
+            } 
             
             /* Add any filter constraints */
             for (String filterVar : filters.keySet()) {
-                for (TriplePatternNode joinableVar : joinableVars) {
-                    if (joinableVar.value().equals(filterVar)) {
-                        for (TripleFilter f : filters.get(filterVar)) {
+                for (MappableNodePattern joinableVar : joinableVars) {
+                    if (joinableVar.isVariable() && joinableVar.getVarName().equals(filterVar)) {
+                        _LOG.debug("match!\n");
+                        for (MappableNodeFilter f : filters.get(filterVar)) {
                             String right;
                             String left;
                             
-                            if (f.s.isVariable() && f.s.value().equals(filterVar)) {
+                            if (f.getNode().isVariable() && f.getNode().getVarName().equals(filterVar)) {
                                 left = getBoundValue(joinableVar, variableBindings);
-                            } else if (f.s.isVariable()) {
-                                left = getBoundValue(f.s, variableBindings);
+                            } else if (f.getNode().isVariable()) {
+                                left = getBoundValue(f.getNode(), variableBindings);
                             } else {
-                                left = "'" + f.s.value() + "'";
+                                left = "'" + f.getNode().getNode() + "'";
                             }
                             
-                            if (f.o.isVariable() && f.o.value().equals(filterVar)) {
+                            if (f.getConstraint().isVariable() && f.getConstraint().getVarName().equals(filterVar)) {
                                 right = getBoundValue(joinableVar, variableBindings);
-                            } else if (f.o.isVariable()) {
-                                right = getBoundValue(f.o, variableBindings);
+                            } else if (f.getConstraint().isVariable()) {
+                                right = getBoundValue(f.getConstraint(), variableBindings);
                             } else {
-                                right = "'" + f.o.value() + "'";
+                                right = "'" + f.getConstraint().getNode()+ "'";
                             }
                             
-                            conditions.addCondition(left, f.operator, right);
+                            conditions.addCondition(left, f.getOperator(), right);
+                            _LOG.debug("Adding filter condition: " + left + " " + f.getOperator() + " " + right + "\n");
                         }
                         
                         removeFromMap(filters.get(filterVar), filters);
@@ -282,10 +306,11 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             }
             
             /* Fold in any remaining constant bindings */
-            for (TriplePatternNode var : joinableVars) {
+            for (MappableNodePattern var : joinableVars) {
                 if (valueBindings.containsKey(var.boundTable().alias())) {
                     
                     for (String condition : valueBindings.get(var.boundTable().alias())) {
+                        _LOG.debug("Adding remaining constant vonditions " + condition + "\n");
                         conditions.addCondition(condition);
                     }
                     valueBindings.remove(var.boundTable().alias());
@@ -303,15 +328,17 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             throw new QueryException("Filter is unbound");
         }
         
-        TriplePattern p = g.getTriplePatterns().get(0);
-;
+        MappableTriplePattern p = new MappableTriplePattern(g.getTriplePatterns().get(0));
+
+        
+        /* Process any remaining filters */
         for (String varName : filters.keySet()) {
 
-            for (TripleFilter f : filters.get(varName)) {
+            for (MappableNodeFilter f : filters.get(varName)) {
                 String mappedName;
-                if (p.subject.value().equals(varName)) {
+                if (p.subject.isVariable() && p.subject.getVarName().equals(varName)) {
                     mappedName = p.subject.mappedName();
-                } else if (p.object.value().equals(varName)) {
+                } else if (p.object.isVariable() && p.object.getVarName().equals(varName)) {
                     mappedName = p.object.mappedName();
                 } else {
                     throw new QueryException("Variable " + varName + " in filter Cannot be found in graph query");
@@ -321,18 +348,30 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                     valueBindings.put(mappedName, new HashSet<String>());
                 }
                 
-                if (f.s.value().equals(varName)) {
-                    valueBindings.get(mappedName).add(mappedName + " " + f.operator + " '" + f.o.value() + "'");
-                } else if (f.o.value().equals(varName) ){
-                    valueBindings.get(mappedName).add("'" + f.s.value() + "' " + f.operator + " " + mappedName);
+                if (f.getNode().isVariable() && f.getNode().getVarName().equals(varName)) {
+                    if (f.getConstraint().isVariable()) {
+                        /* XXX check this */
+                    } else {
+                        valueBindings.get(mappedName).add(
+                                mappedName + " " + f.getOperator() + " '" + f.getConstraint().getNode() + "'");
+                        _LOG.debug("Remaining Filters: " + mappedName + " " + f.getOperator() + " '" + f.getConstraint().getNode() + "'" + "\n");
+                    }
+                } else if (f.getConstraint().isVariable() && f.getConstraint().getVarName().equals(varName) ){
+                    if (f.getNode().isVariable()) {
+                        /* XXX: check this */
+                    } else {
+                        valueBindings.get(mappedName).add(
+                                "'" + f.getNode().getNode() + "' " + f.getOperator() + " " + mappedName);
+                        _LOG.debug("Remainig Filters: " + "'" + f.getNode().getNode() + "' " + f.getOperator() + " " + mappedName + "\n");
+                    }
                 } 
             }
         }
         return joins;
     }
     
-    private TriplePattern getJoinablePattern(List<TriplePattern> l, HashMap<String, String> variableBinsings) {
-        for (TriplePattern p : l) {
+    private MappableTriplePattern getJoinablePattern(List<MappableTriplePattern> l, HashMap<String, String> variableBinsings) {
+        for (MappableTriplePattern p : l) {
             if (isBound(p.subject, variableBinsings) || isBound(p.object, variableBinsings)) {
                 return p;
             }
@@ -344,12 +383,20 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      * Determine if a variable has been apped to a literal or 
      * specific column of a table
      */
-    private boolean isBound(TriplePatternNode n, HashMap<String, String> variableBindings) {
-        return variableBindings.containsKey(n.value());
+    private boolean isBound(MappableNodePattern n, HashMap<String, String> variableBindings) {
+        if (n.isVariable()) {
+            return variableBindings.containsKey(n.getVarName());
+        } else {
+            return true;
+        }
     }
     
-    private String getBoundValue(TriplePatternNode n, HashMap<String, String> variableBindings) {
-        return variableBindings.get(n.value());
+    private String getBoundValue(MappableNodePattern n, HashMap<String, String> variableBindings) {
+        if (n.isVariable()) {
+            return variableBindings.get(n.getVarName());
+        } else {
+            return n.getNode().toString();
+        }
     }
     
     /*
@@ -357,23 +404,28 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      * - Placing any new variables into the master bings map,
      * - Placing any literal values into the literals map
      */
-    private void bindPattern(TriplePattern t, HashMap<String, String>variableBindings) {
+    private void bindPattern(MappableTriplePattern t, HashMap<String, String>variableBindings) {
         t.bindTo(manager.mapPredicateTable(t.predicate));
-        for (TriplePatternNode p : t.getNodes()) {
-            bindNode(p, variableBindings);
-        }
+        
+        bindNode(t.subject, variableBindings);
+        //bindNode(t.predicate, variableBindings);
+        bindNode(t.object, variableBindings);
+
     }
     
-    private void bindNode(TriplePatternNode p, HashMap<String, String>variableBindings) {
+    /* TODO: be able to bind a predicate node */
+    private void bindNode(MappableNodePattern p, HashMap<String, String>variableBindings) {
         if (p.isVariable()) {
-            if (! variableBindings.containsKey(p.value())) {
-                variableBindings.put(p.value(), p.mappedName());
+            if (! variableBindings.containsKey(p.getVarName())) {
+                _LOG.debug("Bound " + p.getVarName() + " to " + p.mappedName() + "\n");
+                variableBindings.put(p.getVarName(), p.mappedName());
             }
         } else {
             if (!valueBindings.containsKey(p.boundTable().alias())) {
                 valueBindings.put(p.boundTable().alias(), new HashSet<String>());
             }
-            valueBindings.get(p.boundTable().alias()).add(p.mappedName() + " = " + "'" + p.value() + "'");
+            _LOG.debug("bindNode: adding valueBinding "+ p.mappedName() + " = " + "'" + p.getNode() + "'\n");
+            valueBindings.get(p.boundTable().alias()).add(p.mappedName() + " = " + "'" + p.getNode() + "'");
         }
     }
     
@@ -409,19 +461,19 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     }
     
     private interface Joinable {
-        public Set<TriplePatternNode> joinVars();
+        public Set<MappableNodePattern> joinVars();
         public String alias();
         public String declaration();
     }
     
     private class JoinTable implements Joinable{
-        private final TriplePattern t;
-        public JoinTable(TriplePattern t) {
+        private final MappableTriplePattern t;
+        public JoinTable(MappableTriplePattern t) {
             this.t = t;
         }
         
-        public Set<TriplePatternNode> joinVars() {
-            HashSet<TriplePatternNode> s = new HashSet<TriplePatternNode>();
+        public Set<MappableNodePattern> joinVars() {
+            HashSet<MappableNodePattern> s = new HashSet<MappableNodePattern>();
             if (t.subject.isVariable()) {
                 s.add(t.subject);
             }
@@ -477,10 +529,10 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             JoinConditions conditions = new JoinConditions();
             
             
-            for (TriplePatternNode existingVar : this.joinVars()) {
-                for (TriplePatternNode candidateVar : j.joinVars()) {
-                    if (existingVar.value().equals(candidateVar.value()) 
-                            && variableBindings.get(candidateVar.value()).equals(existingVar.mappedName())) {
+            for (MappableNodePattern existingVar : this.joinVars()) {
+                for (MappableNodePattern candidateVar : j.joinVars()) {
+                    if (existingVar.getVarName().equals(candidateVar.getVarName()) 
+                            && variableBindings.get(candidateVar.getVarName()).equals(existingVar.mappedName())) {
                         conditions.addCondition(existingVar.mappedName(), "=", candidateVar.mappedName());
                     }
                 }
@@ -489,8 +541,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             addJoin(joinType, j, conditions);
         }
         
-        public Set<TriplePatternNode> joinVars() {
-            HashSet<TriplePatternNode> joinVars = new HashSet<TriplePatternNode>();
+        public Set<MappableNodePattern> joinVars() {
+            HashSet<MappableNodePattern> joinVars = new HashSet<MappableNodePattern>();
             
             for (Joinable join : joined) {
                 joinVars.addAll(join.joinVars());
@@ -514,21 +566,26 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     }
     
     private class JoinConditions {
-        private StringBuilder joinClause = new StringBuilder();
+        private Set<String> conditions = new HashSet<String>();
         
         public void addCondition(String leftOperand, String operator, String rightOperand ) {
-            addCondition(leftOperand + " " + operator + " " + rightOperand);
+            addCondition(leftOperand.trim() + " " + operator.trim() + " " + rightOperand.trim());
         }
         
         public void addCondition(String condition) {
-            if (joinClause.length() == 0) {
-                joinClause.append(condition);
-            } else {
-                joinClause.append(" AND " + condition);
-            }
+            conditions.add(condition.trim());
         }
         
         public String toString () {
+            StringBuilder joinClause = new StringBuilder();
+            for (String condition : conditions) {
+                if (joinClause.length() == 0) {
+                    joinClause.append(condition);
+                } else {
+                    joinClause.append(" AND " + condition);
+                }
+                    
+            }
             return joinClause.toString();
         }
     }
@@ -545,29 +602,21 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         public MappingManager(TableManager adaptor) {
             this.adaptor = adaptor;
         }
-        public MPTable mapPredicateTable(TriplePatternNode predicate) {
-           
-            // FIXME: currently I'm re-parsing predicate.value() here
-            //        in order to make the correct call to TableManager,
-            //        but this will be unnecessary later
-            org.nsdl.mptstore.rdf.PredicateNode predNode;
-            try {
-                predNode = org.nsdl.mptstore.rdf.NTParser.parsePredicate(predicate.value());
-            } catch (java.text.ParseException e) {
-                throw new RuntimeException("Error parsing predicate: "
-                        + predicate.value(), e);
+        
+        public MPTable mapPredicateTable(MappableNodePattern<PredicateNode> predicate) {
+            if (predicate.isVariable()) {
+                throw new IllegalArgumentException("predicate must not be a variable");
             }
-            String tableName = adaptor.getTableFor(predNode);
-
+            String tableName = adaptor.getTableFor(predicate.getNode());
             String alias;
-            if (predicateMap.containsKey(predicate.value())) {
-                List<String> aliases = predicateMap.get(predicate.value());
+            if (predicateMap.containsKey(predicate.getNode().toString())) {
+                List<String> aliases = predicateMap.get(predicate.getNode().toString());
                 alias = tableName + "_" + aliases.size();
                 aliases.add(alias);
             } else {
                 ArrayList<String> aliases = new ArrayList<String>();
                 aliases.add(tableName);
-                predicateMap.put(predicate.value(), aliases);
+                predicateMap.put(predicate.getNode().toString(), aliases);
                 alias = tableName;
             }
             

@@ -10,11 +10,15 @@ package org.nsdl.mptstore.query;
  * @author birkland
  *
  */
-public class MPTable {
+class MPTable {
     private final String alias;
     private final String name;
 
     public MPTable(String name, String alias) {
+        if (name == null || alias == null) {
+            throw new IllegalArgumentException("Cannot create a table without a name or alias. " +
+                    "Given " + name + " as name, " + alias + " as alias\n");
+        }
         this.alias = alias;
         this.name = name;
     }
