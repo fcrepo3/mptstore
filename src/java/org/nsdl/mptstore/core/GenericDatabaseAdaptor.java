@@ -20,16 +20,38 @@ import org.nsdl.mptstore.query.SQLUnionQueryResults;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.Triple;
 
+/**
+ * A <code>DatabaseAdaptor</code> designed to work with any database.
+ *
+ * This implementation uses only a subset of standard SQL92 syntax and 
+ * thus should be compatible with most RDBMS.
+ *
+ * @author cwilper@cs.cornell.edu
+ */
 public class GenericDatabaseAdaptor implements DatabaseAdaptor {
 
+    /**
+     * Logger for this class.
+     */
     private static final Logger _LOG = Logger.getLogger(GenericDatabaseAdaptor.class.getName());
 
+    /**
+     * The <code>TableManager</code> used by this instance.
+     */
     private TableManager _tableManager;
 
+    /**
+     * Map of <code>QueryCompiler</code>s to use for each supported language.
+     */
     private Map<QueryLanguage, QueryCompiler> _compilerMap;
 
     /**
      * Get an instance supporting the built-in query languages.
+     *
+     * @param tableManager The <code>TableManager</code> this instance should use.
+     * @param backslashIsEscape A database vendor-specific specific value indicating
+     *        whether the backslash character in a string is considered to be
+     *        an escape character.
      */
     public GenericDatabaseAdaptor(TableManager tableManager,
                                   boolean backslashIsEscape) {
@@ -42,6 +64,9 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
 
     /**
      * Get an instance supporting the specified query languages.
+     *
+     * @param tableManager The <code>TableManager</code> this instance should use.
+     * @param compilerMap A map of query language to query compiler.
      */
     public GenericDatabaseAdaptor(TableManager tableManager,
                                   Map<QueryLanguage, QueryCompiler> compilerMap) {
@@ -63,6 +88,15 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
         updateTriples(conn, triples, true);
     }
 
+    /**
+     * Execute the given update operation of the given triples.
+     *
+     * @param conn The connection to execute the update on.
+     * @param triples The triples to add or delete.
+     * @param delete Boolean indicating whether the operation is an add 
+     *        or delete.
+     * @throws ModificationException if the operation fails for any reason.
+     */
     private void updateTriples(Connection conn,
                                Iterator<Triple> triples,
                                boolean delete)

@@ -4,11 +4,25 @@ import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Database-related utilities.
+ *
+ * @author cwilper@cs.cornell.edu
+ */
 public abstract class DBUtil {
 
     /**
      * Get a long string, which could be a TEXT or CLOB type.
-     * (CLOBs require special handling -- this method normalizes the reading of them)
+     *
+     * CLOBs require special handling.  This method normalizes the 
+     * reading of them.
+     *
+     * @param rs The ResultSet whose current row contains the desired value.
+     * @param pos The position (column) of the value in the current row.
+     * @return The desired string, or <code>null</code> if the value in the
+     *         ResultSet is null.
+     * @throws SQLException if there is an database error accessing the value 
+     *         from the ResultSet.
      */
     public static String getLongString(ResultSet rs, int pos) 
             throws SQLException {
@@ -23,6 +37,18 @@ public abstract class DBUtil {
         }
     }
 
+    /**
+     * Provide a single-quoted, properly escaped String for the given
+     * value to be used in a SQL statement.
+     *
+     * Apostrophes will always be escaped as ''.  Backslashes will
+     * be escaped as \\ if backslashIsEscape is given as <code>true</code>.
+     *
+     * @param in The input value.
+     * @param backslashIsEscape Whether backslash characters are treated
+     *        as escape characters by the underlying database implementation, 
+     *        and thus need to be escaped themselves.
+     */
     public static String quotedString(String in,
                                       boolean backslashIsEscape) {
         StringBuffer out = new StringBuffer();

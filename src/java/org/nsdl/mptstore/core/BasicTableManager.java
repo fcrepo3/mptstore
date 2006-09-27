@@ -22,34 +22,65 @@ import org.nsdl.mptstore.rdf.NTParser;
 import org.nsdl.mptstore.rdf.PredicateNode;
 
 /**
- * This implementation of TableManager creates predicate tables
- * and map entries as needed, using a separate connection provided
- * from a JDBC DataSource.
+ * A <code>TableManager</code> designed to perform DDL operations
+ * on separate connections from those used for DML.
  *
- * It never attempts to execute DDL on the same transaction as DML.
+ * The DDL-in-a-separate-connection strategy employed by this 
+ * implementation should work with a wide variety of databases.
+ *
+ * @author cwilper@cs.cornell.edu
  */
 public class BasicTableManager implements TableManager {
 
+    /**
+     * The Logger for this class.
+     */
     private static final Logger _LOG = Logger.getLogger(BasicTableManager.class.getName());
 
+    /**
+     * The <code>DataSource</code> from which to obtain connections
+     * for DDL operations.
+     */
     private DataSource _dataSource;
 
+    /**
+     * The <code>DDLGenerator</code> for this instance.
+     */
     private DDLGenerator _ddlGenerator;
 
+    /**
+     * The name of the table in which the table-to-predicate mappings are
+     * persisted.
+     */
     private String _mapTable;
 
+    /**
+     * The prefix for all predicate table names.
+     */
     private String _soTablePrefix;
 
-    /** Map of predicates to tables */
+    /** 
+     * The in-memory predicate-to-table mapping.
+     */
     private Map<PredicateNode,String> _map;
 
-    /** Map of tables to predicates */
+    /** 
+     * The in-memory table-to-predicate mapping.
+     */
     private Map<String,PredicateNode> _reverseMap;
 
     /**
-     * Initialize the table manager, creating the map table
-     * if it doesn't yet exist, and populating the in-memory
-     * map with the content of the map table.
+     * Initialize the table manager.
+     *
+     * This will create the map table if it doesn't yet exist, 
+     * and will read the current mappings into memory.
+     *
+     * @param dataSource The <code>DataSource> from which to obtain
+     *        connections for DDL operations.
+     * @param mapTable The name of the table in which the table-to-predicate
+     *        mappings are persisted.
+     * @param soTablePrefix The prefix for all predicate table names.
+     * @throws SQLException if any kind of database error occurs.
      */
     public BasicTableManager(DataSource dataSource,
                              DDLGenerator ddlGenerator,
@@ -79,6 +110,66 @@ public class BasicTableManager implements TableManager {
 
     }
 
+    // Implements TableManager.getOrMapTableFor(PredicateNode)
+    public String getOrMapTableFor(PredicateNode predicate) throws SQLException {
+        String table = getTableFor(predicate);
+        if (table != null) {
+            return table;
+        } else {
+            Connection conn = _dataSource.getConnection();
+            try {
+                return mapTableFor(predicate, conn);
+            } finally {
+                try { 
+                    conn.close(); 
+                } catch (SQLException e) { 
+                    _LOG.warn("unable to close/release connection", e);
+                }
+            }
+        }
+    }
+
+    // Implements TableManager.getTableFor(PredicateNode)
+    public String getTableFor(PredicateNode predicate) {
+        synchronized (_map) {
+            return _map.get(predicate);
+        }
+    }
+
+    // Implements TableManager.getPredicateFor(PredicateNode)
+    public PredicateNode getPredicateFor(String table) {
+        synchronized (_map) {
+            return _reverseMap.get(table);
+        }
+    }
+
+    // Implements TableManager.getTables()
+    public Set<String> getTables() {
+        synchronized (_map) {
+            return new HashSet<String>(_reverseMap.keySet());
+        }
+    }
+
+    // Implements TableManager.getPredicates()
+    public Set<PredicateNode> getPredicates() {
+        synchronized (_map) {
+            return new HashSet<PredicateNode>(_map.keySet());
+        }
+    }
+
+    // Implements TableManager.dropEmptyPredicateTables()
+    public int dropEmptyPredicateTables() throws SQLException {
+        _LOG.info("Dropping empty predicate tables");
+        return dropPredicateTables(false);
+    }
+
+    /**
+     * Check whether the map table exists.
+     *
+     * @param conn The connection to use for determining the table's existence.
+     * @return true if so, false if not.
+     * @throws SQLException if a database error occurs.
+     */
     private boolean mapTableExists(Connection conn) throws SQLException {
 
         ResultSet results = conn.getMetaData().getTables(null, null,
@@ -128,6 +219,12 @@ public class BasicTableManager implements TableManager {
         }
     }
 
+    /**
+     * Read the content of the map table into memory.
+     *
+     * @param conn The connection to use for reading.
+     * @throws SQLException if a database error occurs.
+     */
     private void loadMapTable(Connection conn) throws SQLException {
         _LOG.info("Loading map table");
         _map = new HashMap<PredicateNode,String>();
@@ -163,25 +260,24 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    // Implements TableManager.getOrMapTableFor(PredicateNode)
-    public String getOrMapTableFor(PredicateNode predicate) throws SQLException {
-        String table = getTableFor(predicate);
-        if (table != null) {
-            return table;
-        } else {
-            Connection conn = _dataSource.getConnection();
-            try {
-                return mapTableFor(predicate, conn);
-            } finally {
-                try { 
-                    conn.close(); 
-                } catch (SQLException e) { 
-                    _LOG.warn("unable to close/release connection", e);
-                }
-            }
-        }
-    }
-
+    /**
+     * Add a new table, mapping it to the given predicate.
+     * <p>
+     *   The new mapping will be persisted to the database
+     *   and stored in memory.
+     * </p>
+     * <p>
+     *   If a table is already mapped to the given predicate,
+     *   no action will be taken; the table name will just be
+     *   returned.
+     * </p>
+     *
+     * @param predicate The predicate.
+     * @param conn The connection on which to create the table and
+     *        persist the mapping.
+     * @return the table name.
+     * @throws SQLException if a database error occurs.
+     */
     private synchronized String mapTableFor(PredicateNode predicate,
                                             Connection conn)
             throws SQLException {
@@ -217,6 +313,15 @@ public class BasicTableManager implements TableManager {
         }
     }
 
+    /**
+     * Add a new predicate to the map table.
+     *
+     * @param predicate The predicate to add.
+     * @param conn The connection to use.
+     * @return the auto-generated id for the predicate, used to formulate
+     *         the name for the new predicate table.
+     * @throws SQLException if a database error occurs.
+     */
     private int addPredicateToMapTable(PredicateNode predicate, 
                                        Connection conn) 
             throws SQLException {
@@ -263,6 +368,13 @@ public class BasicTableManager implements TableManager {
 
     }
 
+    /**
+     * Remove the persistent mapping of the given predicate.
+     *
+     * @param predicate The predicate whose mapping should be removed.
+     * @param conn The connection on which to perform the operation.
+     * @throws SQLException if a database error occurrs.
+     */
     private void deletePredicateFromMapTable(PredicateNode predicate, 
                                              Connection conn) 
             throws SQLException {
@@ -283,6 +395,10 @@ public class BasicTableManager implements TableManager {
 
     /**
      * Execute the given DDL statements.
+     *
+     * @param conn The connection to use.
+     * @param ddlIter The DDL to execute.
+     * @throws SQLException if a database error occurs.
      */
     private void executeDDL(Connection conn,
                             Iterator<String> ddlIter) throws SQLException {
@@ -302,36 +418,17 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    public String getTableFor(PredicateNode predicate) {
-        synchronized (_map) {
-            return _map.get(predicate);
-        }
-    }
-
-    public PredicateNode getPredicateFor(String table) {
-        synchronized (_map) {
-            return _reverseMap.get(table);
-        }
-    }
-
-    public Set<String> getTables() {
-        synchronized (_map) {
-            return new HashSet<String>(_reverseMap.keySet());
-        }
-    }
-
-    public Set<PredicateNode> getPredicates() {
-        synchronized (_map) {
-            return new HashSet<PredicateNode>(_map.keySet());
-        }
-    }
-
-    // Implements TableManager.dropEmptyPredicateTables()
-    public int dropEmptyPredicateTables() throws SQLException {
-        _LOG.info("Dropping empty predicate tables");
-        return dropPredicateTables(false);
-    }
-
+    /**
+     * Drop and unmap the indicated predicate tables.
+     *
+     * The <code>DataSource</code> given in the constructor
+     * will be used for the connection.
+     * 
+     * @param all Boolean indicating whether to drop all of them,
+     *        or just the ones that are empty.
+     * @return the number of dropped predicate tables.
+     * @throws SQLException if a database error occurs.
+     */
     private synchronized int dropPredicateTables(boolean all) throws SQLException {
 
         int dropCount = 0;
@@ -362,6 +459,14 @@ public class BasicTableManager implements TableManager {
         return dropPredicateTables(true);
     }
 
+    /**
+     * Determine whether the given predicate table is empty.
+     *
+     * @param table The name of the table.
+     * @param conn The connection on which to make the determination.
+     * @return true if empty, false otherwise.
+     * @throws SQLException if a database error occurs.
+     */
     private boolean isPredicateTableEmpty(String table, 
                                           Connection conn) throws SQLException {
         Statement st = conn.createStatement();
@@ -388,6 +493,11 @@ public class BasicTableManager implements TableManager {
     /**
      * Remove the predicate from the memory and database maps,
      * then drop the associated table.
+     *
+     * @param predicate The predicate to unmap.
+     * @param table The associated predicate table.
+     * @param conn The connection to use.
+     * @throws SQLException if a database error occurs.
      */
     private void unmapPredicate(PredicateNode predicate,
                                 String table,

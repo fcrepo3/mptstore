@@ -10,7 +10,7 @@ import org.nsdl.mptstore.query.QueryResults;
 import org.nsdl.mptstore.rdf.Triple;
 
 /**
- * High-level interface for working with a triplestore.
+ * The main high-level interface for working with a triplestore.
  *
  * <p>
  *   With a <code>DatabaseAdaptor</code>, you can add and delete triples
