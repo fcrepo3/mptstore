@@ -1,8 +1,8 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 import org.nsdl.mptstore.rdf.Node;
 
-/** Generic  implementation of a {@link org.nsdl.mptstore.query.NodeFilter} 
+/** Generic  implementation of a {@link org.nsdl.mptstore.query.component.NodeFilter} 
  * 
  * 
  * @param <T> The type of node that is being constrained by this filter.  Typically,

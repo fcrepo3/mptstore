@@ -10,6 +10,15 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.query.component.GraphPattern;
+import org.nsdl.mptstore.query.component.GraphQuery;
+import org.nsdl.mptstore.query.component.MPTable;
+import org.nsdl.mptstore.query.component.MappableNodeFilter;
+import org.nsdl.mptstore.query.component.MappableNodePattern;
+import org.nsdl.mptstore.query.component.MappableTriplePattern;
+import org.nsdl.mptstore.query.component.NodeFilter;
+import org.nsdl.mptstore.query.component.QueryElement;
+import org.nsdl.mptstore.query.component.TriplePattern;
 import org.nsdl.mptstore.rdf.Node;
 import org.nsdl.mptstore.rdf.PredicateNode;
 

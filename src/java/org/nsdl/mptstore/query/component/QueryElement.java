@@ -1,4 +1,5 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
+
 
 /** A component of a graph query
  * <p>

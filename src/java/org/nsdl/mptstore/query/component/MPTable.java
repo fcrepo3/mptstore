@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 /** Mapped Predicate Table
  * <p>
@@ -10,7 +10,7 @@ package org.nsdl.mptstore.query;
  * @author birkland
  *
  */
-class MPTable {
+public class MPTable {
     private final String alias;
     private final String name;
 

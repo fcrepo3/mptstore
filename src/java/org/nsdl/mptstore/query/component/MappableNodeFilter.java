@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 import org.nsdl.mptstore.rdf.Node;
 
@@ -12,7 +12,7 @@ import org.nsdl.mptstore.rdf.Node;
  * @author birkland
  *
  */
-class MappableNodeFilter<T extends Node> implements NodeFilter<T> {
+public class MappableNodeFilter<T extends Node> implements NodeFilter<T> {
     private final MappableNodePattern<T> node;
     private final MappableNodePattern<T> value;
     private final String operator;

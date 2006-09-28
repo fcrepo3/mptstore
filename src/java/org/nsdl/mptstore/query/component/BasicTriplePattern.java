@@ -1,11 +1,11 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 
 import org.nsdl.mptstore.rdf.ObjectNode;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.SubjectNode;
 
-/** Generic implementation of {@link org.nsdl.mptstore.query.TriplePattern}
+/** Generic implementation of {@link org.nsdl.mptstore.query.component.TriplePattern}
  * 
  * @author birkland
  *

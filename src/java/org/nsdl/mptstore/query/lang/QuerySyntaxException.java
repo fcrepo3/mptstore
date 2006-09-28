@@ -1,4 +1,6 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.lang;
+
+import org.nsdl.mptstore.query.QueryException;
 
 public class QuerySyntaxException extends QueryException {
 

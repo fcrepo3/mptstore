@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 import org.nsdl.mptstore.rdf.Node;
 import org.nsdl.mptstore.rdf.ObjectNode;
@@ -23,7 +23,7 @@ import org.nsdl.mptstore.rdf.SubjectNode;
  * this is one of SubjectNode, PredicateNode, ObjectNode, or just Node if the
  * exact node type is unimportant or unknown.
  */
-class MappableNodePattern<T extends Node> implements NodePattern<T> {
+public class MappableNodePattern<T extends Node> implements NodePattern<T> {
     private final boolean isVariable;
     private final T nodeValue;
 	private final String varName

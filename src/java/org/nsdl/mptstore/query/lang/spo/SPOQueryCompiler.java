@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.lang.spo;
 
 import java.text.ParseException;
 
@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.query.QueryException;
+import org.nsdl.mptstore.query.SQLProvider;
+import org.nsdl.mptstore.query.lang.QueryCompiler;
+import org.nsdl.mptstore.query.lang.QuerySyntaxException;
 import org.nsdl.mptstore.rdf.NTParser;
 import org.nsdl.mptstore.rdf.Triple;
 import org.nsdl.mptstore.rdf.URIReference;

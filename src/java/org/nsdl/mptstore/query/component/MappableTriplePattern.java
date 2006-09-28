@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +10,7 @@ import org.nsdl.mptstore.rdf.SubjectNode;
 
 /** Represents a pattern that defines matching triples
  * <p>
- * A triple pattern contains three {@link org.nsdl.mptstore.query.MappableNodePattern} 
+ * A triple pattern contains three {@link org.nsdl.mptstore.query.component.MappableNodePattern} 
  * representing the subject, predicate, and object of a triple. 
  * </p>
  * <p>
@@ -23,7 +23,7 @@ import org.nsdl.mptstore.rdf.SubjectNode;
  * @author birkland
  *
  */
-class MappableTriplePattern implements TriplePattern {
+public class MappableTriplePattern implements TriplePattern {
 	private final MappableNodePattern<SubjectNode> subject;
 	private final MappableNodePattern<PredicateNode> predicate;
 	private final MappableNodePattern<ObjectNode> object;

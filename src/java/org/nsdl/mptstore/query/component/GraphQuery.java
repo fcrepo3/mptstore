@@ -1,7 +1,9 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.nsdl.mptstore.query.component.QueryElement.Type;
 
 /** Representation of an RDF graph query
  * <p> A GraphQuery contains a sets of required and optional {@link QueryElement} components that form a

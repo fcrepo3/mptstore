@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 
 import org.nsdl.mptstore.rdf.ObjectNode;
@@ -7,7 +7,7 @@ import org.nsdl.mptstore.rdf.SubjectNode;
 
 /** Represents a pattern that defines matching triples
  * <p>
- * A triple pattern contains three {@link org.nsdl.mptstore.query.NodePattern}s 
+ * A triple pattern contains three {@link org.nsdl.mptstore.query.component.NodePattern}s 
  * representing the subject, predicate, and object of a triple.  
  * </p>
  * @author birkland

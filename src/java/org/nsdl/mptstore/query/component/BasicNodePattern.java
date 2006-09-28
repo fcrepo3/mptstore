@@ -1,8 +1,8 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.component;
 
 import org.nsdl.mptstore.rdf.Node;
 
-/** Generic implementation of {@link org.nsdl.mptstore.query.NodePattern}
+/** Generic implementation of {@link org.nsdl.mptstore.query.component.NodePattern}
  * 
  * @author birkland
  *
