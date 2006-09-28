@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query.lang.spo;
+package org.nsdl.mptstore.query;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,9 +14,9 @@ import org.nsdl.mptstore.rdf.SubjectNode;
 import org.nsdl.mptstore.rdf.Triple;
 import org.nsdl.mptstore.util.DBUtil;
 
-public class SPOSQLProvider implements SQLProvider {
+public class TriplePatternSQLProvider implements SQLProvider {
 
-    private static final Logger _LOG = Logger.getLogger(SPOSQLProvider.class.getName());
+    private static final Logger _LOG = Logger.getLogger(TriplePatternSQLProvider.class.getName());
 
     public static final List<String> SPO_TARGETS;
 
@@ -34,7 +34,7 @@ public class SPOSQLProvider implements SQLProvider {
 
     private List<String> _sql;
 
-    public SPOSQLProvider(TableManager tableManager,
+    public TriplePatternSQLProvider(TableManager tableManager,
                           boolean backslashIsEscape,
                           Triple pattern) {
 
