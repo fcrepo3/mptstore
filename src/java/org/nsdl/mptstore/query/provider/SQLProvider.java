@@ -1,6 +1,8 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.provider;
 
 import java.util.List;
+
+import org.nsdl.mptstore.query.QueryException;
 
 public interface SQLProvider {
 

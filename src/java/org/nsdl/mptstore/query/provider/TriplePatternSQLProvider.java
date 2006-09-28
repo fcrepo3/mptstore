@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.provider;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.nsdl.mptstore.core.TableManager;
-import org.nsdl.mptstore.query.SQLProvider;
 import org.nsdl.mptstore.rdf.ObjectNode;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.SubjectNode;

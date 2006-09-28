@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.provider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.query.component.GraphPattern;
 import org.nsdl.mptstore.query.component.GraphQuery;
 import org.nsdl.mptstore.query.component.MPTable;

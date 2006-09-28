@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.provider;
 
 import java.util.List;
 

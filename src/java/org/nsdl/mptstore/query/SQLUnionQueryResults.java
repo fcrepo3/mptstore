@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.nsdl.mptstore.query.provider.SQLProvider;
 import org.nsdl.mptstore.rdf.Node;
 import org.nsdl.mptstore.rdf.NTParser;
 import org.nsdl.mptstore.util.DBUtil;

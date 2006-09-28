@@ -7,9 +7,10 @@ import java.util.List;
 
 import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.query.QueryException;
-import org.nsdl.mptstore.query.SQLProvider;
 import org.nsdl.mptstore.query.lang.QueryCompiler;
 import org.nsdl.mptstore.query.lang.QuerySyntaxException;
+import org.nsdl.mptstore.query.provider.SQLProvider;
+import org.nsdl.mptstore.query.provider.TriplePatternSQLProvider;
 import org.nsdl.mptstore.rdf.NTParser;
 import org.nsdl.mptstore.rdf.Triple;
 import org.nsdl.mptstore.rdf.URIReference;
@@ -42,9 +43,9 @@ public class SPOQueryCompiler implements QueryCompiler {
     public SQLProvider compile(String query) 
             throws QueryException {
         try {
-            return new SPOSQLProvider(_tableManager,
-                                      _backslashIsEscape,
-                                      NTParser.parseTriplePattern(query));
+            return new TriplePatternSQLProvider(
+                    _tableManager, _backslashIsEscape,
+                    NTParser.parseTriplePattern(query));
         } catch (ParseException e) {
             throw new QuerySyntaxException("Error parsing SPO query", e);
         }
