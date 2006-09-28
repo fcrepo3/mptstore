@@ -3,7 +3,6 @@ package org.nsdl.mptstore.query.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nsdl.mptstore.query.component.QueryElement.Type;
 import org.nsdl.mptstore.rdf.Node;
 
 /** A set of concrete triple patterns and value constraints defining an 
