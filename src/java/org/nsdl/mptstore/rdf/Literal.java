@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 
 import java.text.ParseException;
 
+import org.nsdl.mptstore.util.NTriplesUtil;
+
 /**
  * An RDF literal.
  *
@@ -133,7 +135,7 @@ public class Literal implements ObjectNode {
     public String toString() {
         StringBuffer out = new StringBuffer();
         out.append('"');
-        out.append(NTParser.escape(_value));
+        out.append(NTriplesUtil.escapeLiteralValue(_value));
         out.append('"');
         if (_language != null) {
             out.append("@" + _language);

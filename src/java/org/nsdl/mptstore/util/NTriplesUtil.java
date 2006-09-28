@@ -1,4 +1,4 @@
-package org.nsdl.mptstore.rdf;
+package org.nsdl.mptstore.util;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -7,12 +7,20 @@ import java.net.URISyntaxException;
 
 import java.text.ParseException;
 
+import org.nsdl.mptstore.rdf.Literal;
+import org.nsdl.mptstore.rdf.Node;
+import org.nsdl.mptstore.rdf.ObjectNode;
+import org.nsdl.mptstore.rdf.PredicateNode;
+import org.nsdl.mptstore.rdf.SubjectNode;
+import org.nsdl.mptstore.rdf.Triple;
+import org.nsdl.mptstore.rdf.URIReference;
+
 /**
- * Parses RDF in N-Triples format.
+ * Utility for parsing and outputting strings in N-Triples format.
  *
  * @author cwilper@cs.cornell.edu
  */
-public abstract class NTParser {
+public abstract class NTriplesUtil {
 
     private static final String _EXPECTED_ABS_URI = "Expected absolute URI";
     private static final String _EXPECTED_ACE = "Expected '@', '^', or EOF";
@@ -385,7 +393,7 @@ public abstract class NTParser {
 
             String value;
             try {
-                value = unescape(escaped.toString());
+                value = unescapeLiteralValue(escaped.toString());
             } catch (ParseException e) {
                 throw new ParseException(e.getMessage(),
                                          e.getErrorOffset() + 1);
@@ -471,7 +479,7 @@ public abstract class NTParser {
      * @return The unescaped string.
      * @throws ParseException if the input syntax is incorrect
      */
-    protected static String unescape(String s)
+    public static String unescapeLiteralValue(String s)
             throws ParseException {
 
         // verify ascii input
@@ -576,7 +584,7 @@ public abstract class NTParser {
      * @param s The input string.
      * @return The escaped string.
      */ 
-    protected static String escape(String s) {
+    public static String escapeLiteralValue(String s) {
 
         int len = s.length();
         StringBuffer out = new StringBuffer(len * 2);

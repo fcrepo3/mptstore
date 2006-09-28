@@ -16,8 +16,8 @@ import org.apache.log4j.Logger;
 
 import org.nsdl.mptstore.query.provider.SQLProvider;
 import org.nsdl.mptstore.rdf.Node;
-import org.nsdl.mptstore.rdf.NTParser;
 import org.nsdl.mptstore.util.DBUtil;
+import org.nsdl.mptstore.util.NTriplesUtil;
 
 /**
  * Query results that wrap a set of SQL database queries,
@@ -86,7 +86,7 @@ public class SQLUnionQueryResults implements QueryResults {
                     String nodeString = DBUtil.getLongString(_results, i);
                     try {
                         if (nodeString != null) {
-                            _nextTuple.add(NTParser.parseNode(nodeString));
+                            _nextTuple.add(NTriplesUtil.parseNode(nodeString));
                         } else {
                             _nextTuple.add(null);
                         }

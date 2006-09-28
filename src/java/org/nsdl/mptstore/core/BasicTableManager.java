@@ -18,8 +18,8 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
-import org.nsdl.mptstore.rdf.NTParser;
 import org.nsdl.mptstore.rdf.PredicateNode;
+import org.nsdl.mptstore.util.NTriplesUtil;
 
 /**
  * A <code>TableManager</code> designed to perform DDL operations
@@ -237,7 +237,7 @@ public class BasicTableManager implements TableManager {
             while (results.next()) {
                 String table = _soTablePrefix + results.getInt(1);
                 pString = results.getString(2);
-                PredicateNode predicate = NTParser.parsePredicate(pString);
+                PredicateNode predicate = NTriplesUtil.parsePredicate(pString);
                 _map.put(predicate, table);
                 _reverseMap.put(table, predicate);
             }

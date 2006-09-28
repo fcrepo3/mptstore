@@ -11,9 +11,9 @@ import org.nsdl.mptstore.query.lang.QueryCompiler;
 import org.nsdl.mptstore.query.lang.QuerySyntaxException;
 import org.nsdl.mptstore.query.provider.SQLProvider;
 import org.nsdl.mptstore.query.provider.TriplePatternSQLProvider;
-import org.nsdl.mptstore.rdf.NTParser;
 import org.nsdl.mptstore.rdf.Triple;
 import org.nsdl.mptstore.rdf.URIReference;
+import org.nsdl.mptstore.util.NTriplesUtil;
 
 /**
  * Compiler for SPO queries.
@@ -45,7 +45,7 @@ public class SPOQueryCompiler implements QueryCompiler {
         try {
             return new TriplePatternSQLProvider(
                     _tableManager, _backslashIsEscape,
-                    NTParser.parseTriplePattern(query));
+                    NTriplesUtil.parseTriplePattern(query));
         } catch (ParseException e) {
             throw new QuerySyntaxException("Error parsing SPO query", e);
         }
