@@ -7,10 +7,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.query.component.TriplePattern;
 import org.nsdl.mptstore.rdf.ObjectNode;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.SubjectNode;
-import org.nsdl.mptstore.rdf.Triple;
 import org.nsdl.mptstore.util.DBUtil;
 
 public class TriplePatternSQLProvider implements SQLProvider {
@@ -34,15 +34,15 @@ public class TriplePatternSQLProvider implements SQLProvider {
     private List<String> _sql;
 
     public TriplePatternSQLProvider(TableManager tableManager,
-                          boolean backslashIsEscape,
-                          Triple pattern) {
+                                    boolean backslashIsEscape,
+                                    TriplePattern pattern) {
 
         _tableManager = tableManager;
         _backslashIsEscape = backslashIsEscape;
 
-        SubjectNode subject = pattern.getSubject();
-        PredicateNode predicate = pattern.getPredicate();
-        ObjectNode object = pattern.getObject();
+        SubjectNode subject = pattern.getSubject().getNode();
+        PredicateNode predicate = pattern.getPredicate().getNode();
+        ObjectNode object = pattern.getObject().getNode();
 
         if (subject != null) {
             _subjectString = subject.toString();

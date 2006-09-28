@@ -119,6 +119,10 @@
     <javadoc packagenames="org.nsdl.mptstore.core, 
                            org.nsdl.mptstore.impl.postgres,
                            org.nsdl.mptstore.query,
+                           org.nsdl.mptstore.query.component,
+                           org.nsdl.mptstore.query.provider,
+                           org.nsdl.mptstore.query.lang,
+                           org.nsdl.mptstore.query.lang.spo,
                            org.nsdl.mptstore.rdf,
                            org.nsdl.mptstore.util"
              classpathref="compile.path"
