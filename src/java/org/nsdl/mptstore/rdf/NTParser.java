@@ -38,6 +38,9 @@ public abstract class NTParser {
 
     /**
      * Parse an RDF triple pattern in SPO format.
+     *
+     * TODO: Change this to return a TriplePattern, and possibly move it
+     *       back to SPOQueryCompiler
      */
     public static Triple parseTriplePattern(String spoTriple)
             throws ParseException {
@@ -144,8 +147,8 @@ public abstract class NTParser {
     /**
      * Parse an RDF triple in N-Triples format.
      *
-     * @param ntTriple the input string
-     * @return the parsed triple
+     * @param ntTriple the input string.
+     * @return the parsed triple.
      * @throws ParseException if the input syntax is incorrect
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#triple">
      *        N-Triples triple syntax</a>
@@ -268,8 +271,8 @@ public abstract class NTParser {
     /** 
      * Parse an RDF subject in N-Triples format.
      *
-     * @param ntSubject the input string
-     * @return the parsed subject
+     * @param ntSubject the input string.
+     * @return the parsed subject.
      * @throws ParseException if the input syntax is incorrect
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#subject">
      *        N-Triples subject syntax</a>
@@ -283,8 +286,8 @@ public abstract class NTParser {
     /** 
      * Parse an RDF predicate in N-Triples format.
      *
-     * @param ntPredicate the input string
-     * @return the parsed predicate
+     * @param ntPredicate the input string.
+     * @return the parsed predicate.
      * @throws ParseException if the input syntax is incorrect
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#predicate">
      *        N-Triples predicate syntax</a>
@@ -298,8 +301,8 @@ public abstract class NTParser {
     /** 
      * Parse an RDF object in N-Triples format.
      *
-     * @param ntObject the input string
-     * @return the parsed predicate
+     * @param ntObject the input string.
+     * @return the parsed predicate.
      * @throws ParseException if the input syntax is incorrect
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#object">
      *        N-Triples object syntax</a>
@@ -313,11 +316,9 @@ public abstract class NTParser {
     /**
      * Parse an RDF node in N-Triples format.
      *
-     * @param ntNode the input string
-     * @return the parsed node
+     * @param ntNode the input string.
+     * @return the parsed node.
      * @throws ParseException if the input syntax is incorrect
-     * @see <a href="http://www.w3.org/TR/rdf-testcases/#object">
-     *        N-Triples object syntax</a>
      */
     public static Node parseNode(String ntNode) 
             throws ParseException {
@@ -333,6 +334,13 @@ public abstract class NTParser {
         }
     }
 
+    /**
+     * Parse an RDF literal in N-Triples format.
+     *
+     * @param s the input string.
+     * @return the parsed literal.
+     * @throws ParseException if the input syntax is incorrect
+     */
     public static Literal parseLiteral(String s)
             throws ParseException {
 
@@ -418,6 +426,13 @@ public abstract class NTParser {
         }
     }
 
+    /**
+     * Parse an RDF URI reference in N-Triples format.
+     *
+     * @param s the input string.
+     * @return the parsed URI reference.
+     * @throws ParseException if the input syntax is incorrect
+     */
     public static URIReference parseURIReference(String s)
             throws ParseException {
 
@@ -451,6 +466,10 @@ public abstract class NTParser {
      *        to their original form (tab, carriage return, linefeed, quote,
      *        and backslash, respectively).</li>
      * </ul>
+     *
+     * @param s The input string.
+     * @return The unescaped string.
+     * @throws ParseException if the input syntax is incorrect
      */
     protected static String unescape(String s)
             throws ParseException {
@@ -553,6 +572,9 @@ public abstract class NTParser {
      *        and tab (\t) characters.</li>
      *   <li> All other characters will be represented as-is.</li>
      * </ul>
+     *
+     * @param s The input string.
+     * @return The escaped string.
      */ 
     protected static String escape(String s) {
 
@@ -593,6 +615,10 @@ public abstract class NTParser {
     /**
      * Get an uppercase hex string of the specified length, 
      * representing the given number.
+     *
+     * @param num The number to represent.
+     * @param len The desired length of the output.
+     * @return The uppercase hex string.
      */
     private static String hexString(int num, int len) {
         StringBuffer out = new StringBuffer(len);
