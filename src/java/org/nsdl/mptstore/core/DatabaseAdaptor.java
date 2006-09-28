@@ -5,8 +5,8 @@ import java.sql.Connection;
 import java.util.Iterator;
 
 import org.nsdl.mptstore.query.QueryException;
-import org.nsdl.mptstore.query.QueryLanguage;
 import org.nsdl.mptstore.query.QueryResults;
+import org.nsdl.mptstore.query.lang.QueryLanguage;
 import org.nsdl.mptstore.rdf.Triple;
 
 /**

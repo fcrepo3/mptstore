@@ -10,13 +10,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import org.nsdl.mptstore.query.QueryCompiler;
 import org.nsdl.mptstore.query.QueryException;
-import org.nsdl.mptstore.query.QueryLanguage;
 import org.nsdl.mptstore.query.QueryResults;
-import org.nsdl.mptstore.query.SPOQueryCompiler;
 import org.nsdl.mptstore.query.SQLProvider;
 import org.nsdl.mptstore.query.SQLUnionQueryResults;
+import org.nsdl.mptstore.query.lang.QueryCompiler;
+import org.nsdl.mptstore.query.lang.QueryLanguage;
+import org.nsdl.mptstore.query.lang.spo.SPOQueryCompiler;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.Triple;
 
