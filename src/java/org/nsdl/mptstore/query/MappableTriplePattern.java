@@ -23,10 +23,10 @@ import org.nsdl.mptstore.rdf.SubjectNode;
  * @author birkland
  *
  */
-class MappableTriplePattern {
-	public final MappableNodePattern<SubjectNode> subject;
-	public final MappableNodePattern<PredicateNode> predicate;
-	public final MappableNodePattern<ObjectNode> object;
+class MappableTriplePattern implements TriplePattern {
+	private final MappableNodePattern<SubjectNode> subject;
+	private final MappableNodePattern<PredicateNode> predicate;
+	private final MappableNodePattern<ObjectNode> object;
     
 	public MappableTriplePattern(MappableNodePattern<SubjectNode> s, 
                                  MappableNodePattern<PredicateNode> p, 
@@ -38,9 +38,21 @@ class MappableTriplePattern {
 	}
 	
     public MappableTriplePattern(TriplePattern pattern) {
-        this.subject = new MappableNodePattern<SubjectNode>(pattern.subject);
-        this.predicate = new MappableNodePattern<PredicateNode>(pattern.predicate);
-        this.object = new MappableNodePattern<ObjectNode>(pattern.object);
+        this.subject = new MappableNodePattern<SubjectNode>(pattern.getSubject());
+        this.predicate = new MappableNodePattern<PredicateNode>(pattern.getPredicate());
+        this.object = new MappableNodePattern<ObjectNode>(pattern.getObject());
+    }
+    
+    public MappableNodePattern<SubjectNode> getSubject() {
+        return this.subject;
+    }
+    
+    public MappableNodePattern<PredicateNode> getPredicate() {
+        return this.predicate;
+    }
+    
+    public MappableNodePattern<ObjectNode> getObject() {
+        return this.object;
     }
     
 	public void bindTo(MPTable t) {

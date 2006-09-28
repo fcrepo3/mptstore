@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.rdf.Node;
 import org.nsdl.mptstore.rdf.PredicateNode;
 
 /** Translates a {@link GraphQuery} into a series of SQL statements
@@ -201,9 +202,9 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         /* First, organize the filters by variable so that we can map them */
         HashMap<String, Set<MappableNodeFilter>> filters = new HashMap<String, Set<MappableNodeFilter>>();
         
-        Set<MappableNodeFilter>givenFilters = new HashSet<MappableNodeFilter>();
-        for (NodeFilter filter : g.getFilters()) {
-            givenFilters.add(new MappableNodeFilter(filter));
+        Set<MappableNodeFilter<Node>>givenFilters = new HashSet<MappableNodeFilter<Node>>();
+        for (NodeFilter<Node> filter : g.getFilters()) {
+            givenFilters.add(new MappableNodeFilter<Node>(filter));
         }
         
         for (MappableNodeFilter f : givenFilters) {
@@ -336,10 +337,10 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
 
             for (MappableNodeFilter f : filters.get(varName)) {
                 String mappedName;
-                if (p.subject.isVariable() && p.subject.getVarName().equals(varName)) {
-                    mappedName = p.subject.mappedName();
-                } else if (p.object.isVariable() && p.object.getVarName().equals(varName)) {
-                    mappedName = p.object.mappedName();
+                if (p.getSubject().isVariable() && p.getSubject().getVarName().equals(varName)) {
+                    mappedName = p.getSubject().mappedName();
+                } else if (p.getObject().isVariable() && p.getObject().getVarName().equals(varName)) {
+                    mappedName = p.getObject().mappedName();
                 } else {
                     throw new QueryException("Variable " + varName + " in filter Cannot be found in graph query");
                 }
@@ -372,7 +373,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     
     private MappableTriplePattern getJoinablePattern(List<MappableTriplePattern> l, HashMap<String, String> variableBinsings) {
         for (MappableTriplePattern p : l) {
-            if (isBound(p.subject, variableBinsings) || isBound(p.object, variableBinsings)) {
+            if (isBound(p.getSubject(), variableBinsings) || isBound(p.getObject(), variableBinsings)) {
                 return p;
             }
         }
@@ -405,11 +406,11 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      * - Placing any literal values into the literals map
      */
     private void bindPattern(MappableTriplePattern t, HashMap<String, String>variableBindings) {
-        t.bindTo(manager.mapPredicateTable(t.predicate));
+        t.bindTo(manager.mapPredicateTable(t.getPredicate()));
         
-        bindNode(t.subject, variableBindings);
+        bindNode(t.getSubject(), variableBindings);
         //bindNode(t.predicate, variableBindings);
-        bindNode(t.object, variableBindings);
+        bindNode(t.getObject(), variableBindings);
 
     }
     
@@ -474,24 +475,24 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         
         public Set<MappableNodePattern> joinVars() {
             HashSet<MappableNodePattern> s = new HashSet<MappableNodePattern>();
-            if (t.subject.isVariable()) {
-                s.add(t.subject);
+            if (t.getSubject().isVariable()) {
+                s.add(t.getSubject());
             }
             
-            if (t.object.isVariable()) {
-                s.add(t.object);
+            if (t.getObject().isVariable()) {
+                s.add(t.getObject());
             }
             
             return s;
         }
         
         public String alias() {
-            return t.subject.boundTable().alias();
+            return t.getSubject().boundTable().alias();
         }
         
         public String declaration() {
-            String alias = t.subject.boundTable().alias();
-            String name = t.subject.boundTable().name();
+            String alias = t.getSubject().boundTable().alias();
+            String name = t.getSubject().boundTable().name();
             if (name.equals(alias)) {
                 return name;
             } else {

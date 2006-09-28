@@ -19,8 +19,11 @@ import org.nsdl.mptstore.rdf.SubjectNode;
  * </p>
  * @author birkland
  *
+ * @param <T> The type of node that is described by the pattern.  Typically,
+ * this is one of SubjectNode, PredicateNode, ObjectNode, or just Node if the
+ * exact node type is unimportant or unknown.
  */
-class MappableNodePattern<T extends Node> implements NodePattern {
+class MappableNodePattern<T extends Node> implements NodePattern<T> {
     private final boolean isVariable;
     private final T nodeValue;
 	private final String varName

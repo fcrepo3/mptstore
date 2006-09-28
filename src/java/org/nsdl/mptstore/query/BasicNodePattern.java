@@ -2,6 +2,14 @@ package org.nsdl.mptstore.query;
 
 import org.nsdl.mptstore.rdf.Node;
 
+/** Generic implementation of {@link org.nsdl.mptstore.query.NodePattern}
+ * 
+ * @author birkland
+ *
+ * @param <T> The type of node that is described by the pattern.  Typically,
+ * this is one of SubjectNode, PredicateNode, ObjectNode, or just Node if the
+ * exact node type is unimportant or unknown.
+ */
 public class BasicNodePattern<T extends Node> implements NodePattern<T> {
     
     private final T nodeValue;

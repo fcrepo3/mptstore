@@ -3,6 +3,8 @@ package org.nsdl.mptstore.query;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.nsdl.mptstore.rdf.Node;
+
 /** A set of concrete triple patterns and value constraints defining an 
  *  RDF subgraph
  * <p>
@@ -14,7 +16,7 @@ import java.util.List;
  */
 public class GraphPattern implements QueryElement {
 	private ArrayList<TriplePattern> steps = new ArrayList<TriplePattern>();
-	private ArrayList<NodeFilter> filters = new ArrayList<NodeFilter>();
+	private ArrayList<NodeFilter<Node>> filters = new ArrayList<NodeFilter<Node>>();
 	
 	
 	public QueryElement.Type getType() {
@@ -27,8 +29,8 @@ public class GraphPattern implements QueryElement {
 	}
 	
 	
-	public List<NodeFilter> getFilters() {
-		return new ArrayList<NodeFilter>(filters);
+	public List<NodeFilter<Node>> getFilters() {
+		return new ArrayList<NodeFilter<Node>>(filters);
 	}
 	
 	
@@ -40,7 +42,7 @@ public class GraphPattern implements QueryElement {
 		steps.remove(s);
 	}
 	
-	public void addFilter(NodeFilter filter) {
+	public void addFilter(NodeFilter<Node> filter) {
 		filters.add(filter);
 	}
 	
