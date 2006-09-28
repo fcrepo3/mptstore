@@ -52,4 +52,45 @@ public interface Node {
      */
     public String toString();
 
+    /**
+     * Tell whether this <code>Node</code> should be considered equivalent
+     * to the given object.
+     * <p>
+     *   A <code>URIReference</code> node is equal to the given 
+     *   object if all of the following conditions are met:
+     *   <ul>
+     *     <li> <code>obj != null</code></li>
+     *     <li> <code>obj instanceof URIReference</code></li>
+     *     <li> <code>obj.getURI().equals(this.getURI())</code></li>
+     *   </ul>
+     * </p>
+     * <p>
+     *   A <code>Literal</code> node is equal to the given 
+     *   object if all of the following conditions are met:
+     *   <ul>
+     *     <li> <code>obj != null</code></li>
+     *     <li> <code>obj instanceof Literal</code></li>
+     *     <li> <code>obj.getValue().equals(this.getValue())</code></li>
+     *     <li> The given literal's language (or null) is equal to this
+     *          literal's language (or null).</li>
+     *     <li> The given literal's datatype (or null) is equal to this
+     *          literal's datatype (or null).</li>
+     *   </ul>
+     * </p>
+     *
+     * @return true if the objects are equal according to the rules above.
+     */
+    public boolean equals(Object obj);
+
+    /**
+     * Return a hash code for this node.
+     * <p>
+     *   The hash code of a URIReference is the hash code of getURI().
+     *   The hash code of a Literal is the hash code of getValue().
+     * </p>
+     *
+     * @return the hash code.
+     */
+    public int hashCode();
+
 }

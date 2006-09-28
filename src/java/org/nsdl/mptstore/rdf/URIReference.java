@@ -64,4 +64,18 @@ public class URIReference
         return "<" + _uri.toString() + ">";
     }
 
+    // Implements Node.equals(Object)
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof URIReference) {
+            return _uri.equals(((URIReference) obj).getURI());
+        } else {
+            return false;
+        }
+    }
+
+    // Implements Node.hashCode()
+    public int hashCode() {
+        return _uri.hashCode();
+    }
+
 }

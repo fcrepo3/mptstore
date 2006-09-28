@@ -145,4 +145,29 @@ public class Literal implements ObjectNode {
         return out.toString();
     }
 
+    // Implements Node.equals(Object)
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof Literal) {
+            Literal lit = (Literal) obj;
+            if (_language != null) {
+                return _language.equals(lit.getLanguage())
+                    && _value.equals(lit.getValue());
+            } else if (_datatype != null) {
+                return _datatype.equals(lit.getDatatype())
+                    && _value.equals(lit.getValue());
+            } else {
+                return lit.getLanguage() == null
+                    && lit.getDatatype() == null
+                    && _value.equals(lit.getValue());
+            }
+        } else {
+            return false;
+        }
+    }
+
+    // Implements Node.hashCode()
+    public int hashCode() {
+        return _value.hashCode();
+    }
+
 }
