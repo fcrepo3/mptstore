@@ -1,13 +1,13 @@
-package org.nsdl.mptstore.rdf;
+package org.nsdl.mptstore.util;
 
 import java.text.ParseException;
 
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
-public class NTParserTest extends TestCase {
+public class NTriplesUtilTest extends TestCase {
 
-    public NTParserTest(String name) { super (name); }
+    public NTriplesUtilTest(String name) { super (name); }
 
     public void setUp() {
     }
@@ -21,7 +21,7 @@ public class NTParserTest extends TestCase {
 
     private String checkTriple(String ntTriple) {
         try {
-            NTParser.parseTriple(ntTriple);
+            NTriplesUtil.parseTriple(ntTriple);
             return null;
         } catch (ParseException e) {
             return e.getMessage() + " at character " + e.getErrorOffset() 
@@ -118,7 +118,7 @@ public class NTParserTest extends TestCase {
     }
 
     public static void main(String[] args) {
-        TestRunner.run(NTParserTest.class);
+        TestRunner.run(NTriplesUtilTest.class);
     }   
 
 }

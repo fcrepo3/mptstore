@@ -1,9 +1,10 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.query.lang.spo;
 
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
 import org.nsdl.mptstore.core.TableManager;
+import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.rdf.PredicateNode;
 
 public class SPOQueryCompilerTest extends TestCase {

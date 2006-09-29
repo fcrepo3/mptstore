@@ -1,23 +1,20 @@
-package org.nsdl.mptstore.query;
+package org.nsdl.mptstore.util;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.swingui.TestRunner;
 
-import org.nsdl.mptstore.query.lang.LangPackageTestSuite;
-
-public class QueryPackageTestSuite extends TestCase {
+public class UtilPackageTestSuite extends TestCase {
 
     public static Test suite() throws Exception {
 
-        TestSuite suite = new TestSuite(QueryPackageTestSuite.class.getName());
+        TestSuite suite = new TestSuite(UtilPackageTestSuite.class.getName());
    
         // classes in this package
-        //suite.addTestSuite(SomeTest.class);
+        suite.addTestSuite(NTriplesUtilTest.class);
 
         // sub-package suites
-        suite.addTest(LangPackageTestSuite.suite());
 
         return suite;
 
@@ -25,9 +22,9 @@ public class QueryPackageTestSuite extends TestCase {
 
     public static void main(String[] args) throws Exception {
         if (System.getProperty("text") != null && System.getProperty("text").equals("true")) {
-            junit.textui.TestRunner.run(QueryPackageTestSuite.suite());
+            junit.textui.TestRunner.run(UtilPackageTestSuite.suite());
         } else {
-            TestRunner.run(QueryPackageTestSuite.class);
+            TestRunner.run(UtilPackageTestSuite.class);
         }
     }
 }

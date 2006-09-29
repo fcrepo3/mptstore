@@ -9,6 +9,7 @@ import org.nsdl.mptstore.core.CorePackageTestSuite;
 import org.nsdl.mptstore.impl.ImplPackageTestSuite;
 import org.nsdl.mptstore.query.QueryPackageTestSuite;
 import org.nsdl.mptstore.rdf.RDFPackageTestSuite;
+import org.nsdl.mptstore.util.UtilPackageTestSuite;
 
 public class MPTStorePackageTestSuite extends TestCase {
 
@@ -24,6 +25,7 @@ public class MPTStorePackageTestSuite extends TestCase {
         suite.addTest(ImplPackageTestSuite.suite());
         suite.addTest(QueryPackageTestSuite.suite());
         suite.addTest(RDFPackageTestSuite.suite());
+        suite.addTest(UtilPackageTestSuite.suite());
 
         return suite;
 
