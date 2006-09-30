@@ -1,7 +1,5 @@
 package org.nsdl.mptstore.rdf;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import java.text.ParseException;
 
@@ -140,7 +138,7 @@ public class Literal implements ObjectNode {
         if (_language != null) {
             out.append("@" + _language);
         } else if (_datatype != null) {
-            out.append("^^" + _datatype.getValue());
+            out.append("^^" + _datatype.toString());
         }
         return out.toString();
     }
