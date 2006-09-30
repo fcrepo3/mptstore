@@ -20,26 +20,69 @@ import org.nsdl.mptstore.util.DBUtil;
 import org.nsdl.mptstore.util.NTriplesUtil;
 
 /**
- * Query results that wrap a set of SQL database queries,
- * run back-to-back on a single connection.
+ * RDF query results generated from a list of SQL statements.
+ *
+ * This class executes the given SQL in the order given, and provides
+ * an RDF result row for each JDBC ResultSet row.
+ *
+ * @author cwilper@cs.cornell.edu
  */
 public class SQLUnionQueryResults implements QueryResults {
 
+    /**
+     * The Logger for this class.
+     */
     private static final Logger _LOG = Logger.getLogger(SQLUnionQueryResults.class.getName());
 
+    /**
+     * The database connection to use for the SQL queries.
+     */
     private Connection _conn;
+
+    /**
+     * The JDBC fetchSize to use for each SQL query.
+     */
     private int _fetchSize;
+
+    /**
+     * Provides the SQL and column names for the query.
+     */
     private SQLProvider _sqlProvider;
 
+    /**
+     * The SQL queries to execute.
+     */
     private Iterator<String> _queries;
 
+    /**
+     * Whether this instance has been closed.
+     */
     private boolean _closed;
 
+    /**
+     * The current JDBC ResultSet.
+     */
     private ResultSet _results;
+
+    /**
+     * The current JDBC Statement.
+     */
     private Statement _statement;
 
+    /**
+     * The row to be returned by the next call to next().
+     */
     private List<Node> _nextTuple;
 
+    /**
+     * Instantiate SQLUnionQueryResults to work with the given SQL on the 
+     * given connection
+     *
+     * @param conn the database connection to use.
+     * @param fetchSize the JDBC fetchSize to use for each SQL query.
+     * @param sqlProvider provides the SQL and column names for the query.
+     * @throws QueryException if an unexpected error occurs starting the query.
+     */
     public SQLUnionQueryResults(Connection conn,
                                 int fetchSize,
                                 SQLProvider sqlProvider) 
@@ -66,9 +109,12 @@ public class SQLUnionQueryResults implements QueryResults {
     }
 
     /**
-     * Set _nextTuple to the next tuple,
-     * If there are no more tuples, proactively close
-     * and set _nextTuple to null.
+     * Set _nextTuple to the next tuple.  
+     *
+     * If there are no more tuples, proactively close and set 
+     * <code>_nextTuple</code> to <code>null</code>.
+     *
+     * @throws QueryException if an unexpected error occurs.
      */
     private void readNextTuple() throws QueryException {
 
@@ -102,6 +148,14 @@ public class SQLUnionQueryResults implements QueryResults {
         }
     }
 
+    /**
+     * Start the next SQL query, setting _results as appropriate.
+     *
+     * Any resources tied up by the prior query, if any, will be cleaned up.
+     * If there are no more queries, _results will be set to <code>null</code>.
+     *
+     * @throws SQLException if there is a database error.
+     */
     private void startNextQuery() throws SQLException {
         if (_queries.hasNext()) {
             if (_results != null) {
@@ -173,8 +227,9 @@ public class SQLUnionQueryResults implements QueryResults {
     }
 
     /**
-     * In the event of garbage collection, make sure close()
-     * has occurred.
+     * In the event of garbage collection, make sure close() has occurred.
+     *
+     * Note: This is intended to be called by the VM, not by client code.
      */
     public void finalize() {
         close();
