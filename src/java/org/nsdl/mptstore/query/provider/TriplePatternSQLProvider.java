@@ -13,8 +13,16 @@ import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.SubjectNode;
 import org.nsdl.mptstore.util.DBUtil;
 
+/**
+ * Translates a {@link TriplePattern} into a series of SQL statements.
+ *
+ * @author cwilper@cs.cornell.edu.
+ */
 public class TriplePatternSQLProvider implements SQLProvider {
 
+    /**
+     * The Logger for this class.
+     */
     private static final Logger _LOG = Logger.getLogger(TriplePatternSQLProvider.class.getName());
 
     public static final List<String> SPO_TARGETS;

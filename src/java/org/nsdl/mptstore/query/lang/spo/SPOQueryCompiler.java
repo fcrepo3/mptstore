@@ -26,15 +26,20 @@ import org.nsdl.mptstore.util.NTriplesUtil;
 /**
  * Compiler for SPO queries.
  *
- * SPO is a simple query language that returns triples (subject, predicate,
- * object) given a single triple pattern where an asterisk in any
- * position means "any".
- *
+ * <p>
+ *   SPO is a simple query language that returns triples (subject, predicate,
+ *   object) given a single triple pattern where an asterisk in any
+ *   position acts as a wildcard.
+ * </p>
  * <p>
  *   The grammar for SPO queries is the same as the N-Triples "triple"
  *   production, except it allows an asterisk in any node position and 
  *   is not terminated with a dot.
  * </p>
+ *
+ * @see <a href="http://www.w3.org/TR/rdf-testcases/#triple">
+ *      N-Triples "triple" syntax specification</a>
+ * @author cwilper@cs.cornell.edu
  */
 public class SPOQueryCompiler implements QueryCompiler {
 
@@ -44,9 +49,24 @@ public class SPOQueryCompiler implements QueryCompiler {
     private static final String _EXPECTED_G = "Expected '>'";
     private static final String _EXPECTED_ST = "Expected ' ' or TAB";
 
+    /**
+     * The table manager used to look up table names for predicates.
+     */
     private TableManager _tableManager;
+
+    /**
+     * Whether the backslash character should be escaped in the output SQL.
+     */
     private boolean _backslashIsEscape;
 
+    /**
+     * Instantiate an SPOQueryCompiler.
+     *
+     * @param tableManager The table manager to be used to look up table names 
+     *                     for predicates.
+     * @param backslashIsEscape Whether the backslash character should be
+     *                          escaped in the output SQL.
+     */
     public SPOQueryCompiler(TableManager tableManager,
                             boolean backslashIsEscape) {
         _tableManager = tableManager;
@@ -66,6 +86,13 @@ public class SPOQueryCompiler implements QueryCompiler {
         }
     }
 
+    /**
+     * Translate an SPO query string into a single <code>TriplePattern</code>.
+     *
+     * @param query the SPO query.
+     * @return TriplePattern the triple pattern.
+     * @throws ParseException if the query is malformed.
+     */
     private TriplePattern parseTriplePattern(String query) 
             throws ParseException {
 

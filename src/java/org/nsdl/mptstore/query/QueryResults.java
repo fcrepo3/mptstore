@@ -27,7 +27,7 @@ public interface QueryResults extends ClosableIterator<List<Node>> {
     public List<Node> next();
 
     /**
-     * Is there another row of results?
+     * Tell whether there's another row of results.
      *
      * @return true if there's another row, false if not.
      */
