@@ -295,8 +295,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                     /* Join this variable's column with the corresponding bound column */
                     if (!p.mappedName().equals(getBoundValue(p, variableBindings))) {
                         LOG.debug("parseGraphPattern: Adding Join Condition " + 
-                                p.mappedName() +  " = " +  "'" + getBoundValue(p, variableBindings) + "'"+ "\n");
-                        conditions.addCondition(p.mappedName(), " = ", "'" + getBoundValue(p, variableBindings) + "'");
+                                p.mappedName() +  " = " +  getBoundValue(p, variableBindings) + "\n");
+                        conditions.addCondition(p.mappedName(), " = ", getBoundValue(p, variableBindings));
                     }
                 }
             } 
@@ -436,7 +436,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         if (n.isVariable()) {
             return variableBindings.get(n.getVarName());
         } else {
-            return n.getNode().toString();
+            return "'" + n.getNode().toString() + "'";
         }
     }
     
