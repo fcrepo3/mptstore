@@ -3,51 +3,90 @@
     "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
     "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 <!--
-  Java coding standards for MPTStore.
+  Coding standards for MPTStore.
 
-  These differ from the defaults (sun_checks.xml) in Checkstyle 4.2.
-
-  Differences are:
-
-    1) Omitted NewlineAtEndOfFile check.  This is platform-specific.
-    2) Javadoc comments are not required for private members.
-    3) Private members may begin with underscore.
-    3) Lines may be up to 100 characters long.
-
+  These roughly follow Sun coding conventions, with a few other
+  best practices mixed in.
 -->
 
 <module name="Checker">
 
-    <!-- Checks that a package.html file exists for each package.     -->
-    <!-- See http://checkstyle.sf.net/config_javadoc.html#PackageHtml -->
+    <!-- 
+      Every package must have a package.html file. 
+    -->
     <module name="PackageHtml"/>
 
-    <!-- Checks that property files contain the same keys.         -->
-    <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
+    <!-- 
+      Localized property files must define the same keys. 
+    -->
     <module name="Translation"/>
-
 
     <module name="TreeWalker">
 
-        <!-- Checks for Javadoc comments.                     -->
-        <!-- See http://checkstyle.sf.net/config_javadoc.html -->
+        <!--//////////////////////////////////////////////////////////////
+                                  Javadoc Requirements
+            //////////////////////////////////////////////////////////////-->
+
+        <!-- 
+          All non-private methods/constructors must have javadocs for all:
+             o Parameters
+             o Return values
+             o Declared exceptions
+          Note: To avoid duplication, use {@inheritDoc} if the method is
+                already documented sufficiently in the superclass/interface.
+        -->
         <module name="JavadocMethod">
           <property name="scope" value="package"/>
         </module>
+
+        <!-- 
+          All non-private classes/interfaces must have javadocs with:
+            o At least one author tag
+            o Class parameters documented
+        -->
         <module name="JavadocType">
           <property name="scope" value="package"/>
+          <property name="authorFormat" value="^.+$"/>
         </module>
+
+        <!-- 
+          All non-private variables/constants must have javadocs. 
+        -->
         <module name="JavadocVariable">
           <property name="scope" value="package"/>
         </module>
-        <module name="JavadocStyle"/>
 
+        <!-- 
+          All javadocs must be well-formed.
+            o The first sentence must end with proper punctuation.
+            o Empty javadocs are not allowed.
+            o HTML tags must be properly closed.
+        -->
+        <module name="JavadocStyle">
+          <property name="checkFirstSentence" value="true"/>
+          <property name="checkEmptyJavadoc" value="true"/>
+          <property name="checkHtml" value="true"/>
+        </module>
 
-        <!-- Checks for Naming Conventions.                  -->
-        <!-- See http://checkstyle.sf.net/config_naming.html -->
+        <!--//////////////////////////////////////////////////////////////
+                                  Naming Conventions
+            //////////////////////////////////////////////////////////////-->
+
+        <!--
+          Constants (static final) must be ALL_CAPS.
+        -->
         <module name="ConstantName"/>
+
+        <!--
+          Local variables should be in camelCase.
+        -->
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
+
+        <!--
+          Member variables should be in camelCase.
+          Private members may optionally begin with an underscore.
+        -->
         <module name="MemberName">
           <property name="applyToPrivate" value="false"/>
         </module>
@@ -58,108 +97,336 @@
           <property name="applyToPrivate" value="true"/>
           <property name="format" value="^_?[a-z][a-zA-Z0-9]*$"/>
         </module>
+
+        <!--
+          Method names should be in camelCase.
+        -->
         <module name="MethodName"/>
-        <module name="PackageName"/>
+
+        <!--
+          Package names should be all lowercase with no underscores.
+        -->
+        <module name="PackageName">
+          <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+        </module>
+
+        <!--
+          Parameter names should be in camelCase.
+        -->
         <module name="ParameterName"/>
+
+        <!--
+          Non-final static variables should be in camelCase.
+        -->
         <module name="StaticVariableName"/>
+
+        <!--
+          Class/interface names should have the FirstLetterOfWordsCapitalized.
+        -->
         <module name="TypeName"/>
 
 
-        <!-- Checks for imports                              -->
-        <!-- See http://checkstyle.sf.net/config_import.html -->
+        <!--//////////////////////////////////////////////////////////////
+                                      Imports
+            //////////////////////////////////////////////////////////////-->
+
+        <!-- 
+          Wildcards are not allowed in import statements.
+        -->
         <module name="AvoidStarImport"/>
-        <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
+
+        <!--
+          No packages under sun.* may be used.
+        -->
+        <module name="IllegalImport"/>
+
+        <!--
+          Redundant imports should be removed.
+        -->
         <module name="RedundantImport"/>
+
+        <!--
+          Unused imports should be removed.
+        -->
         <module name="UnusedImports"/>
 
 
-        <!-- Checks for Size Violations.                    -->
-        <!-- See http://checkstyle.sf.net/config_sizes.html -->
+        <!--//////////////////////////////////////////////////////////////
+                                   Size Limits
+            //////////////////////////////////////////////////////////////-->
+
+
         <!--
+          Java files should be kept at or below 2000 lines.
+        -->
         <module name="FileLength"/>
+
+        <!--
+          Lines should not exceed 80 characters.
         <module name="LineLength">
-          <property name="max" value="100"/>
+          <property name="max" value="80"/>
         </module>
-        <module name="MethodLength"/>
+131        -->
+
+        <!--
+          Methods should not exceed 150 lines of code.
+        <module name="MethodLength">
+          <property name="countEmpty" value="false"/>
+        </module>
+1        -->
+
+        <!--
+          No constructor or method should take more than 7 parameters.
+        -->
         <module name="ParameterNumber"/>
-        -->
 
+        <!--//////////////////////////////////////////////////////////////
+                                   Whitespace
+            //////////////////////////////////////////////////////////////-->
 
-        <!-- Checks for whitespace                               -->
-        <!-- See http://checkstyle.sf.net/config_whitespace.html -->
         <!--
+          Empty initializers in for loops should not contain whitespace.
+
+          Good: for (; i == 1; i++) {
+          Bad : for ( ; i == 1; i++) {
+        -->
         <module name="EmptyForIteratorPad"/>
+
+        <!--
+          There should be no whitespace between a method and the left paren
+          of its parameters, either in it's defintion or invocation.
+
+          Good: someMethod(a);
+          Bad : someMethod (a);
         <module name="MethodParamPad"/>
+4        -->
+
+        <!--
+          There should be no whitespace after the following tokens:
+
+          ARRAY_INIT, BNOT, DEC, DOT, INC, LNOT, UNARY_MINUS, UNARY_PLUS, TYPECAST
+
+          Good: if (!true) {
+          Bad: if (! true) {
         <module name="NoWhitespaceAfter"/>
+1        -->
+
+        <!--
+          There should be no whitespace before the following tokens:
+
+          SEMI, DOT, POST_DEC, POST_INC
+
+          Good: if (!true) {
+          Bad: if ( !true) {
+        -->
         <module name="NoWhitespaceBefore"/>
+
+        <!--
+          When wrapping an expression, the operator should be the
+          first token on the new line.
+
+          Good: if (a
+                        & b) {
+          Bad:  if (a &
+                        b) {
         <module name="OperatorWrap"/>
+10        -->
+
+        <!--
+          Spaces are forbidden on the left and right side of an
+          expression in parentheses.
         <module name="ParenPad"/>
+12        -->
+
+        <!--
+          Spaces are forbidden inside the parentheses of a type cast.
+        -->
         <module name="TypecastParenPad"/>
+
+        <!--
+          Tabs are not allowed.
         <module name="TabCharacter"/>
+120        -->
+
+        <!--
+          Whitespace is required after commas, semicolons, and typecasts.
         <module name="WhitespaceAfter"/>
+20        -->
+
+        <!--
+          Whitespace is required on both sides of most tokens.
         <module name="WhitespaceAround"/>
-        -->
+760 (almost all are generics-related) -->
 
 
-        <!-- Modifier Checks                                    -->
-        <!-- See http://checkstyle.sf.net/config_modifiers.html -->
+
+        <!--//////////////////////////////////////////////////////////////
+                                     Modifiers
+            //////////////////////////////////////////////////////////////-->
+
         <!--
+          Modifiers should be specified in the order suggested by the
+          Java language specification.
+        -->
         <module name="ModifierOrder"/>
-        <module name="RedundantModifier"/>
-        -->
 
-
-        <!-- Checks for blocks. You know, those {}'s         -->
-        <!-- See http://checkstyle.sf.net/config_blocks.html -->
         <!--
-        <module name="AvoidNestedBlocks"/>
-        <module name="EmptyBlock"/>
-        <module name="LeftCurly"/>
-        <module name="NeedBraces"/>
-        <module name="RightCurly"/>
+          Modifiers should not be specified where it would be
+          redundant to do so, such as interface method declarations.
+        <module name="RedundantModifier"/>
+40        -->
+
+
+        <!--//////////////////////////////////////////////////////////////
+                                   Blocks { }
+            //////////////////////////////////////////////////////////////-->
+
+        <!--
+          Avoid meaningless blocks.
+          These are usually debugging/commenting leftovers.
         -->
+        <module name="AvoidNestedBlocks"/>
+
+        <!--
+          Blocks must have at least one statement.
+          In particular, this guards against empty catch blocks.
+          If an error is caught and not acted upon, the software should at least 
+          generate a warning of some kind.
+        <module name="EmptyBlock"/>
+9        -->
+
+        <!--
+          Block openers should be immediately followed by an EOL.
+        <module name="LeftCurly"/>
+1       -->
+
+        <!--
+          Even short if/else statements need to use blocks for readability.
+        <module name="NeedBraces"/>
+3 -->
+
+        <!--
+          Right braces should be the first character on the line for
+          try, catch, and else statements.
+        -->
+        <module name="RightCurly"/>
 
 
         <!-- Checks for common coding problems               -->
         <!-- See http://checkstyle.sf.net/config_coding.html -->
-        <!--
         <module name="AvoidInlineConditionals"/>
         <module name="DoubleCheckedLocking"/> 
+
+        <!--
+          Empty statements are not allowed.
+          This usually indicates a typo, like ;;.
         <module name="EmptyStatement"/>
+1        -->
+
+        <!--
+          If toString is overridden, hashCode should also be.
         <module name="EqualsHashCode"/>
+2        -->
+
+        <!--
+          Local variable names should be distinct from (and not "hide")
+          fields in the same class.
         <module name="HiddenField"/>
-        <module name="IllegalInstantiation"/>
+14        -->
+
+          
         <module name="InnerAssignment"/>
+
+        <!--
+          Magic numbers (inline literal constants) should be avoided.
         <module name="MagicNumber"/>
+22        -->
+
+        <!--
+          Switch statements should always have a default clause.
+        -->
         <module name="MissingSwitchDefault"/>
-        <module name="RedundantThrows"/>
+
+        <!--
+          Boolean expressions should not contain the true and false
+          constants because it's redundant.
+        -->
         <module name="SimplifyBooleanExpression"/>
+
+        <!--
+          When returning a boolean, don't have constructs like the following:
+
+          if (a) {
+              return true;
+          } else {
+              return false;
+          }
+
+          Instead, just return the expression.
+        -->
         <module name="SimplifyBooleanReturn"/>
-        -->
 
-        <!-- Checks for class design                         -->
-        <!-- See http://checkstyle.sf.net/config_design.html -->
         <!--
-        <module name="DesignForExtension"/>
+          Classes with only private constructors must be declared as final.
+        -->
         <module name="FinalClass"/>
-        <module name="HideUtilityClassConstructor"/>
-        <module name="InterfaceIsType"/>
-        <module name="VisibilityModifier"/>
-        -->
 
-
-        <!-- Miscellaneous other checks.                   -->
-        <!-- See http://checkstyle.sf.net/config_misc.html -->
         <!--
+          Utility classes should have private no-arg constructors.
+        <module name="HideUtilityClassConstructor"/>
+2        -->
+
+        <!--
+          An interface cannot be used solely to define constants.
+          It must be either a marker interface or define one or more methods.
+        -->
+        <module name="InterfaceIsType"/>
+
+        <!--
+          Class members must be either a) public, static, and final, or b) private.
+          This rule enforces encapsulation.
+        -->
+        <module name="VisibilityModifier"/>
+
+
+        <!--//////////////////////////////////////////////////////////////
+                                   Miscellaneous
+            //////////////////////////////////////////////////////////////-->
+
+        <!--
+          Use java-style array definitions, like String[] a.
+        -->
         <module name="ArrayTypeStyle"/>
+
+        <!--
+          Declare method/constructor/catch block parameters as final.
+          This removes the possibility of changing the value of a parameter
+          in the body of the corresponding block, which is bad practice.
+          This is unnecessary for interface methods and abstract methods,
+          so the check will not be performed on them.
         <module name="FinalParameters"/>
+165        -->
+
+        <!--
+          Lines should not end with spaces.
         <module name="GenericIllegalRegexp">
             <property name="format" value="\s+$"/>
             <property name="message" value="Line has trailing spaces."/>
         </module>
+335        -->
+
+        <!--
+          Don't forget to address TODO: comments before a release.
+          If they can't be addressed before a release, elevate the issue
+          from the code to the release notes.
         <module name="TodoComment"/>
-        <module name="UpperEll"/>
+2        -->
+
+        <!--
+          Long constants should be defined with uppercase L syntax, not lowercase.
+          This recommendation is from the Java language specification.
         -->
+        <module name="UpperEll"/>
 
     </module>
 
