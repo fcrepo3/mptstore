@@ -22,24 +22,24 @@ import org.nsdl.mptstore.rdf.URIReference;
  */
 public abstract class NTriplesUtil {
 
-    private static final String _EXPECTED_ABS_URI = "Expected absolute URI";
-    private static final String _EXPECTED_ACE = "Expected '@', '^', or EOF";
-    private static final String _EXPECTED_C = "Expected '^'";
-    private static final String _EXPECTED_G = "Expected '>'";
-    private static final String _EXPECTED_L = "Expected '<'";
-    private static final String _EXPECTED_LST = "Expected '<', ' ', or TAB";
-    private static final String _EXPECTED_PST = "Expected '.', ' ', or TAB";
-    private static final String _EXPECTED_Q = "Expected '\"'";
-    private static final String _EXPECTED_QL = "Expected '\"' or '<'";
-    private static final String _EXPECTED_QLST = "Expected '\"', '<', ' ', or TAB";
-    private static final String _EXPECTED_ST = "Expected ' ' or TAB";
-    private static final String _NON_ASCII_CHAR = "Non-ASCII character";
-    private static final String _UNESCAPED_BACKSLASH = "Unescaped backslash";
-    private static final String _ILLEGAL_ESCAPE = "Illegal Unicode escape sequence";
-    private static final String _INCOMPLETE_ESCAPE = "Incomplete Unicode escape sequence";
-    private static final String _UNESCAPED_CR = "Unescaped carriage return";
-    private static final String _UNESCAPED_LF = "Unescaped linefeed";
-    private static final String _UNESCAPED_TAB = "Unescaped tab";
+    private static final String EXPECTED_ABS_URI = "Expected absolute URI";
+    private static final String EXPECTED_ACE = "Expected '@', '^', or EOF";
+    private static final String EXPECTED_C = "Expected '^'";
+    private static final String EXPECTED_G = "Expected '>'";
+    private static final String EXPECTED_L = "Expected '<'";
+    private static final String EXPECTED_LST = "Expected '<', ' ', or TAB";
+    private static final String EXPECTED_PST = "Expected '.', ' ', or TAB";
+    private static final String EXPECTED_Q = "Expected '\"'";
+    private static final String EXPECTED_QL = "Expected '\"' or '<'";
+    private static final String EXPECTED_QLST = "Expected '\"', '<', ' ', or TAB";
+    private static final String EXPECTED_ST = "Expected ' ' or TAB";
+    private static final String NON_ASCII_CHAR = "Non-ASCII character";
+    private static final String UNESCAPED_BACKSLASH = "Unescaped backslash";
+    private static final String ILLEGAL_ESCAPE = "Illegal Unicode escape sequence";
+    private static final String INCOMPLETE_ESCAPE = "Incomplete Unicode escape sequence";
+    private static final String UNESCAPED_CR = "Unescaped carriage return";
+    private static final String UNESCAPED_LF = "Unescaped linefeed";
+    private static final String UNESCAPED_TAB = "Unescaped tab";
 
     /**
      * Parse an RDF triple in N-Triples format.
@@ -64,7 +64,7 @@ public abstract class NTriplesUtil {
             StringBuffer sBuf = new StringBuffer();
             while (c != '>') {
                 if (c == -1) {
-                    throw new ParseException(_EXPECTED_G, i);
+                    throw new ParseException(EXPECTED_G, i);
                 }
                 sBuf.append((char) c);
                 i++;
@@ -77,11 +77,11 @@ public abstract class NTriplesUtil {
             i++;
             c = reader.read();
             if (c != ' ' && c != '\t') {
-                throw new ParseException(_EXPECTED_ST, i);
+                throw new ParseException(EXPECTED_ST, i);
             }
             while (c == ' ' || c == '\t') {
                 if (c == -1) {
-                    throw new ParseException(_EXPECTED_LST, i);
+                    throw new ParseException(EXPECTED_LST, i);
                 }
                 i++;
                 c = reader.read();
@@ -91,7 +91,7 @@ public abstract class NTriplesUtil {
             StringBuffer pBuf = new StringBuffer();
             while (c != '>') {
                 if (c == -1) {
-                    throw new ParseException(_EXPECTED_G, i);
+                    throw new ParseException(EXPECTED_G, i);
                 }
                 pBuf.append((char) c);
                 i++;
@@ -109,11 +109,11 @@ public abstract class NTriplesUtil {
             i++;
             c = reader.read();
             if (c != ' ' && c != '\t') {
-                throw new ParseException(_EXPECTED_ST, i);
+                throw new ParseException(EXPECTED_ST, i);
             }
             while (c == ' ' || c == '\t') {
                 if (c == -1) {
-                    throw new ParseException(_EXPECTED_QLST, i);
+                    throw new ParseException(EXPECTED_QLST, i);
                 }
                 i++;
                 c = reader.read();
@@ -126,24 +126,24 @@ public abstract class NTriplesUtil {
             char ch = ntTriple.charAt(j);
             while (ch != '.') {
                 if (ch != '\t' && ch != ' ') {
-                    throw new ParseException(_EXPECTED_PST, j);
+                    throw new ParseException(EXPECTED_PST, j);
                 }
                 j--;
                 if (j < i) {
-                    throw new ParseException(_EXPECTED_QLST, j);
+                    throw new ParseException(EXPECTED_QLST, j);
                 }
                 ch = ntTriple.charAt(j);
             }
 
             j--;
             if (j < i) {
-                throw new ParseException(_EXPECTED_QLST, j);
+                throw new ParseException(EXPECTED_QLST, j);
             }
             ch = ntTriple.charAt(j);
             while (ch == ' ' || ch == '\t') {
                 j--;
                 if (j < i) {
-                    throw new ParseException(_EXPECTED_QLST, j);
+                    throw new ParseException(EXPECTED_QLST, j);
                 }
                 ch = ntTriple.charAt(j);
             }
@@ -227,7 +227,7 @@ public abstract class NTriplesUtil {
         } else if (first == '<') {
             return parseURIReference(ntNode);
         } else {
-            throw new ParseException(_EXPECTED_QL, 0);
+            throw new ParseException(EXPECTED_QL, 0);
         }
     }
 
@@ -248,7 +248,7 @@ public abstract class NTriplesUtil {
             int first = reader.read();
 
             if (first != '"') {
-                throw new ParseException(_EXPECTED_Q, 0);
+                throw new ParseException(EXPECTED_Q, 0);
             }
 
             StringBuffer escaped = new StringBuffer();
@@ -259,22 +259,22 @@ public abstract class NTriplesUtil {
             while (c != '"') {
 
                 if (c == -1) {
-                    throw new ParseException(_EXPECTED_Q, i);
+                    throw new ParseException(EXPECTED_Q, i);
                 }
                 escaped.append((char) c);
 
                 if (c == '\\') {
                     c = reader.read(); i++;
                     if (c == -1) {
-                        throw new ParseException(_EXPECTED_Q, i);
+                        throw new ParseException(EXPECTED_Q, i);
                     }
                     escaped.append((char) c);
                 } else if (c == '\r') {
-                    throw new ParseException(_UNESCAPED_LF, i);
+                    throw new ParseException(UNESCAPED_LF, i);
                 } else if (c == '\n') {
-                    throw new ParseException(_UNESCAPED_CR, i);
+                    throw new ParseException(UNESCAPED_CR, i);
                 } else if (c == '\t') {
-                    throw new ParseException(_UNESCAPED_TAB, i);
+                    throw new ParseException(UNESCAPED_TAB, i);
                 }
 
                 c = reader.read(); i++;
@@ -301,7 +301,7 @@ public abstract class NTriplesUtil {
             } else if (c == '^') {
                 c = reader.read(); i++;
                 if (c != '^') {
-                    throw new ParseException(_EXPECTED_C, i);
+                    throw new ParseException(EXPECTED_C, i);
                 }
                 try {
                     URIReference datatype = parseURIReference(
@@ -314,7 +314,7 @@ public abstract class NTriplesUtil {
             } else if (c == -1) {
                 return new Literal(value);
             } else {
-                throw new ParseException(_EXPECTED_ACE, i);
+                throw new ParseException(EXPECTED_ACE, i);
             }
 
         } catch (IOException e) {
@@ -336,18 +336,18 @@ public abstract class NTriplesUtil {
         char first = s.charAt(0);
 
         if (first != '<') {
-            throw new ParseException(_EXPECTED_L, 0);
+            throw new ParseException(EXPECTED_L, 0);
         }
 
         char last = s.charAt(s.length() - 1);
         if (last != '>') {
-            throw new ParseException(_EXPECTED_G, s.length() - 1);
+            throw new ParseException(EXPECTED_G, s.length() - 1);
         }
 
         try {
             return new URIReference(s.substring(1, s.length() - 1));
         } catch (URISyntaxException e) {
-            throw new ParseException(_EXPECTED_ABS_URI, 1);
+            throw new ParseException(EXPECTED_ABS_URI, 1);
         }
     }
 
@@ -375,7 +375,7 @@ public abstract class NTriplesUtil {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c > 127) {
-                throw new ParseException(_NON_ASCII_CHAR, i);
+                throw new ParseException(NON_ASCII_CHAR, i);
             }
         }
 
@@ -395,7 +395,7 @@ public abstract class NTriplesUtil {
             buf.append(s.substring(i, backslashPos));
 
             if (backslashPos + 1 >= len) {
-                throw new ParseException(_UNESCAPED_BACKSLASH, i);
+                throw new ParseException(UNESCAPED_BACKSLASH, i);
             }
 
             char c = s.charAt(backslashPos + 1);
@@ -417,7 +417,7 @@ public abstract class NTriplesUtil {
                 i = backslashPos + 2;
             } else if (c == 'u') {
                 if (backslashPos + 5 >= len) {
-                    throw new ParseException(_INCOMPLETE_ESCAPE, i);
+                    throw new ParseException(INCOMPLETE_ESCAPE, i);
                 }
                 String xx = s.substring(backslashPos + 2, backslashPos + 6);
                 try {
@@ -425,11 +425,11 @@ public abstract class NTriplesUtil {
                     buf.append( (char)c );
                     i = backslashPos + 6;
                 } catch (NumberFormatException e) {
-                    throw new ParseException(_ILLEGAL_ESCAPE, i);
+                    throw new ParseException(ILLEGAL_ESCAPE, i);
                 }
             } else if (c == 'U') {
                 if (backslashPos + 9 >= len) {
-                    throw new ParseException(_INCOMPLETE_ESCAPE, i);
+                    throw new ParseException(INCOMPLETE_ESCAPE, i);
                 }
                 String xx = s.substring(backslashPos + 2, backslashPos + 10);
                 try {
@@ -437,10 +437,10 @@ public abstract class NTriplesUtil {
                     buf.append( (char)c );
                     i = backslashPos + 10;
                 } catch (NumberFormatException e) {
-                    throw new ParseException(_ILLEGAL_ESCAPE, i);
+                    throw new ParseException(ILLEGAL_ESCAPE, i);
                 }
             } else {
-                throw new ParseException(_UNESCAPED_BACKSLASH, i);
+                throw new ParseException(UNESCAPED_BACKSLASH, i);
             }
 
             backslashPos = s.indexOf('\\', i);

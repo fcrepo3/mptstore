@@ -44,7 +44,7 @@ import org.nsdl.mptstore.rdf.PredicateNode;
  */
 public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     
-    private static final Logger _LOG = Logger.getLogger(GraphQuerySQLProvider.class.getName());
+    private static final Logger LOG = Logger.getLogger(GraphQuerySQLProvider.class.getName());
     
     private final GraphQuery query;
     
@@ -149,7 +149,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                 joinSeq = new JoinSequence(
                         parseGraphPattern((GraphPattern) e, requiredBindings));
             } else {
-                joinSeq.addJoin(JoinType.innerJoin, 
+                joinSeq.addJoin(JoinType.INNER_JOIN, 
                         parseGraphPattern((GraphPattern) e,requiredBindings), requiredBindings);
             }
         }
@@ -168,7 +168,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                 throw new QueryException("Unknown query element type " + e.getType());
             }
             
-            joinSeq.addJoin(JoinType.leftOuterJoin, 
+            joinSeq.addJoin(JoinType.LEFT_OUTER_JOIN, 
                     parseGraphPattern((GraphPattern) e, optionalBindings), requiredBindings);
             
             addNewMappings(optionalBindings, allBindings);
@@ -235,14 +235,14 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         for (MappableNodeFilter f : givenFilters) {
             if (f.getNode().isVariable()) {
                 if (!filters.containsKey(f.getNode().getVarName())) {
-                    _LOG.debug("Adding " + f.getNode().getVarName() + " To filter pool..\n");
+                    LOG.debug("Adding " + f.getNode().getVarName() + " To filter pool..\n");
                     filters.put(f.getNode().getVarName(), new HashSet<MappableNodeFilter>());
                 }
                 filters.get(f.getNode().getVarName()).add(f);
             } 
             if (f.getConstraint().isVariable()) {
                if (!filters.containsKey(f.getConstraint().getVarName())) {
-                    _LOG.debug("Adding " + f.getConstraint().getVarName() + " To filter pool..\n");
+                    LOG.debug("Adding " + f.getConstraint().getVarName() + " To filter pool..\n");
                     filters.put(f.getConstraint().getVarName(), new HashSet<MappableNodeFilter>());
                 }
                filters.get(f.getConstraint().getVarName()).add(f);
@@ -294,7 +294,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                 if (isBound(p, variableBindings)) {
                     /* Join this variable's column with the corresponding bound column */
                     if (!p.mappedName().equals(getBoundValue(p, variableBindings))) {
-                        _LOG.debug("parseGraphPattern: Adding Join Condition " + 
+                        LOG.debug("parseGraphPattern: Adding Join Condition " + 
                                 p.mappedName() +  " = " +  "'" + getBoundValue(p, variableBindings) + "'"+ "\n");
                         conditions.addCondition(p.mappedName(), " = ", "'" + getBoundValue(p, variableBindings) + "'");
                     }
@@ -326,7 +326,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                             }
                             
                             conditions.addCondition(left, f.getOperator(), right);
-                            _LOG.debug("parseGraphPattern: Adding filter condition: " + left + " " + f.getOperator() + " " + right + "\n");
+                            LOG.debug("parseGraphPattern: Adding filter condition: " + left + " " + f.getOperator() + " " + right + "\n");
                         }
                         
                         removeFromMap(filters.get(filterVar), filters);
@@ -339,7 +339,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                 if (valueBindings.containsKey(var.boundTable().alias())) {
                     
                     for (String condition : valueBindings.get(var.boundTable().alias())) {
-                        _LOG.debug("parseGraphPattern: Adding remaining constant conditions " + condition + "\n");
+                        LOG.debug("parseGraphPattern: Adding remaining constant conditions " + condition + "\n");
                         conditions.addCondition(condition);
                     }
                     valueBindings.remove(var.boundTable().alias());
@@ -347,7 +347,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             }
             
             /* Finally, add the join to the sequence */
-            joins.addJoin(JoinType.innerJoin, table, conditions);
+            joins.addJoin(JoinType.INNER_JOIN, table, conditions);
         }
         
         /* 
@@ -385,7 +385,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                     } else {
                         valueBindings.get(mappedName).add(
                                 mappedName + " " + f.getOperator() + " '" + f.getConstraint().getNode() + "'");
-                        _LOG.debug("Remaining Filters: " + mappedName + " " + f.getOperator() + " '" + f.getConstraint().getNode() + "'" + "\n");
+                        LOG.debug("Remaining Filters: " + mappedName + " " + f.getOperator() + " '" + f.getConstraint().getNode() + "'" + "\n");
                     }
                 } else if (f.getConstraint().isVariable() && f.getConstraint().getVarName().equals(varName) ){
                     if (f.getNode().isVariable()) {
@@ -393,7 +393,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                     } else {
                         valueBindings.get(mappedName).add(
                                 "'" + f.getNode().getNode() + "' " + f.getOperator() + " " + mappedName);
-                        _LOG.debug("Remainig Filters: " + "'" + f.getNode().getNode() + "' " + f.getOperator() + " " + mappedName + "\n");
+                        LOG.debug("Remainig Filters: " + "'" + f.getNode().getNode() + "' " + f.getOperator() + " " + mappedName + "\n");
                     }
                 } 
             }
@@ -458,14 +458,14 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     private void bindNode(MappableNodePattern p, HashMap<String, String>variableBindings) {
         if (p.isVariable()) {
             if (! variableBindings.containsKey(p.getVarName())) {
-                _LOG.debug("Bound " + p.getVarName() + " to " + p.mappedName() + "\n");
+                LOG.debug("Bound " + p.getVarName() + " to " + p.mappedName() + "\n");
                 variableBindings.put(p.getVarName(), p.mappedName());
             }
         } else {
             if (!valueBindings.containsKey(p.boundTable().alias())) {
                 valueBindings.put(p.boundTable().alias(), new HashSet<String>());
             }
-            _LOG.debug("bindNode: adding valueBinding "+ p.mappedName() + " = " + "'" + p.getNode() + "'\n");
+            LOG.debug("bindNode: adding valueBinding "+ p.mappedName() + " = " + "'" + p.getNode() + "'\n");
             valueBindings.get(p.boundTable().alias()).add(p.mappedName() + " = " + "'" + p.getNode() + "'");
         }
     }
@@ -631,8 +631,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         }
     }
     private class JoinType {
-        public static final String leftOuterJoin = "LEFT OUTER JOIN";
-        public static final String innerJoin = "JOIN";
+        public static final String LEFT_OUTER_JOIN = "LEFT OUTER JOIN";
+        public static final String INNER_JOIN = "JOIN";
     }
     
     private class MappingManager {

@@ -89,9 +89,9 @@ public class MappableTriplePattern implements TriplePattern {
      * @param t the table to bind to.
      */
 	public void bindTo(MPTable t) {
-		subject.bindTo(t, MappableNodePattern.Types.subject);
+		subject.bindTo(t, MappableNodePattern.Types.SUBJECT);
 		predicate.bindTo(t);
-		object.bindTo(t, MappableNodePattern.Types.object);
+		object.bindTo(t, MappableNodePattern.Types.OBJECT);
 	}
 
     /**

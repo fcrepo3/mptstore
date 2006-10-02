@@ -5,9 +5,6 @@ import java.io.StringReader;
 
 import java.text.ParseException;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.query.component.BasicNodePattern;
@@ -43,11 +40,11 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  */
 public class SPOQueryCompiler implements QueryCompiler {
 
-    private static final String _EXPECTED_AQLST = "Expected '*', '\"', '<', ' ', or TAB";
-    private static final String _EXPECTED_ALST = "Expected '*', '<', ' ', or TAB";
-    private static final String _EXPECTED_EOS = "Expected end of query string";
-    private static final String _EXPECTED_G = "Expected '>'";
-    private static final String _EXPECTED_ST = "Expected ' ' or TAB";
+    private static final String EXPECTED_AQLST = "Expected '*', '\"', '<', ' ', or TAB";
+    private static final String EXPECTED_ALST = "Expected '*', '<', ' ', or TAB";
+    private static final String EXPECTED_EOS = "Expected end of query string";
+    private static final String EXPECTED_G = "Expected '>'";
+    private static final String EXPECTED_ST = "Expected ' ' or TAB";
 
     /**
      * The table manager used to look up table names for predicates.
@@ -111,7 +108,7 @@ public class SPOQueryCompiler implements QueryCompiler {
                 StringBuffer sBuf = new StringBuffer();
                 while (c != '>') {
                     if (c == -1) {
-                        throw new ParseException(_EXPECTED_G, i);
+                        throw new ParseException(EXPECTED_G, i);
                     }
                     sBuf.append((char) c);
                     i++;
@@ -125,11 +122,11 @@ public class SPOQueryCompiler implements QueryCompiler {
             i++;
             c = reader.read();
             if (c != ' ' && c != '\t') {
-                throw new ParseException(_EXPECTED_ST, i);
+                throw new ParseException(EXPECTED_ST, i);
             }
             while (c == ' ' || c == '\t') {
                 if (c == -1) {
-                    throw new ParseException(_EXPECTED_ALST, i);
+                    throw new ParseException(EXPECTED_ALST, i);
                 }
                 i++;
                 c = reader.read();
@@ -143,7 +140,7 @@ public class SPOQueryCompiler implements QueryCompiler {
                 StringBuffer pBuf = new StringBuffer();
                 while (c != '>') {
                     if (c == -1) {
-                        throw new ParseException(_EXPECTED_G, i);
+                        throw new ParseException(EXPECTED_G, i);
                     }
                     pBuf.append((char) c);
                     i++;
@@ -161,11 +158,11 @@ public class SPOQueryCompiler implements QueryCompiler {
             i++;
             c = reader.read();
             if (c != ' ' && c != '\t') {
-                throw new ParseException(_EXPECTED_ST, i);
+                throw new ParseException(EXPECTED_ST, i);
             }
             while (c == ' ' || c == '\t') {
                 if (c == -1) {
-                    throw new ParseException(_EXPECTED_AQLST, i);
+                    throw new ParseException(EXPECTED_AQLST, i);
                 }
                 i++;
                 c = reader.read();
@@ -175,7 +172,7 @@ public class SPOQueryCompiler implements QueryCompiler {
             if (c == '*') {
                 o = null;
                 if (reader.read() != -1) {
-                    throw new ParseException(_EXPECTED_EOS, i + 1);
+                    throw new ParseException(EXPECTED_EOS, i + 1);
                 }
             } else {
                 try {

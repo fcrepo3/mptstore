@@ -10,7 +10,9 @@
   Differences are:
 
     1) Omitted NewlineAtEndOfFile check.  This is platform-specific.
-    2) Javadoc is not required for private members.
+    2) Javadoc comments are not required for private members.
+    3) Private members may begin with underscore.
+    3) Lines may be up to 100 characters long.
 
 -->
 
@@ -43,36 +45,41 @@
 
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
-        <!--
         <module name="ConstantName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
-        <module name="MemberName"/>
+        <module name="MemberName">
+          <property name="applyToPrivate" value="false"/>
+        </module>
+        <module name="MemberName">
+          <property name="applyToPublic" value="false"/>
+          <property name="applyToProtected" value="false"/>
+          <property name="applyToPackage" value="false"/>
+          <property name="applyToPrivate" value="true"/>
+          <property name="format" value="^_?[a-z][a-zA-Z0-9]*$"/>
+        </module>
         <module name="MethodName"/>
         <module name="PackageName"/>
         <module name="ParameterName"/>
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
-        -->
 
 
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_import.html -->
-        <!--
         <module name="AvoidStarImport"/>
-        -->
-        <!-- <module name="IllegalImport"/> --> <!-- defaults to sun.* packages -->
-        <!--
+        <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
-        -->
 
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
         <!--
         <module name="FileLength"/>
-        <module name="LineLength"/>
+        <module name="LineLength">
+          <property name="max" value="100"/>
+        </module>
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
         -->

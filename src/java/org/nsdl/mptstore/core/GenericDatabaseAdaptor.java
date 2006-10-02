@@ -33,7 +33,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     /**
      * Logger for this class.
      */
-    private static final Logger _LOG = Logger.getLogger(GenericDatabaseAdaptor.class.getName());
+    private static final Logger LOG = Logger.getLogger(GenericDatabaseAdaptor.class.getName());
 
     /**
      * The <code>TableManager</code> used by this instance.
@@ -120,7 +120,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
                     } else {
                         sql = "INSERT INTO " + table + " (s, o) VALUES (?, ?)";
                     }
-                    _LOG.info("Preparing update: " + sql);
+                    LOG.info("Preparing update: " + sql);
                     statement = conn.prepareStatement(sql);
                     statements.put(predicate, statement);
                 }
@@ -140,7 +140,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    _LOG.warn("unable to close statement", e);
+                    LOG.warn("unable to close statement", e);
                 }
             }
         }

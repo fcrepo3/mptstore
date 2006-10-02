@@ -5,7 +5,7 @@ import org.nsdl.mptstore.rdf.ObjectNode;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.SubjectNode;
 
-/** Represents node pattern that can be mapped to a database object
+/** Represents node pattern that can be mapped to a database object.
  * <p>
  * Since a triple pattern may be mapped ap a specific table in the MPT model,
  * a mappable pattern node, then, can retain a mapping to a specific column
@@ -50,11 +50,11 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
      */
     public MappableNodePattern(T node) {
         if (node instanceof SubjectNode) {
-            this.type = Types.subject;
+            this.type = Types.SUBJECT;
         } else if (node instanceof ObjectNode) {
-            this.type = Types.object;
+            this.type = Types.OBJECT;
         } else if (node instanceof PredicateNode) {
-            this.type = Types.predicate;
+            this.type = Types.PREDICATE;
         } else {
             throw new IllegalArgumentException("Given node type is not a " +
             "SubjectNode, PredicateNode, or ObjectNode" );
@@ -82,11 +82,11 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         if (!nodePattern.isVariable()) {
             T node = nodePattern.getNode();
             if (node instanceof SubjectNode) {
-                this.type = Types.subject;
+                this.type = Types.SUBJECT;
             } else if (node instanceof ObjectNode) {
-                this.type = Types.object;
+                this.type = Types.OBJECT;
             } else if (node instanceof PredicateNode) {
-                this.type = Types.predicate;
+                this.type = Types.PREDICATE;
             } else {
                 throw new IllegalArgumentException("Given node type is not a " +
                 "SubjectNode, PredicateNode, or ObjectNode" );
@@ -131,7 +131,7 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         }
         
         if (this.type == null) {
-            if (!type.matches("^" + Types.subject + "|" + Types.predicate + "|" + Types.object + "$")) {
+            if (!type.matches("^" + Types.SUBJECT + "|" + Types.PREDICATE + "|" + Types.OBJECT + "$")) {
                 throw new IllegalArgumentException("Unknown type '" + type + ";");
             }
             this.type = type;
@@ -154,7 +154,7 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
             }
 		}
 		
-        if (this.type == null || this.type.equals(MappableNodePattern.Types.predicate)) {
+        if (this.type == null || this.type.equals(MappableNodePattern.Types.PREDICATE)) {
             return boundTable.alias();
         } else { 
 			return (boundTable.alias() + "." + type);
@@ -229,12 +229,12 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
 	public static class Types {
 
         /** Indicates a subject. */
-		public static final String subject = "s";
+		public static final String SUBJECT = "s";
 
         /** Indicates a predicate. */
-		public static final String predicate = "p";
+		public static final String PREDICATE = "p";
 
         /** Indicates an object. */
-		public static final String object = "o";
+		public static final String OBJECT = "o";
 	}
 }

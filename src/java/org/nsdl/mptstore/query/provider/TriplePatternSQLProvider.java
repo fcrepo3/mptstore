@@ -23,7 +23,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
     /**
      * The Logger for this class.
      */
-    private static final Logger _LOG = Logger.getLogger(TriplePatternSQLProvider.class.getName());
+    private static final Logger LOG = Logger.getLogger(TriplePatternSQLProvider.class.getName());
 
     /**
      * The targets are always "s", "p", "o".
@@ -118,7 +118,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
             }
 
             String sqlString = select.toString();
-            _LOG.info("Generated query:\n" + sqlString);
+            LOG.info("Generated query:\n" + sqlString);
             _sql.add(sqlString);
         }
     }

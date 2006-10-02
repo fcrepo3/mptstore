@@ -32,7 +32,7 @@ public class SQLUnionQueryResults implements QueryResults {
     /**
      * The Logger for this class.
      */
-    private static final Logger _LOG = Logger.getLogger(SQLUnionQueryResults.class.getName());
+    private static final Logger LOG = Logger.getLogger(SQLUnionQueryResults.class.getName());
 
     /**
      * The database connection to use for the SQL queries.
@@ -166,10 +166,10 @@ public class SQLUnionQueryResults implements QueryResults {
             _statement = _conn.createStatement();
             _statement.setFetchSize(_fetchSize);
             String query = _queries.next();
-            _LOG.info("Executing query:\n" + query);
+            LOG.info("Executing query:\n" + query);
             _results = _statement.executeQuery(query);
         } else {
-            _LOG.info("Finished executing all queries");
+            LOG.info("Finished executing all queries");
             close(); // proactively close if no more queries
             _results = null;
         }
@@ -196,7 +196,7 @@ public class SQLUnionQueryResults implements QueryResults {
                 return thisTuple;
             } catch (QueryException e) {
                 close(); // proactively close on error
-                _LOG.error(e);
+                LOG.error(e);
                 throw new RuntimeQueryException(e);
             }
         }
