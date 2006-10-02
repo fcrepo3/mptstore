@@ -54,17 +54,17 @@ public class URIReference
         return _uri;
     }
 
-    // Implements Node.getValue()
+    /** {@inheritDoc} */
     public String getValue() {
         return _uri.toString();
     }
 
-    // Implements Node.toString()
+    /** {@inheritDoc} */
     public String toString() {
         return "<" + _uri.toString() + ">";
     }
 
-    // Implements Node.equals(Object)
+    /** {@inheritDoc} */
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof URIReference) {
             return _uri.equals(((URIReference) obj).getURI());
@@ -73,7 +73,7 @@ public class URIReference
         }
     }
 
-    // Implements Node.hashCode()
+    /** {@inheritDoc} */
     public int hashCode() {
         return _uri.hashCode();
     }

@@ -74,14 +74,14 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
         _compilerMap = compilerMap;
     }
 
-    // Implements DatabaseAdaptor.addTriples(Connection, Iterator<Triple>)
+    /** {@inheritDoc} */
     public void addTriples(Connection conn, 
                            Iterator<Triple> triples) 
             throws ModificationException {
         updateTriples(conn, triples, false);
     }
 
-    // Implements DatabaseAdaptor.deleteTriples(Connection, Iterator<Triple>)
+    /** {@inheritDoc} */
     public void deleteTriples(Connection conn, 
                               Iterator<Triple> triples) 
             throws ModificationException {
@@ -146,7 +146,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
         }
     }
 
-    // Implements DatabaseAdaptor.deleteAllTriples(Connection)
+    /** {@inheritDoc} */
     public void deleteAllTriples(Connection conn) 
             throws ModificationException {
         try {
@@ -157,7 +157,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     }
 
 
-    // Implements DatabaseAdaptor.query(Connection, QueryLanguage, String)
+    /** {@inheritDoc} */
     public QueryResults query(Connection conn, 
                               QueryLanguage lang,
                               int fetchSize,

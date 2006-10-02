@@ -48,6 +48,7 @@ public abstract class DBUtil {
      * @param backslashIsEscape Whether backslash characters are treated
      *        as escape characters by the underlying database implementation, 
      *        and thus need to be escaped themselves.
+     * @return the escaped string.
      */
     public static String quotedString(String in,
                                       boolean backslashIsEscape) {

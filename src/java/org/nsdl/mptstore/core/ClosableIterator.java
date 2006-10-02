@@ -12,6 +12,6 @@ public interface ClosableIterator<E> extends Iterator<E> {
     /**
      * Release any resources tied up by this iterator.
      */
-    public void close();
+    void close();
 
 }

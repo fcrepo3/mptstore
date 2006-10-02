@@ -6,6 +6,9 @@
   <!-- defines mptstore.version -->
   <loadproperties srcFile="src/java/org/nsdl/mptstore/MPTStore.properties"/>
 
+  <taskdef resource="checkstyletask.properties"
+           classpath="${lib.checkstyle}"/>
+
   <path id="compile.path">
     <pathelement location="${lib.log4j}"/>
   </path>
@@ -152,6 +155,15 @@
                    value="org.apache.commons.logging.impl.Log4JLogger"/>
       <sysproperty key="log4j.ignoreTCL" value="true"/>
     </java>
+  </target>
+
+  <target name="checkstyle" depends="classes">
+    <checkstyle config="src/doc/coding-standards.xml"
+                classpath="build/classes">
+      <fileset dir="src/java" includes="**/*.java"/>
+      <formatter type="plain"/>
+      <formatter type="xml" toFile="build/checkstyle-errors.xml"/>
+    </checkstyle>
   </target>
 
   <target name="prep"

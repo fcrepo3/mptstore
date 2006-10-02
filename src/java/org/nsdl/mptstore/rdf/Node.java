@@ -78,6 +78,7 @@ public interface Node {
      *   </ul>
      * </p>
      *
+     * @param obj the object to compare to this one.
      * @return true if the objects are equal according to the rules above.
      */
     public boolean equals(Object obj);

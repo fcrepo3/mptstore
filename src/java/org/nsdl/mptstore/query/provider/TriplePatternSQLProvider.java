@@ -41,6 +41,13 @@ public class TriplePatternSQLProvider implements SQLProvider {
 
     private List<String> _sql;
 
+    /**
+     * Instantiate from the given values.
+     *
+     * @param tableManager the table manager to use for getting table names.
+     * @param backslashIsEscape whether backslash should be escaped in SQL.
+     * @param pattern the triple pattern.
+     */
     public TriplePatternSQLProvider(TableManager tableManager,
                                     boolean backslashIsEscape,
                                     TriplePattern pattern) {
@@ -75,6 +82,8 @@ public class TriplePatternSQLProvider implements SQLProvider {
     /**
      * If a table exists for the given predicate, add the appropriate
      * SELECT query to the list.
+     *
+     * @param predicate the predicate in question.
      */
     private void addSelect(PredicateNode predicate) {
 
@@ -111,10 +120,12 @@ public class TriplePatternSQLProvider implements SQLProvider {
         }
     }
 
+    /** {@inheritDoc} */
     public List<String> getTargets() {
         return SPO_TARGETS;
     }
 
+    /** {@inheritDoc} */
     public List<String> getSQL() {
         return _sql;
     }

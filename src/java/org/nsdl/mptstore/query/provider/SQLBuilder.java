@@ -12,6 +12,7 @@ public interface SQLBuilder extends SQLProvider {
     /**
      * Set the targets to the given values.
      *
+     * @param targets the targets.
      * @see SQLProvider#getTargets()
      */
     public void setTargets(List<String> targets);

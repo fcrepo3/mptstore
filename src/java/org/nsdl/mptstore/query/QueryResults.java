@@ -22,9 +22,10 @@ public interface QueryResults extends ClosableIterator<List<Node>> {
     /**
      * Get the next row of results.
      *
+     * @return the next row.
      * @throws RuntimeQueryException if there's an error getting the next row.
      */
-    public List<Node> next();
+    public List<Node> next() throws RuntimeQueryException;
 
     /**
      * Tell whether there's another row of results.

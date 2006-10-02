@@ -27,6 +27,7 @@ public interface SQLProvider {
      * Get the sequence of <code>SELECT</code> statements.
      *
      * @return List<String> the <code>SELECT</code> statements.
+     * @throws QueryException if the SQL could not be generated for any reason.
      */
     public List<String> getSQL() throws QueryException;
 

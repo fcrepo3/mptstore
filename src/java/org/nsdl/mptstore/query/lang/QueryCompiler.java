@@ -14,6 +14,7 @@ public interface QueryCompiler {
      * Compile the given query.
      *
      * @param queryText the RDF query.
+     * @throws QueryException if there's an error querying.
      * @return SQLProvider provides the SQL and result column names.
      */
     public SQLProvider compile(String queryText) throws QueryException;

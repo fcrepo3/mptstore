@@ -75,8 +75,9 @@ public class BasicTableManager implements TableManager {
      * This will create the map table if it doesn't yet exist, 
      * and will read the current mappings into memory.
      *
-     * @param dataSource The <code>DataSource> from which to obtain
+     * @param dataSource The DataSource from which to obtain
      *        connections for DDL operations.
+     * @param ddlGenerator The DDLGenerator to use when DDL is needed.
      * @param mapTable The name of the table in which the table-to-predicate
      *        mappings are persisted.
      * @param soTablePrefix The prefix for all predicate table names.
@@ -110,7 +111,7 @@ public class BasicTableManager implements TableManager {
 
     }
 
-    // Implements TableManager.getOrMapTableFor(PredicateNode)
+    /** {@inheritDoc} */
     public String getOrMapTableFor(PredicateNode predicate) throws SQLException {
         String table = getTableFor(predicate);
         if (table != null) {
@@ -129,35 +130,35 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    // Implements TableManager.getTableFor(PredicateNode)
+    /** {@inheritDoc} */
     public String getTableFor(PredicateNode predicate) {
         synchronized (_map) {
             return _map.get(predicate);
         }
     }
 
-    // Implements TableManager.getPredicateFor(PredicateNode)
+    /** {@inheritDoc} */
     public PredicateNode getPredicateFor(String table) {
         synchronized (_map) {
             return _reverseMap.get(table);
         }
     }
 
-    // Implements TableManager.getTables()
+    /** {@inheritDoc} */
     public Set<String> getTables() {
         synchronized (_map) {
             return new HashSet<String>(_reverseMap.keySet());
         }
     }
 
-    // Implements TableManager.getPredicates()
+    /** {@inheritDoc} */
     public Set<PredicateNode> getPredicates() {
         synchronized (_map) {
             return new HashSet<PredicateNode>(_map.keySet());
         }
     }
 
-    // Implements TableManager.dropEmptyPredicateTables()
+    /** {@inheritDoc} */
     public int dropEmptyPredicateTables() throws SQLException {
         _LOG.info("Dropping empty predicate tables");
         return dropPredicateTables(false);
@@ -453,7 +454,7 @@ public class BasicTableManager implements TableManager {
         }
     }
 
-    // Implements Tablemanager.dropAllPredicateTables()
+    /** {@inheritDoc} */
     public int dropAllPredicateTables() throws SQLException {
         _LOG.info("Dropping all predicate tables");
         return dropPredicateTables(true);

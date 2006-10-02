@@ -73,7 +73,7 @@ public class SPOQueryCompiler implements QueryCompiler {
         _backslashIsEscape = backslashIsEscape;
     }
 
-    // Implements QueryCompiler.compile(String)
+    /** {@inheritDoc} */
     public SQLProvider compile(String query) 
             throws QueryException {
         try {

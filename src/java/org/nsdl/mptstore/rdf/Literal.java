@@ -124,12 +124,12 @@ public class Literal implements ObjectNode {
         return _datatype;
     }
 
-    // Implements Node.getValue()
+    /** {@inheritDoc} */
     public String getValue() {
         return _value;
     }
 
-    // Implements Node.toString()
+    /** {@inheritDoc} */
     public String toString() {
         StringBuffer out = new StringBuffer();
         out.append('"');
@@ -143,7 +143,7 @@ public class Literal implements ObjectNode {
         return out.toString();
     }
 
-    // Implements Node.equals(Object)
+    /** {@inheritDoc} */
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof Literal) {
             Literal lit = (Literal) obj;
@@ -163,7 +163,7 @@ public class Literal implements ObjectNode {
         }
     }
 
-    // Implements Node.hashCode()
+    /** {@inheritDoc} */
     public int hashCode() {
         return _value.hashCode();
     }

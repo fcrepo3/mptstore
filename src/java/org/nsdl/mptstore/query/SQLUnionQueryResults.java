@@ -175,17 +175,17 @@ public class SQLUnionQueryResults implements QueryResults {
         }
     }
 
-    // Implements QueryResults.getTargets()
+    /** {@inheritDoc} */
     public List<String> getTargets() {
         return _sqlProvider.getTargets();
     }
 
-    // Implements Iterator.hasNext()
+    /** {@inheritDoc} */
     public boolean hasNext() {
         return _nextTuple != null;
     }
 
-    // Implements Iterator.next()
+    /** {@inheritDoc} */
     public List<Node> next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
@@ -202,12 +202,12 @@ public class SQLUnionQueryResults implements QueryResults {
         }
     }
 
-    // Implements Iterator.remove()
+    /** {@inheritDoc} */
     public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    // Implements ClosableIterator.close()
+    /** {@inheritDoc} */
     public void close() {
         if (!_closed) {
             if (_results != null) {

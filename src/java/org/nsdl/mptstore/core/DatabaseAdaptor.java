@@ -72,6 +72,7 @@ public interface DatabaseAdaptor {
      * @param fetchSize The number of results to request from the database
      *                  at one time.
      * @param queryText The query.
+     * @return the results.
      * @throws QueryException if the query failed for any reason.
      */
     public QueryResults query(Connection conn, 
