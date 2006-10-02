@@ -254,9 +254,11 @@
 20        -->
 
         <!--
-          Whitespace is required on both sides of most tokens.
-        <module name="WhitespaceAround"/>
-760 (almost all are generics-related) -->
+          Whitespace is required on both sides of most tokens (but not generics).
+        <module name="WhitespaceAround">
+          <property name="tokens" value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN, EQUAL, GE, GT, LAND, LCURLY, LE, LITERAL_ASSERT, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_RETURN, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION, RCURLY, SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR, STAR_ASSIGN, TYPE_EXTENSION_AND, WILDCARD_TYPE"/>
+        </module>
+20 (almost all are generics-related) -->
 
 
 
@@ -420,7 +422,13 @@
           If they can't be addressed before a release, elevate the issue
           from the code to the release notes.
         <module name="TodoComment"/>
-2        -->
+        <module name="TodoComment">
+          <property name="format" value="XXX"/>
+        </module>
+        <module name="TodoComment">
+          <property name="format" value="FIXME"/>
+        </module>
+4        -->
 
         <!--
           Long constants should be defined with uppercase L syntax, not lowercase.
