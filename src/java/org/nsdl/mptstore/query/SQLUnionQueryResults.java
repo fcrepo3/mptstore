@@ -76,7 +76,7 @@ public class SQLUnionQueryResults implements QueryResults {
 
     /**
      * Instantiate SQLUnionQueryResults to work with the given SQL on the 
-     * given connection
+     * given connection.
      *
      * @param conn the database connection to use.
      * @param fetchSize the JDBC fetchSize to use for each SQL query.

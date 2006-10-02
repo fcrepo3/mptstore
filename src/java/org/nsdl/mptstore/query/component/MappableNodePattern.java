@@ -26,15 +26,15 @@ import org.nsdl.mptstore.rdf.SubjectNode;
 public class MappableNodePattern<T extends Node> implements NodePattern<T> {
     private final boolean isVariable;
     private final T nodeValue;
-	private final String varName
-    ;
+	private final String varName;
 	private MPTable boundTable;
 	private String type;
 	
-    /** Create a node pattern that is a variable
+    /** Create a node pattern that is a variable.
      * 
      * @param variable any string representing the variable's name (e.g. "$value", "?person");
-     * @param nodeClass the class of node this variable represents
+     * @param type the type of node this variable represents, which should be
+     *        s, p, or o.
      */
 	public MappableNodePattern(String variable, String type) {
         
@@ -44,7 +44,7 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         this.type = type;
 	}
     
-    /** Create a node pattern given a node value
+    /** Create a node pattern given a node value.
      * 
      * @param node Node representing this pattern's value
      */
@@ -64,7 +64,15 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         this.isVariable = false;
         this.nodeValue = node;
     }
-    
+   
+    /**
+     * Create a mappable node pattern from an existing node pattern.
+     *
+     * If the given pattern is variable, the type of this mappable node
+     * pattern will be set to <code>null</code>.
+     *
+     * @param nodePattern the node pattern to base this one on.
+     */
     public MappableNodePattern(NodePattern<? extends T> nodePattern) {
         
         this.varName = nodePattern.getVarName();
@@ -88,12 +96,21 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         }
 
     }
-    	
+
+    /**
+     * Tell whether this node pattern is variable.
+     *
+     * @return true if it is variable, false otherwise.
+     */
 	public boolean isVariable() {
 		return isVariable;
 	}
 	
-    
+    /**
+     * Bind this node pattern to the given table.
+     *
+     * @param t the table.
+     */
 	public void bindTo(MPTable t) {
         if (t == null) {
             throw new NullPointerException("Cannot bind to null table");
@@ -101,6 +118,13 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
 		this.boundTable = t;
 	}
 	
+    /**
+     * Bind this node pattern to the given table and optionally set the type.
+     *
+     * @param t the table.
+     * @param type the new type for this node pattern.  This should be s, p,
+     *        o, or <code>null</code> if the type shouldn't be set.
+     */
     public void bindTo(MPTable t, String type) {
         if (t == null) {
             throw new NullPointerException("Cannot bind to null table");
@@ -117,7 +141,9 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
     
 	/**
 	 * Return the table/alias and column identifier of the RDBMS location of this
-	 * value or literal
+	 * value or literal.
+     *
+     * @return the mapped name.
 	 */
 	public String mappedName() {
 		if (boundTable == null) {
@@ -135,22 +161,25 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
 		} 
 	}
 	
-    /** Returns the table to shich this pattern is bound
+    /** Return the table to which this pattern is bound.
      * 
+     * @return the table this is bound to.
      */
 	public MPTable boundTable() {
 		return boundTable;
 	}
-	
+
+    /** {@inheritDoc} */
 	public T getNode() {
 		return nodeValue;
 	}
     
+    /** {@inheritDoc} */
     public String getVarName() {
         return this.varName;
     }
 	
-    /** Equality of Triple Pattern
+    /** Equality of Triple Pattern.
      *  <p>
      *  Equality of triple patterns follow the following rules:
      *  <ul>
@@ -160,6 +189,8 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
      *   getValue() for each node.  
      *  </ul>
      *  </p>
+     * @param p the object to compare this one to.
+     * @return whether the objects are equal according to the above rules.
      */
     public boolean equals(Object p) {
         if (!(p instanceof MappableNodePattern)) {return false;}
@@ -182,7 +213,8 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         } 
         return false;
     }
-    
+   
+    /** {@inheritDoc} */
     public String toString() {
         if (isVariable) {
             return varName;
@@ -190,10 +222,19 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
             return nodeValue.toString();
         }
     }
-    
+   
+    /**
+     * Types of <code>MappableNodePattern</code>.
+     */
 	public static class Types {
+
+        /** Indicates a subject. */
 		public static final String subject = "s";
+
+        /** Indicates a predicate. */
 		public static final String predicate = "p";
+
+        /** Indicates an object. */
 		public static final String object = "o";
 	}
 }

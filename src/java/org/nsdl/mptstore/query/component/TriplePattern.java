@@ -15,13 +15,25 @@ import org.nsdl.mptstore.rdf.SubjectNode;
  */
 public interface TriplePattern {
     
-    /** Get the subject pattern of a triple */
+    /** 
+     * Get the subject pattern of this triple pattern.
+     *
+     * @return the subject pattern.
+     */
     public NodePattern<SubjectNode> getSubject();
     
-    /** Get the predicate pattern of a triple */
+    /** 
+     * Get the predicate pattern of this triple pattern.
+     *
+     * @return the predicate pattern.
+     */
     public NodePattern<PredicateNode> getPredicate();
     
-    /** Get the Object pattern of a triple */
+    /** 
+     * Get the object pattern of this triple pattern.
+     *
+     * @return the object pattern.
+     */
     public NodePattern<ObjectNode> getObject();
     
 }

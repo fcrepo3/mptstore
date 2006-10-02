@@ -14,6 +14,12 @@ public class MPTable {
     private final String alias;
     private final String name;
 
+    /**
+     * Construct an MPTable.
+     *
+     * @param name the name of the table.
+     * @param alias the alias.
+     */
     public MPTable(String name, String alias) {
         if (name == null || alias == null) {
             throw new IllegalArgumentException("Cannot create a table without a name or alias. " +
@@ -22,9 +28,21 @@ public class MPTable {
         this.alias = alias;
         this.name = name;
     }
+
+    /**
+     * Get the alias.
+     *
+     * @return the alias.
+     */
     public String alias() {
         return alias;
     }
+
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String name() {
         return name;
     }

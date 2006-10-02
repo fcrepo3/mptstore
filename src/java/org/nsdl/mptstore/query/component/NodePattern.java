@@ -20,19 +20,24 @@ import org.nsdl.mptstore.rdf.Node;
  */
 public interface NodePattern<T extends Node> {
     
-    /** Get the node value ofthis pattern, or null if this pattern
-     * does not represent a variable
+    /** Get the node value of this pattern, or null if this pattern
+     * does not represent a variable.
      * 
      * @return the node value
      */
     public T getNode();
     
     /** Get the variable name of this pattern, or null if this pattern
-     * does not represent a variable 
+     * does not represent a variable.
+     *
      * @return the variable name
      */
     public String getVarName();
     
-    /** Determind if this node pattern represents a variable */
+    /** 
+     * Tell whether this node pattern represents a variable.
+     * 
+     * @return whether this pattern represents a variable.
+     */
     public boolean isVariable();
 }

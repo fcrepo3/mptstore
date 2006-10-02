@@ -57,6 +57,12 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     private HashMap<String, Set<String>> valueBindings    = new HashMap<String, Set<String>>();
      
 
+    /**
+     * Create an instance.
+     *
+     * @param adaptor the table manager to use for looking up table names.
+     * @param query the graph query.
+     */
     public GraphQuerySQLProvider(TableManager adaptor, GraphQuery query) {
         
         this.manager = new MappingManager(adaptor);
@@ -203,9 +209,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         return sqlList;
     }
 
-    /** Return the list of variables that represent this query's targets
-     * 
-     */
+    /** {@inheritDoc} */
     public List<String> getTargets() {
         return new ArrayList<String>(targets);
     }
@@ -467,7 +471,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     }
     
     
-    /** Removes a mapped value (and all associated keys) from a map
+    /** Removes a mapped value (and all associated keys) from a map.
      *
      * @param value mapped value to remove
      * @param m map to remove the value from

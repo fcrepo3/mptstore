@@ -15,7 +15,7 @@ public interface QueryResults extends ClosableIterator<List<Node>> {
     /**
      * Get the column names for these query result rows.
      *
-     * @return List<String> the ordered list of names.
+     * @return the ordered list of names.
      */
     public List<String> getTargets();
 

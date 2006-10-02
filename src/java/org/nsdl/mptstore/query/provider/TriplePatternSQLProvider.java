@@ -25,6 +25,9 @@ public class TriplePatternSQLProvider implements SQLProvider {
      */
     private static final Logger _LOG = Logger.getLogger(TriplePatternSQLProvider.class.getName());
 
+    /**
+     * The targets are always "s", "p", "o".
+     */
     public static final List<String> SPO_TARGETS;
 
     static {

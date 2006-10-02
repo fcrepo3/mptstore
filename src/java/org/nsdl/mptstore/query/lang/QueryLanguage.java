@@ -28,7 +28,7 @@ public class QueryLanguage {
     private String _name;
 
     /**
-     * Instantiate a <code>QueryLanguage</code>
+     * Instantiate a <code>QueryLanguage</code>.
      *
      * @param name the name.
      */

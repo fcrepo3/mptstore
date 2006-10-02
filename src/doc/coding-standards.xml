@@ -9,8 +9,8 @@
 
   Differences are:
 
-    1) Omitted NewlineAtEndOfFile check.
-       Rationale: Platform-specific.
+    1) Omitted NewlineAtEndOfFile check.  This is platform-specific.
+    2) Javadoc is not required for private members.
 
 -->
 
@@ -29,12 +29,16 @@
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
-        <module name="JavadocMethod"/>
-        <!--
-        <module name="JavadocType"/>
-        <module name="JavadocVariable"/>
+        <module name="JavadocMethod">
+          <property name="scope" value="package"/>
+        </module>
+        <module name="JavadocType">
+          <property name="scope" value="package"/>
+        </module>
+        <module name="JavadocVariable">
+          <property name="scope" value="package"/>
+        </module>
         <module name="JavadocStyle"/>
-        -->
 
 
         <!-- Checks for Naming Conventions.                  -->

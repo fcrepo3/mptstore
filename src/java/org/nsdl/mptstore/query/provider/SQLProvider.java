@@ -19,14 +19,14 @@ public interface SQLProvider {
      * query, and should match the order of the associated values in the
      * SQL.
      *
-     * @return List<String> the target names.
+     * @return the target names.
      */
     public List<String> getTargets();
 
     /**
      * Get the sequence of <code>SELECT</code> statements.
      *
-     * @return List<String> the <code>SELECT</code> statements.
+     * @return the <code>SELECT</code> statements.
      * @throws QueryException if the SQL could not be generated for any reason.
      */
     public List<String> getSQL() throws QueryException;

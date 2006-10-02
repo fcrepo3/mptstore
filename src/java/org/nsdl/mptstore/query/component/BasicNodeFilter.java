@@ -2,7 +2,7 @@ package org.nsdl.mptstore.query.component;
 
 import org.nsdl.mptstore.rdf.Node;
 
-/** Generic  implementation of a {@link org.nsdl.mptstore.query.component.NodeFilter} 
+/** Generic implementation of a {@link NodeFilter}.
  * 
  * 
  * @param <T> The type of node that is being constrained by this filter.  Typically,
@@ -16,7 +16,7 @@ public class BasicNodeFilter<T extends Node> implements NodeFilter<T> {
     private final NodePattern<T> constraint;
     private final String operator;
 
-    /** Create a filter on a particular node pattern
+    /** Create a filter on a particular node pattern.
      * 
      * @param node The node pattern to constrain
      * @param operator String representing some operator
@@ -28,15 +28,18 @@ public class BasicNodeFilter<T extends Node> implements NodeFilter<T> {
         this.constraint = constraint;
         this.operator = operator;
     }
-    
+
+    /** {@inheritDoc} */
     public NodePattern<T> getNode() {
         return node;
     }
     
+    /** {@inheritDoc} */
     public NodePattern<T> getConstraint() {
         return constraint;
     }
     
+    /** {@inheritDoc} */
     public String getOperator() {
         return operator;
     }
