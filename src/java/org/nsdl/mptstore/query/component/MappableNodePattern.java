@@ -96,6 +96,33 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         }
 
     }
+    /**
+     * Create a mappable node pattern from an existing node pattern.
+     *
+     * If the given pattern is variable, the type of this mappable node
+     * pattern will be set to <code>null</code>.
+     *
+     * @param nodePattern the node pattern to create the mappable pattern from
+     * @param patternType constraint on the type of node allowed by this pattern
+     */
+    public  MappableNodePattern(NodePattern<? extends T> nodePattern, Class<T> patternType) {
+        
+        this.varName = nodePattern.getVarName();
+        this.isVariable = nodePattern.isVariable();
+        this.nodeValue = nodePattern.getNode();
+        
+
+        if (SubjectNode.class.isAssignableFrom(patternType)) {
+            this.type = Types.SUBJECT;
+        } else if (ObjectNode.class.isAssignableFrom(patternType)) {
+            this.type = Types.OBJECT;
+        } else if (PredicateNode.class.isAssignableFrom(patternType)) {
+            this.type = Types.PREDICATE;
+        } else {
+            throw new IllegalArgumentException("Given node type is not a " +
+            "SubjectNode, PredicateNode, or ObjectNode" );
+        }
+    }
 
     /**
      * Tell whether this node pattern is variable.

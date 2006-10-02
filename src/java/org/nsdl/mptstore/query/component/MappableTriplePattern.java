@@ -51,9 +51,9 @@ public class MappableTriplePattern implements TriplePattern {
      * @param pattern the existing triple pattern.
      */
     public MappableTriplePattern(TriplePattern pattern) {
-        this.subject = new MappableNodePattern<SubjectNode>(pattern.getSubject());
-        this.predicate = new MappableNodePattern<PredicateNode>(pattern.getPredicate());
-        this.object = new MappableNodePattern<ObjectNode>(pattern.getObject());
+        this.subject = new MappableNodePattern<SubjectNode>(pattern.getSubject(), SubjectNode.class);
+        this.predicate = new MappableNodePattern<PredicateNode>(pattern.getPredicate(), PredicateNode.class);
+        this.object = new MappableNodePattern<ObjectNode>(pattern.getObject(), ObjectNode.class);
     }
 
     /**
