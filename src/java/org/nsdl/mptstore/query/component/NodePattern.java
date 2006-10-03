@@ -25,19 +25,19 @@ public interface NodePattern<T extends Node> {
      * 
      * @return the node value
      */
-    public T getNode();
+    T getNode();
     
     /** Get the variable name of this pattern, or null if this pattern
      * does not represent a variable.
      *
      * @return the variable name
      */
-    public String getVarName();
+    String getVarName();
     
     /** 
      * Tell whether this node pattern represents a variable.
      * 
      * @return whether this pattern represents a variable.
      */
-    public boolean isVariable();
+    boolean isVariable();
 }

@@ -21,7 +21,7 @@ public interface Node {
      *
      * @return the lexical value, never <code>null</code>.
      */
-    public String getValue();
+    String getValue();
 
     /**
      * Get an N-Triples string representing this node.
@@ -50,7 +50,7 @@ public interface Node {
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#ntriples">
      *        <em>RDF Test Cases, Section 3: N-Triples</em></a>
      */
-    public String toString();
+    String toString();
 
     /**
      * Tell whether this <code>Node</code> should be considered equivalent
@@ -81,7 +81,7 @@ public interface Node {
      * @param obj the object to compare to this one.
      * @return true if the objects are equal according to the rules above.
      */
-    public boolean equals(Object obj);
+    boolean equals(Object obj);
 
     /**
      * Return a hash code for this node.
@@ -92,6 +92,6 @@ public interface Node {
      *
      * @return the hash code.
      */
-    public int hashCode();
+    int hashCode();
 
 }

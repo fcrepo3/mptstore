@@ -17,6 +17,6 @@ public interface QueryCompiler {
      * @throws QueryException if there's an error querying.
      * @return SQLProvider provides the SQL and result column names.
      */
-    public SQLProvider compile(String queryText) throws QueryException;
+    SQLProvider compile(String queryText) throws QueryException;
 
 }

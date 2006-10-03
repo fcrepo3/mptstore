@@ -34,8 +34,7 @@ public interface DatabaseAdaptor {
      * @param triples The triples to add.
      * @throws ModificationException if the operation failed for any reason.
      */
-    public void addTriples(Connection conn,
-                           Iterator<Triple> triples) 
+    void addTriples(Connection conn, Iterator<Triple> triples) 
             throws ModificationException;
 
     /**
@@ -45,8 +44,7 @@ public interface DatabaseAdaptor {
      * @param triples The triples to delete.
      * @throws ModificationException if the operation failed for any reason.
      */
-    public void deleteTriples(Connection conn, 
-                              Iterator<Triple> triples) 
+    void deleteTriples(Connection conn, Iterator<Triple> triples) 
             throws ModificationException;
 
     /**
@@ -55,7 +53,7 @@ public interface DatabaseAdaptor {
      * @param conn The database connection to use.
      * @throws ModificationException if the operation failed for any reason.
      */
-    public void deleteAllTriples(Connection conn)
+    void deleteAllTriples(Connection conn)
             throws ModificationException;
 
     /**
@@ -75,10 +73,10 @@ public interface DatabaseAdaptor {
      * @return the results.
      * @throws QueryException if the query failed for any reason.
      */
-    public QueryResults query(Connection conn, 
-                              QueryLanguage lang,
-                              int fetchSize,
-                              String queryText) 
+    QueryResults query(Connection conn, 
+                       QueryLanguage lang, 
+                       int fetchSize,
+                       String queryText) 
             throws QueryException;
 
 }

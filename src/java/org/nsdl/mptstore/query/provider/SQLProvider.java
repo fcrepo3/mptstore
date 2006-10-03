@@ -21,7 +21,7 @@ public interface SQLProvider {
      *
      * @return the target names.
      */
-    public List<String> getTargets();
+    List<String> getTargets();
 
     /**
      * Get the sequence of <code>SELECT</code> statements.
@@ -29,6 +29,6 @@ public interface SQLProvider {
      * @return the <code>SELECT</code> statements.
      * @throws QueryException if the SQL could not be generated for any reason.
      */
-    public List<String> getSQL() throws QueryException;
+    List<String> getSQL() throws QueryException;
 
 }

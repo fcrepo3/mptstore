@@ -32,7 +32,7 @@ public class PostgresDDLGenerator extends AbstractDDLGenerator {
     }
 
     /** {@inheritDoc} */
-    public List<String> getCreateMapTableDDL(String table) {
+    public List<String> getCreateMapTableDDL(final String table) {
 
         List<String> cmds = new ArrayList<String>();
 
@@ -49,7 +49,7 @@ public class PostgresDDLGenerator extends AbstractDDLGenerator {
     }
 
     /** {@inheritDoc} */
-    public List<String> getCreateSOTableDDL(String table) {
+    public List<String> getCreateSOTableDDL(final String table) {
 
         List<String> cmds = new ArrayList<String>();
 

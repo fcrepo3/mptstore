@@ -22,9 +22,9 @@ public class BasicTriplePattern implements TriplePattern {
      * @param p the predicate pattern.
      * @param o the object pattern.
      */
-    public BasicTriplePattern(NodePattern<SubjectNode> s, 
-                         NodePattern<PredicateNode> p, 
-                         NodePattern<ObjectNode> o) {
+    public BasicTriplePattern(final NodePattern<SubjectNode> s, 
+                              final NodePattern<PredicateNode> p, 
+                              final NodePattern<ObjectNode> o) {
         this.subject = s;
         this.predicate = p;
         this.object = o;

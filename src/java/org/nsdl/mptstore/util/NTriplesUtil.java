@@ -22,6 +22,26 @@ import org.nsdl.mptstore.rdf.URIReference;
  */
 public abstract class NTriplesUtil {
 
+    private static final int HIGHEST_ASCII_CHAR = 127;
+    private static final int HEX = 16;
+    private static final int SHORT_ESCAPE_LENGTH = 5;
+    private static final int LONG_ESCAPE_LENGTH = 10;
+
+    private static final int UC_LOW1 = 0x0;
+    private static final int UC_HIGH1 = 0x8;
+
+    private static final int UC_LOW2 = 0xB;
+    private static final int UC_HIGH2 = 0xC;
+
+    private static final int UC_LOW3 = 0xE;
+    private static final int UC_HIGH3 = 0x1F;
+
+    private static final int UC_LOW4 = 0x7F;
+    private static final int UC_HIGH4 = 0xFFFF;
+
+    private static final int UC_LOW5 = 0x10000;
+    private static final int UC_HIGH5 = 0x10FFFF;
+
     private static final String EXPECTED_ABS_URI = "Expected absolute URI";
     private static final String EXPECTED_ACE = "Expected '@', '^', or EOF";
     private static final String EXPECTED_C = "Expected '^'";
@@ -31,15 +51,20 @@ public abstract class NTriplesUtil {
     private static final String EXPECTED_PST = "Expected '.', ' ', or TAB";
     private static final String EXPECTED_Q = "Expected '\"'";
     private static final String EXPECTED_QL = "Expected '\"' or '<'";
-    private static final String EXPECTED_QLST = "Expected '\"', '<', ' ', or TAB";
+    private static final String EXPECTED_QLST = "Expected '\"', '<', ' ', "
+            + "or TAB";
     private static final String EXPECTED_ST = "Expected ' ' or TAB";
     private static final String NON_ASCII_CHAR = "Non-ASCII character";
     private static final String UNESCAPED_BACKSLASH = "Unescaped backslash";
-    private static final String ILLEGAL_ESCAPE = "Illegal Unicode escape sequence";
-    private static final String INCOMPLETE_ESCAPE = "Incomplete Unicode escape sequence";
+    private static final String ILLEGAL_ESCAPE = "Illegal Unicode escape "
+            + "sequence";
+    private static final String INCOMPLETE_ESCAPE = "Incomplete Unicode "
+            + "escape sequence";
     private static final String UNESCAPED_CR = "Unescaped carriage return";
     private static final String UNESCAPED_LF = "Unescaped linefeed";
     private static final String UNESCAPED_TAB = "Unescaped tab";
+
+    private NTriplesUtil() { }
 
     /**
      * Parse an RDF triple in N-Triples format.
@@ -50,7 +75,7 @@ public abstract class NTriplesUtil {
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#triple">
      *        N-Triples triple syntax</a>
      */
-    public static Triple parseTriple(String ntTriple) 
+    public static Triple parseTriple(final String ntTriple) 
             throws ParseException {
 
         StringReader reader = new StringReader(ntTriple);
@@ -102,7 +127,8 @@ public abstract class NTriplesUtil {
             try {
                 predicate = parsePredicate(pBuf.toString());
             } catch (ParseException e) {
-                throw new ParseException(e.getMessage(), e.getErrorOffset() + i);
+                throw new ParseException(e.getMessage(), 
+                        e.getErrorOffset() + i);
             }
 
             // followed by one or more whitespace
@@ -153,7 +179,8 @@ public abstract class NTriplesUtil {
             try {
                 o = parseObject(oString);
             } catch (ParseException e) {
-                throw new ParseException(e.getMessage(), e.getErrorOffset() + i);
+                throw new ParseException(e.getMessage(), 
+                        e.getErrorOffset() + i);
             }
 
             return new Triple(subject, predicate, o);
@@ -174,7 +201,7 @@ public abstract class NTriplesUtil {
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#subject">
      *        N-Triples subject syntax</a>
      */
-    public static SubjectNode parseSubject(String ntSubject)
+    public static SubjectNode parseSubject(final String ntSubject)
             throws ParseException {
 
         return parseURIReference(ntSubject);
@@ -189,7 +216,7 @@ public abstract class NTriplesUtil {
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#predicate">
      *        N-Triples predicate syntax</a>
      */
-    public static PredicateNode parsePredicate(String ntPredicate)
+    public static PredicateNode parsePredicate(final String ntPredicate)
             throws ParseException {
 
         return parseURIReference(ntPredicate);
@@ -204,7 +231,7 @@ public abstract class NTriplesUtil {
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#object">
      *        N-Triples object syntax</a>
      */
-    public static ObjectNode parseObject(String ntObject)
+    public static ObjectNode parseObject(final String ntObject)
             throws ParseException {
 
         return (ObjectNode) parseNode(ntObject);
@@ -217,7 +244,7 @@ public abstract class NTriplesUtil {
      * @return the parsed node.
      * @throws ParseException if the input syntax is incorrect
      */
-    public static Node parseNode(String ntNode) 
+    public static Node parseNode(final String ntNode) 
             throws ParseException {
 
         char first = ntNode.charAt(0);
@@ -238,7 +265,7 @@ public abstract class NTriplesUtil {
      * @return the parsed literal.
      * @throws ParseException if the input syntax is incorrect
      */
-    public static Literal parseLiteral(String s)
+    public static Literal parseLiteral(final String s)
             throws ParseException {
 
         StringReader reader = new StringReader(s);
@@ -330,7 +357,7 @@ public abstract class NTriplesUtil {
      * @return the parsed URI reference.
      * @throws ParseException if the input syntax is incorrect
      */
-    public static URIReference parseURIReference(String s)
+    public static URIReference parseURIReference(final String s)
             throws ParseException {
 
         char first = s.charAt(0);
@@ -368,20 +395,20 @@ public abstract class NTriplesUtil {
      * @return The unescaped string.
      * @throws ParseException if the input syntax is incorrect
      */
-    public static String unescapeLiteralValue(String s)
+    public static String unescapeLiteralValue(final String s)
             throws ParseException {
 
         // verify ascii input
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c > 127) {
+            if (c > HIGHEST_ASCII_CHAR) {
                 throw new ParseException(NON_ASCII_CHAR, i);
             }
         }
 
         int backslashPos = s.indexOf('\\');
 
-        // return early if no escapes
+        // return early if no escape
         if (backslashPos == -1) {
             return s;
         }
@@ -416,26 +443,28 @@ public abstract class NTriplesUtil {
                 buf.append('\\');
                 i = backslashPos + 2;
             } else if (c == 'u') {
-                if (backslashPos + 5 >= len) {
+                if (backslashPos + SHORT_ESCAPE_LENGTH >= len) {
                     throw new ParseException(INCOMPLETE_ESCAPE, i);
                 }
-                String xx = s.substring(backslashPos + 2, backslashPos + 6);
+                String xx = s.substring(backslashPos + 2, 
+                        backslashPos + SHORT_ESCAPE_LENGTH + 1);
                 try {
-                    c = (char)Integer.parseInt(xx, 16);
-                    buf.append( (char)c );
-                    i = backslashPos + 6;
+                    c = (char) Integer.parseInt(xx, HEX);
+                    buf.append((char) c);
+                    i = backslashPos + SHORT_ESCAPE_LENGTH + 1;
                 } catch (NumberFormatException e) {
                     throw new ParseException(ILLEGAL_ESCAPE, i);
                 }
             } else if (c == 'U') {
-                if (backslashPos + 9 >= len) {
+                if (backslashPos + LONG_ESCAPE_LENGTH - 1 >= len) {
                     throw new ParseException(INCOMPLETE_ESCAPE, i);
                 }
-                String xx = s.substring(backslashPos + 2, backslashPos + 10);
+                String xx = s.substring(backslashPos + 2, 
+                        backslashPos + LONG_ESCAPE_LENGTH);
                 try {
-                    c = (char)Integer.parseInt(xx, 16);
-                    buf.append( (char)c );
-                    i = backslashPos + 10;
+                    c = (char) Integer.parseInt(xx, HEX);
+                    buf.append((char) c);
+                    i = backslashPos + LONG_ESCAPE_LENGTH;
                 } catch (NumberFormatException e) {
                     throw new ParseException(ILLEGAL_ESCAPE, i);
                 }
@@ -454,7 +483,7 @@ public abstract class NTriplesUtil {
      * Escape a string to N-Triples literal format.
      *
      * <ul>
-     *   <li> Unicode escaping (&#x5C;uxxxx or &#x5C;Uxxxxxxxx, as
+     *   <li> Unicode escaping (&#x5C;uxxxx or &#x5C;Uxxxxxxxx, a
      *        appropriate) will be used for all characters in the 
      *        following ranges:
      *        <ul>
@@ -473,14 +502,14 @@ public abstract class NTriplesUtil {
      * @param s The input string.
      * @return The escaped string.
      */ 
-    public static String escapeLiteralValue(String s) {
+    public static String escapeLiteralValue(final String s) {
 
         int len = s.length();
         StringBuffer out = new StringBuffer(len * 2);
 
         for (int i = 0; i < len; i++) {
             char c = s.charAt(i);
-            int cNum = (int)c;
+            int cNum = (int) c;
             if (c == '\\') {
                 out.append("\\\\");
             } else if (c == '"') {
@@ -491,16 +520,15 @@ public abstract class NTriplesUtil {
                 out.append("\\r");
             } else if (c == '\t') {
                 out.append("\\t");
-            } else if (
-                    cNum >= 0x0 && cNum <= 0x8 ||
-                    cNum == 0xB || cNum == 0xC ||
-                    cNum >= 0xE && cNum <= 0x1F ||
-                    cNum >= 0x7F && cNum <= 0xFFFF) {
+            } else if (cNum >= UC_LOW1 && cNum <= UC_HIGH1
+                    || cNum == UC_LOW2 || cNum == UC_HIGH2
+                    || cNum >= UC_LOW3 && cNum <= UC_HIGH3
+                    || cNum >= UC_LOW4 && cNum <= UC_HIGH4) {
                 out.append("\\u");
-                out.append(hexString(cNum, 4));
-            } else if (cNum >= 0x10000 && cNum <= 0x10FFFF) {
+                out.append(hexString(cNum, SHORT_ESCAPE_LENGTH - 1));
+            } else if (cNum >= UC_LOW5 && cNum <= UC_HIGH5) {
                 out.append("\\U");
-                out.append(hexString(cNum, 8));
+                out.append(hexString(cNum, LONG_ESCAPE_LENGTH - 2));
             } else {
                 out.append(c);
             }
@@ -517,7 +545,7 @@ public abstract class NTriplesUtil {
      * @param len The desired length of the output.
      * @return The uppercase hex string.
      */
-    private static String hexString(int num, int len) {
+    private static String hexString(final int num, final int len) {
         StringBuffer out = new StringBuffer(len);
         String hex = Integer.toHexString(num).toUpperCase();
         int n = len - hex.length();

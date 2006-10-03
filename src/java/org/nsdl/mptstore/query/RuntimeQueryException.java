@@ -17,7 +17,7 @@ public class RuntimeQueryException extends RuntimeException {
      *
      * @param cause the cause, which is always a <code>QueryException</code>.
      */
-    public RuntimeQueryException(QueryException cause) {
+    public RuntimeQueryException(final QueryException cause) {
         super(cause);
     }
 

@@ -23,7 +23,8 @@ public class TriplePatternSQLProvider implements SQLProvider {
     /**
      * The Logger for this class.
      */
-    private static final Logger LOG = Logger.getLogger(TriplePatternSQLProvider.class.getName());
+    private static final Logger LOG = 
+            Logger.getLogger(TriplePatternSQLProvider.class.getName());
 
     /**
      * The targets are always "s", "p", "o".
@@ -31,7 +32,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
     public static final List<String> SPO_TARGETS;
 
     static {
-        SPO_TARGETS = new ArrayList<String>(3);
+        SPO_TARGETS = new ArrayList<String>();
         SPO_TARGETS.add("s");
         SPO_TARGETS.add("p");
         SPO_TARGETS.add("o");
@@ -51,9 +52,9 @@ public class TriplePatternSQLProvider implements SQLProvider {
      * @param backslashIsEscape whether backslash should be escaped in SQL.
      * @param pattern the triple pattern.
      */
-    public TriplePatternSQLProvider(TableManager tableManager,
-                                    boolean backslashIsEscape,
-                                    TriplePattern pattern) {
+    public TriplePatternSQLProvider(final TableManager tableManager,
+                                    final boolean backslashIsEscape,
+                                    final TriplePattern pattern) {
 
         _tableManager = tableManager;
         _backslashIsEscape = backslashIsEscape;
@@ -75,7 +76,8 @@ public class TriplePatternSQLProvider implements SQLProvider {
         if (predicate != null) {
             addSelect(predicate);
         } else {
-            Iterator<PredicateNode> preds = _tableManager.getPredicates().iterator();
+            Iterator<PredicateNode> preds = 
+                    _tableManager.getPredicates().iterator();
             while (preds.hasNext()) {
                 addSelect(preds.next());
             }
@@ -88,7 +90,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
      *
      * @param predicate the predicate in question.
      */
-    private void addSelect(PredicateNode predicate) {
+    private void addSelect(final PredicateNode predicate) {
 
         String table = _tableManager.getTableFor(predicate);
 
@@ -106,14 +108,16 @@ public class TriplePatternSQLProvider implements SQLProvider {
                 select.append("\nWHERE ");
                 if (_subjectString != null) {
                     select.append("s = ");
-                    select.append(DBUtil.quotedString(_subjectString, _backslashIsEscape));
+                    select.append(DBUtil.quotedString(_subjectString, 
+                            _backslashIsEscape));
                     if (_objectString != null) {
                         select.append("\nAND ");
                     }
                 }
                 if (_objectString != null) {
                     select.append("o = ");
-                    select.append(DBUtil.quotedString(_objectString, _backslashIsEscape));
+                    select.append(DBUtil.quotedString(_objectString, 
+                            _backslashIsEscape));
                 }
             }
 

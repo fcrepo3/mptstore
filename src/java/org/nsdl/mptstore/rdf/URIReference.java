@@ -26,7 +26,7 @@ public class URIReference
      * @param uri The existing URI.
      * @throws URISyntaxException if the URI is not absolute.
      */
-    public URIReference(URI uri) throws URISyntaxException {
+    public URIReference(final URI uri) throws URISyntaxException {
         if (uri.isAbsolute()) {
             _uri = uri;
         } else {
@@ -41,7 +41,7 @@ public class URIReference
      * @throws URISyntaxException if the given string is not a valid URI
      *         or is not absolute.
      */
-    public URIReference(String uri) throws URISyntaxException {
+    public URIReference(final String uri) throws URISyntaxException {
         this(new URI(uri));
     }
 
@@ -65,7 +65,7 @@ public class URIReference
     }
 
     /** {@inheritDoc} */
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj != null && obj instanceof URIReference) {
             return _uri.equals(((URIReference) obj).getURI());
         } else {

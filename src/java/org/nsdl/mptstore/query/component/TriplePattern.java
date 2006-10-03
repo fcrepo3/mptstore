@@ -1,17 +1,17 @@
 package org.nsdl.mptstore.query.component;
 
-
 import org.nsdl.mptstore.rdf.ObjectNode;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.SubjectNode;
 
-/** Represents a pattern that defines matching triples
+/** 
+ * Represents a pattern that defines matching triples.
  * <p>
- * A triple pattern contains three {@link org.nsdl.mptstore.query.component.NodePattern}s 
- * representing the subject, predicate, and object of a triple.  
+ * A triple pattern contains three {@link NodePattern}s representing the 
+ * subject, predicate, and object of a triple.  
  * </p>
- * @author birkland
  *
+ * @author birkland
  */
 public interface TriplePattern {
     
@@ -20,20 +20,20 @@ public interface TriplePattern {
      *
      * @return the subject pattern.
      */
-    public NodePattern<SubjectNode> getSubject();
+    NodePattern<SubjectNode> getSubject();
     
     /** 
      * Get the predicate pattern of this triple pattern.
      *
      * @return the predicate pattern.
      */
-    public NodePattern<PredicateNode> getPredicate();
+    NodePattern<PredicateNode> getPredicate();
     
     /** 
      * Get the object pattern of this triple pattern.
      *
      * @return the object pattern.
      */
-    public NodePattern<ObjectNode> getObject();
+    NodePattern<ObjectNode> getObject();
     
 }

@@ -32,7 +32,8 @@ public class SQLUnionQueryResults implements QueryResults {
     /**
      * The Logger for this class.
      */
-    private static final Logger LOG = Logger.getLogger(SQLUnionQueryResults.class.getName());
+    private static final Logger LOG = 
+            Logger.getLogger(SQLUnionQueryResults.class.getName());
 
     /**
      * The database connection to use for the SQL queries.
@@ -83,9 +84,9 @@ public class SQLUnionQueryResults implements QueryResults {
      * @param sqlProvider provides the SQL and column names for the query.
      * @throws QueryException if an unexpected error occurs starting the query.
      */
-    public SQLUnionQueryResults(Connection conn,
-                                int fetchSize,
-                                SQLProvider sqlProvider) 
+    public SQLUnionQueryResults(final Connection conn,
+                                final int fetchSize,
+                                final SQLProvider sqlProvider) 
             throws QueryException {
 
         _conn = conn;
@@ -211,17 +212,31 @@ public class SQLUnionQueryResults implements QueryResults {
     public void close() {
         if (!_closed) {
             if (_results != null) {
-                try { _results.close(); } catch (Exception e) { }
+                try { 
+                    _results.close(); 
+                } catch (Exception e) { 
+                    LOG.warn("Error closing result set", e);
+                }
             }
             if (_statement != null) {
-                try { _statement.close(); } catch (Exception e) { }
+                try { 
+                    _statement.close(); 
+                } catch (Exception e) { 
+                    LOG.warn("Error closing statement", e);
+                }
             }
             try {
                 if (!_conn.getAutoCommit()) {
                     _conn.setAutoCommit(true);
                 }
-            } catch (Exception e) { }
-            try { _conn.close(); } catch (Exception e) { }
+            } catch (Exception e) { 
+                LOG.warn("Error setting autocommit", e);
+            }
+            try { 
+                _conn.close(); 
+            } catch (Exception e) { 
+                LOG.warn("Error closing/releasing connection", e);
+            }
             _closed = true;
         }
     }

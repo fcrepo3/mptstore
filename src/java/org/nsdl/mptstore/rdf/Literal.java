@@ -18,6 +18,11 @@ import org.nsdl.mptstore.util.NTriplesUtil;
 public class Literal implements ObjectNode {
 
     /**
+     * Maximum characters for a language code subtag.
+     */
+    private static final int SUBTAG_MAXLEN = 8;
+
+    /**
      * The lexical value of this literal.
      */
     private String _value;
@@ -37,7 +42,7 @@ public class Literal implements ObjectNode {
      *
      * @param value The lexical value.
      */
-    public Literal(String value) {
+    public Literal(final String value) {
         _value = value;
     }
 
@@ -61,7 +66,9 @@ public class Literal implements ObjectNode {
      * @throws ParseException if the language is syntactically
      *         invalid according to RFC3066.
      */
-    public Literal(String value, String language) throws ParseException {
+    public Literal(final String value, 
+                   final String language) 
+            throws ParseException {
         _value = value;
         if (language != null) {
             if (language.length() == 0) {
@@ -74,17 +81,16 @@ public class Literal implements ObjectNode {
 
             String[] parts = language.split("-");
             for (int i = 0; i < parts.length; i++) {
-                if (parts[i].length() < 1 || parts[i].length() > 8) {
+                if (parts[i].length() < 1 
+                        || parts[i].length() > SUBTAG_MAXLEN) {
                     throw new ParseException("Language subtags must be "
-                            + "1-8 characters long", 0);
+                            + "1-" + SUBTAG_MAXLEN + " characters long", 0);
                 }
                 for (int j = 0; j < parts[i].length(); j++) {
                     char c = parts[i].charAt(j);
-                    if (   (c >= 'a' && c <= 'z') 
-                        || (c >= 'A' && c <= 'Z')) {
-                    } else if (    (i > 0) 
-                                && (c >= '0' && c <= '9') ) {
-                    } else {
+                    if (!((c >= 'a' && c <= 'z')
+                            || (c >= 'A' && c <= 'Z')
+                            || (c >= '0' && c <= '9' && i > 0))) {
                         throw new ParseException("Language subtag cannot "
                                 + "contain character '" + c + "'", 0);
                     }
@@ -101,7 +107,8 @@ public class Literal implements ObjectNode {
      * @param value The lexical value.
      * @param datatype The datatype.
      */
-    public Literal(String value, URIReference datatype) {
+    public Literal(final String value, 
+                   final URIReference datatype) {
         _value = value;
         _datatype = datatype;
     }
@@ -144,7 +151,7 @@ public class Literal implements ObjectNode {
     }
 
     /** {@inheritDoc} */
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj != null && obj instanceof Literal) {
             Literal lit = (Literal) obj;
             if (_language != null) {

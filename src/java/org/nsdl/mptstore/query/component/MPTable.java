@@ -1,6 +1,7 @@
 package org.nsdl.mptstore.query.component;
 
-/** Mapped Predicate Table
+/** 
+ * Mapped Predicate Table.
  * <p>
  * Represents a specific mapping of a predicate to a table.  This mapped
  * table has both a name and an alias.  The table name is determined by the
@@ -8,11 +9,10 @@ package org.nsdl.mptstore.query.component;
  * </p>
  * 
  * @author birkland
- *
  */
 public class MPTable {
-    private final String alias;
-    private final String name;
+    private final String theAlias;
+    private final String theName;
 
     /**
      * Construct an MPTable.
@@ -20,13 +20,14 @@ public class MPTable {
      * @param name the name of the table.
      * @param alias the alias.
      */
-    public MPTable(String name, String alias) {
+    public MPTable(final String name, final String alias) {
         if (name == null || alias == null) {
-            throw new IllegalArgumentException("Cannot create a table without a name or alias. " +
-                    "Given " + name + " as name, " + alias + " as alias\n");
+            throw new IllegalArgumentException("Cannot create a table "
+                    + "without a name or alias.  Given " + name + " as name, " 
+                    + alias + " as alias\n");
         }
-        this.alias = alias;
-        this.name = name;
+        theAlias = alias;
+        theName = name;
     }
 
     /**
@@ -35,7 +36,7 @@ public class MPTable {
      * @return the alias.
      */
     public String alias() {
-        return alias;
+        return theAlias;
     }
 
     /**
@@ -44,6 +45,6 @@ public class MPTable {
      * @return the name.
      */
     public String name() {
-        return name;
+        return theName;
     }
 }

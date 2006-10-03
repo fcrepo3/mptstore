@@ -33,7 +33,8 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     /**
      * Logger for this class.
      */
-    private static final Logger LOG = Logger.getLogger(GenericDatabaseAdaptor.class.getName());
+    private static final Logger LOG = 
+            Logger.getLogger(GenericDatabaseAdaptor.class.getName());
 
     /**
      * The <code>TableManager</code> used by this instance.
@@ -48,13 +49,14 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     /**
      * Get an instance supporting the built-in query languages.
      *
-     * @param tableManager The <code>TableManager</code> this instance should use.
-     * @param backslashIsEscape A database vendor-specific specific value indicating
-     *        whether the backslash character in a string is considered to be
-     *        an escape character.
+     * @param tableManager The <code>TableManager</code> this instance 
+     *        should use.
+     * @param backslashIsEscape A database vendor-specific specific value 
+     *        indicating whether the backslash character in a string is 
+     *        considered to be an escape character.
      */
-    public GenericDatabaseAdaptor(TableManager tableManager,
-                                  boolean backslashIsEscape) {
+    public GenericDatabaseAdaptor(final TableManager tableManager,
+                                  final boolean backslashIsEscape) {
         _tableManager = tableManager;
         _compilerMap = new HashMap<QueryLanguage, QueryCompiler>();
         _compilerMap.put(QueryLanguage.SPO, 
@@ -65,25 +67,27 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     /**
      * Get an instance supporting the specified query languages.
      *
-     * @param tableManager The <code>TableManager</code> this instance should use.
+     * @param tableManager The <code>TableManager</code> this instance 
+     *        should use.
      * @param compilerMap A map of query language to query compiler.
      */
-    public GenericDatabaseAdaptor(TableManager tableManager,
-                                  Map<QueryLanguage, QueryCompiler> compilerMap) {
+    public GenericDatabaseAdaptor(
+            final TableManager tableManager,
+            final Map<QueryLanguage, QueryCompiler> compilerMap) {
         _tableManager = tableManager;
         _compilerMap = compilerMap;
     }
 
     /** {@inheritDoc} */
-    public void addTriples(Connection conn, 
-                           Iterator<Triple> triples) 
+    public void addTriples(final Connection conn, 
+                           final Iterator<Triple> triples) 
             throws ModificationException {
         updateTriples(conn, triples, false);
     }
 
     /** {@inheritDoc} */
-    public void deleteTriples(Connection conn, 
-                              Iterator<Triple> triples) 
+    public void deleteTriples(final Connection conn, 
+                              final Iterator<Triple> triples) 
             throws ModificationException {
         updateTriples(conn, triples, true);
     }
@@ -97,13 +101,13 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
      *        or delete.
      * @throws ModificationException if the operation fails for any reason.
      */
-    private void updateTriples(Connection conn,
-                               Iterator<Triple> triples,
-                               boolean delete)
+    private void updateTriples(final Connection conn,
+                               final Iterator<Triple> triples,
+                               final boolean delete)
             throws ModificationException {
 
-        Map<PredicateNode,PreparedStatement> statements = 
-                new HashMap<PredicateNode,PreparedStatement>();
+        Map<PredicateNode, PreparedStatement> statements = 
+                new HashMap<PredicateNode, PreparedStatement>();
 
         try {
             while (triples.hasNext()) {
@@ -116,9 +120,11 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
                     String table = _tableManager.getOrMapTableFor(predicate);
                     String sql;
                     if (delete) {
-                        sql = "DELETE FROM " + table + " WHERE s = ? AND o = ?";
+                        sql = "DELETE FROM " + table 
+                                + " WHERE s = ? AND o = ?";
                     } else {
-                        sql = "INSERT INTO " + table + " (s, o) VALUES (?, ?)";
+                        sql = "INSERT INTO " + table 
+                                + " (s, o) VALUES (?, ?)";
                     }
                     LOG.info("Preparing update: " + sql);
                     statement = conn.prepareStatement(sql);
@@ -147,7 +153,7 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     }
 
     /** {@inheritDoc} */
-    public void deleteAllTriples(Connection conn) 
+    public void deleteAllTriples(final Connection conn) 
             throws ModificationException {
         try {
             _tableManager.dropAllPredicateTables();
@@ -158,17 +164,18 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
 
 
     /** {@inheritDoc} */
-    public QueryResults query(Connection conn, 
-                              QueryLanguage lang,
-                              int fetchSize,
-                              String query) 
+    public QueryResults query(final Connection conn, 
+                              final QueryLanguage lang,
+                              final int fetchSize,
+                              final String query) 
             throws QueryException {
         QueryCompiler compiler = _compilerMap.get(lang);
         if (compiler != null) {
             SQLProvider provider = compiler.compile(query);
             return new SQLUnionQueryResults(conn, fetchSize, provider);
         } else {
-            throw new QueryException("Query language not supported: " + lang.getName());
+            throw new QueryException("Query language not supported: " 
+                    + lang.getName());
         }
     }
 

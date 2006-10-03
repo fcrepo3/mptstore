@@ -2,13 +2,14 @@ package org.nsdl.mptstore.query.component;
 
 import org.nsdl.mptstore.rdf.Node;
 
-/** Generic implementation of {@link NodePattern}.
- * 
- * @author birkland
+/** 
+ * Generic implementation of {@link NodePattern}.
  *
  * @param <T> The type of node that is described by the pattern.  Typically,
  * this is one of SubjectNode, PredicateNode, ObjectNode, or just Node if the
  * exact node type is unimportant or unknown.
+ * 
+ * @author birkland
  */
 public class BasicNodePattern<T extends Node> implements NodePattern<T> {
     
@@ -21,7 +22,7 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
      *
      * @param node the node.
      */
-    public BasicNodePattern(T node) {
+    public BasicNodePattern(final T node) {
         this.nodeValue = node;
         this.isVariable = false;
         this.varName = null;
@@ -32,7 +33,7 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
      *
      * @param variable the variable name.
      */
-    public BasicNodePattern(String variable) {
+    public BasicNodePattern(final String variable) {
         this.nodeValue = null;
         this.isVariable = true;
         this.varName = variable;
@@ -57,17 +58,19 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
      *  <p>
      *  Equality of triple patterns follow the following rules:
      *  <ul>
-     *   <li> They both need to be the same type (e.g. variables or nodes) </li>
+     *   <li> They need to be the same type (e.g. variables or nodes) </li>
      *   <li> Nulls are not equal </li>
      *   <li> If both patterns are Nodes, equality is determined by comparing
-     *   getValue() for each node.  
+     *   getValue() for each node.  </li>
      *  </ul>
      *  </p>
      * @param p the object to compare this one to.
      * @return whether the objects are equal according to the rules above.
      */
-    public boolean equals(Object p) {
-        if (!(p instanceof NodePattern)) {return false;}
+    public boolean equals(final Object p) {
+        if (!(p instanceof NodePattern)) {
+            return false;
+        }
         NodePattern comparison = (NodePattern) p;
         
         if (this.isVariable() && comparison.isVariable()) {
@@ -80,12 +83,29 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
                 return false;
             }
             try {
-                return this.getNode().getValue().equals(comparison.getNode().getValue());
+                return this.getNode().getValue().equals(
+                        comparison.getNode().getValue());
             } catch (NullPointerException e) {
                 return false;
             }
         } 
         return false;
+    }
+
+    /**
+     * Get a hash code for this node pattern.
+     *
+     * If variable, the hash code is that of the variable string.
+     * Otherwise, it's the hash code of the node.
+     *
+     * @return the hash code.
+     */
+    public int hashCode() {
+        if (isVariable) {
+            return varName.hashCode();
+        } else {
+            return nodeValue.hashCode();
+        }
     }
    
     /** {@inheritDoc} */

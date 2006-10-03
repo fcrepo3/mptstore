@@ -27,7 +27,7 @@ public interface TableManager {
      * @return The table name for the given predicate, never <code>null</code>.
      * @throws SQLException if a database error occurs while the table is
      */
-    public String getOrMapTableFor(PredicateNode predicate) throws SQLException;
+    String getOrMapTableFor(PredicateNode predicate) throws SQLException;
 
     /**
      * Get the name of the table reserved for relationships of the given type,
@@ -37,7 +37,7 @@ public interface TableManager {
      * @return The table name for the given predicate, or <code>null</code>
      *         if no such predicate exists in the graph.
      */
-    public String getTableFor(PredicateNode predicate);
+    String getTableFor(PredicateNode predicate);
 
     /**
      * Get the predicate that's mapped to the given table, if such a mapping
@@ -46,21 +46,21 @@ public interface TableManager {
      * @param table The name of the table.
      * @return The predicate, or <code>null</code> if no such mapping exists.
      */
-    public PredicateNode getPredicateFor(String table);
+    PredicateNode getPredicateFor(String table);
 
     /**
      * Get the set of tables that store per-predicate relationships.
      *
      * @return A set with zero or more table names.
      */
-    public Set<String> getTables();
+    Set<String> getTables();
 
     /**
      * Get the set of predicates for which a table mapping exists. 
      *
      * @return A set with zero or more predicates.
      */
-    public Set<PredicateNode> getPredicates();
+    Set<PredicateNode> getPredicates();
 
     /**
      * Drop all unused predicate tables and mappings. 
@@ -68,7 +68,7 @@ public interface TableManager {
      * @return the number of dropped predicate tables.
      * @throws SQLException if a database error occured during the operation.
      */ 
-    public int dropEmptyPredicateTables() throws SQLException;
+    int dropEmptyPredicateTables() throws SQLException;
 
     /**
      * Drop all predicate tables and mappings, effectively
@@ -77,6 +77,6 @@ public interface TableManager {
      * @return the number of dropped predicate tables.
      * @throws SQLException if a database error occured during the operation.
      */
-    public int dropAllPredicateTables() throws SQLException;
+    int dropAllPredicateTables() throws SQLException;
 
 }

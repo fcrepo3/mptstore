@@ -40,8 +40,10 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  */
 public class SPOQueryCompiler implements QueryCompiler {
 
-    private static final String EXPECTED_AQLST = "Expected '*', '\"', '<', ' ', or TAB";
-    private static final String EXPECTED_ALST = "Expected '*', '<', ' ', or TAB";
+    private static final String EXPECTED_AQLST = "Expected '*', '\"',"
+            + " '<', ' ', or TAB";
+    private static final String EXPECTED_ALST = "Expected '*', '<',"
+            + " ' ', or TAB";
     private static final String EXPECTED_EOS = "Expected end of query string";
     private static final String EXPECTED_G = "Expected '>'";
     private static final String EXPECTED_ST = "Expected ' ' or TAB";
@@ -64,14 +66,14 @@ public class SPOQueryCompiler implements QueryCompiler {
      * @param backslashIsEscape Whether the backslash character should be
      *                          escaped in the output SQL.
      */
-    public SPOQueryCompiler(TableManager tableManager,
-                            boolean backslashIsEscape) {
+    public SPOQueryCompiler(final TableManager tableManager,
+                            final boolean backslashIsEscape) {
         _tableManager = tableManager;
         _backslashIsEscape = backslashIsEscape;
     }
 
     /** {@inheritDoc} */
-    public SQLProvider compile(String query) 
+    public SQLProvider compile(final String query) 
             throws QueryException {
         try {
             return new TriplePatternSQLProvider(
@@ -90,7 +92,7 @@ public class SPOQueryCompiler implements QueryCompiler {
      * @return TriplePattern the triple pattern.
      * @throws ParseException if the query is malformed.
      */
-    private TriplePattern parseTriplePattern(String query) 
+    private TriplePattern parseTriplePattern(final String query) 
             throws ParseException {
 
         StringReader reader = new StringReader(query);
@@ -150,7 +152,8 @@ public class SPOQueryCompiler implements QueryCompiler {
                 try {
                     predicate = NTriplesUtil.parsePredicate(pBuf.toString());
                 } catch (ParseException e) {
-                    throw new ParseException(e.getMessage(), e.getErrorOffset() + i);
+                    throw new ParseException(e.getMessage(), 
+                            e.getErrorOffset() + i);
                 }
             }
 
@@ -178,7 +181,8 @@ public class SPOQueryCompiler implements QueryCompiler {
                 try {
                     o = NTriplesUtil.parseObject(query.substring(i));
                 } catch (ParseException e) {
-                    throw new ParseException(e.getMessage(), e.getErrorOffset() + i);
+                    throw new ParseException(e.getMessage(), 
+                            e.getErrorOffset() + i);
                 }
             }
             reader.close();

@@ -35,7 +35,8 @@ public class BasicTableManager implements TableManager {
     /**
      * The Logger for this class.
      */
-    private static final Logger LOG = Logger.getLogger(BasicTableManager.class.getName());
+    private static final Logger LOG = 
+            Logger.getLogger(BasicTableManager.class.getName());
 
     /**
      * The <code>DataSource</code> from which to obtain connections
@@ -62,12 +63,12 @@ public class BasicTableManager implements TableManager {
     /** 
      * The in-memory predicate-to-table mapping.
      */
-    private Map<PredicateNode,String> _map;
+    private Map<PredicateNode, String> _map;
 
     /** 
      * The in-memory table-to-predicate mapping.
      */
-    private Map<String,PredicateNode> _reverseMap;
+    private Map<String, PredicateNode> _reverseMap;
 
     /**
      * Initialize the table manager.
@@ -83,10 +84,10 @@ public class BasicTableManager implements TableManager {
      * @param soTablePrefix The prefix for all predicate table names.
      * @throws SQLException if any kind of database error occurs.
      */
-    public BasicTableManager(DataSource dataSource,
-                             DDLGenerator ddlGenerator,
-                             String mapTable,
-                             String soTablePrefix) throws SQLException {
+    public BasicTableManager(final DataSource dataSource,
+                             final DDLGenerator ddlGenerator,
+                             final String mapTable,
+                             final String soTablePrefix) throws SQLException {
 
         _dataSource = dataSource;
         _ddlGenerator = ddlGenerator;
@@ -98,7 +99,8 @@ public class BasicTableManager implements TableManager {
             if (!mapTableExists(conn)) {
                 LOG.info("Creating map table");
                 executeDDL(conn,
-                           _ddlGenerator.getCreateMapTableDDL(_mapTable).iterator());
+                           _ddlGenerator.getCreateMapTableDDL(
+                           _mapTable).iterator());
             }
             loadMapTable(conn);
         } finally {
@@ -112,7 +114,8 @@ public class BasicTableManager implements TableManager {
     }
 
     /** {@inheritDoc} */
-    public String getOrMapTableFor(PredicateNode predicate) throws SQLException {
+    public String getOrMapTableFor(final PredicateNode predicate) 
+            throws SQLException {
         String table = getTableFor(predicate);
         if (table != null) {
             return table;
@@ -131,14 +134,14 @@ public class BasicTableManager implements TableManager {
     }
 
     /** {@inheritDoc} */
-    public String getTableFor(PredicateNode predicate) {
+    public String getTableFor(final PredicateNode predicate) {
         synchronized (_map) {
             return _map.get(predicate);
         }
     }
 
     /** {@inheritDoc} */
-    public PredicateNode getPredicateFor(String table) {
+    public PredicateNode getPredicateFor(final String table) {
         synchronized (_map) {
             return _reverseMap.get(table);
         }
@@ -171,7 +174,7 @@ public class BasicTableManager implements TableManager {
      * @return true if so, false if not.
      * @throws SQLException if a database error occurs.
      */
-    private boolean mapTableExists(Connection conn) throws SQLException {
+    private boolean mapTableExists(final Connection conn) throws SQLException {
 
         ResultSet results = conn.getMetaData().getTables(null, null,
                                                          _mapTable, null);
@@ -198,9 +201,12 @@ public class BasicTableManager implements TableManager {
                 results = st.executeQuery("SELECT COUNT(*) FROM " + _mapTable);
                 exists = results.next();
             } catch (SQLException e) {
+                throw e;
             } finally {
                 try {
-                    if (results != null) results.close();
+                    if (results != null) {
+                        results.close();
+                    }
                 } catch (SQLException e) {
                     LOG.warn("unable to close result set", e);
                 }
@@ -226,10 +232,10 @@ public class BasicTableManager implements TableManager {
      * @param conn The connection to use for reading.
      * @throws SQLException if a database error occurs.
      */
-    private void loadMapTable(Connection conn) throws SQLException {
+    private void loadMapTable(final Connection conn) throws SQLException {
         LOG.info("Loading map table");
-        _map = new HashMap<PredicateNode,String>();
-        _reverseMap = new HashMap<String,PredicateNode>();
+        _map = new HashMap<PredicateNode, String>();
+        _reverseMap = new HashMap<String, PredicateNode>();
         Statement st = conn.createStatement();
         ResultSet results = null;
         String pString = null;
@@ -279,8 +285,8 @@ public class BasicTableManager implements TableManager {
      * @return the table name.
      * @throws SQLException if a database error occurs.
      */
-    private synchronized String mapTableFor(PredicateNode predicate,
-                                            Connection conn)
+    private synchronized String mapTableFor(final PredicateNode predicate,
+                                            final Connection conn)
             throws SQLException {
 
         // re-check map in case the predicate was added
@@ -289,12 +295,14 @@ public class BasicTableManager implements TableManager {
         if (table != null) {
             return table;
         } else {
-            LOG.info("Mapping new table for predicate: " + predicate.toString());
+            LOG.info("Mapping new table for predicate: " 
+                    + predicate.toString());
             int id = addPredicateToMapTable(predicate, conn);
             try {
                 table = _soTablePrefix + id;
                 executeDDL(conn,
-                           _ddlGenerator.getCreateSOTableDDL(table).iterator());
+                           _ddlGenerator.getCreateSOTableDDL(table)
+                           .iterator());
             } catch (SQLException e) {
                 try {
                     // since we're not on a transaction, we must manually
@@ -323,8 +331,8 @@ public class BasicTableManager implements TableManager {
      *         the name for the new predicate table.
      * @throws SQLException if a database error occurs.
      */
-    private int addPredicateToMapTable(PredicateNode predicate, 
-                                       Connection conn) 
+    private int addPredicateToMapTable(final PredicateNode predicate, 
+                                       final Connection conn) 
             throws SQLException {
 
         String pString = predicate.toString();
@@ -376,8 +384,8 @@ public class BasicTableManager implements TableManager {
      * @param conn The connection on which to perform the operation.
      * @throws SQLException if a database error occurrs.
      */
-    private void deletePredicateFromMapTable(PredicateNode predicate, 
-                                             Connection conn) 
+    private void deletePredicateFromMapTable(final PredicateNode predicate, 
+                                             final Connection conn) 
             throws SQLException {
         PreparedStatement ps = conn.prepareStatement(
                 "DELETE FROM " + _mapTable + " WHERE p = ?");
@@ -401,8 +409,9 @@ public class BasicTableManager implements TableManager {
      * @param ddlIter The DDL to execute.
      * @throws SQLException if a database error occurs.
      */
-    private void executeDDL(Connection conn,
-                            Iterator<String> ddlIter) throws SQLException {
+    private void executeDDL(final Connection conn,
+                            final Iterator<String> ddlIter)
+            throws SQLException {
         Statement st = conn.createStatement();
         try {
             while (ddlIter.hasNext()) {
@@ -430,7 +439,8 @@ public class BasicTableManager implements TableManager {
      * @return the number of dropped predicate tables.
      * @throws SQLException if a database error occurs.
      */
-    private synchronized int dropPredicateTables(boolean all) throws SQLException {
+    private synchronized int dropPredicateTables(final boolean all) 
+            throws SQLException {
 
         int dropCount = 0;
         Connection conn = _dataSource.getConnection();
@@ -468,8 +478,9 @@ public class BasicTableManager implements TableManager {
      * @return true if empty, false otherwise.
      * @throws SQLException if a database error occurs.
      */
-    private boolean isPredicateTableEmpty(String table, 
-                                          Connection conn) throws SQLException {
+    private boolean isPredicateTableEmpty(final String table, 
+                                          final Connection conn) 
+            throws SQLException {
         Statement st = conn.createStatement();
         try {
             ResultSet results = st.executeQuery("SELECT MAX(s) FROM " + table);
@@ -500,9 +511,9 @@ public class BasicTableManager implements TableManager {
      * @param conn The connection to use.
      * @throws SQLException if a database error occurs.
      */
-    private void unmapPredicate(PredicateNode predicate,
-                                String table,
-                                Connection conn) 
+    private void unmapPredicate(final PredicateNode predicate,
+                                final String table,
+                                final Connection conn) 
             throws SQLException {
 
         String pString = predicate.toString();

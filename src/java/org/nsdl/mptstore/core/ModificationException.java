@@ -12,7 +12,7 @@ public class ModificationException extends Exception {
      *
      * @param message The detail message.
      */
-    public ModificationException(String message) {
+    public ModificationException(final String message) {
         super(message);
     }
 
@@ -23,7 +23,7 @@ public class ModificationException extends Exception {
      * @param message The detail message.
      * @param cause The underlying cause.
      */
-    public ModificationException(String message, Throwable cause) {
+    public ModificationException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

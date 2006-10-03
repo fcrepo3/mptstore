@@ -32,7 +32,7 @@ public class QueryLanguage {
      *
      * @param name the name.
      */
-    protected QueryLanguage(String name) {
+    protected QueryLanguage(final String name) {
         _name = name;
     }
 

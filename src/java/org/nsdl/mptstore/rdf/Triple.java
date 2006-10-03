@@ -31,9 +31,9 @@ public class Triple {
      * @param predicate The predicate.
      * @param object The object.
      */
-    public Triple(SubjectNode subject,
-                  PredicateNode predicate,
-                  ObjectNode object) {
+    public Triple(final SubjectNode subject,
+                  final PredicateNode predicate,
+                  final ObjectNode object) {
         _subject = subject;
         _predicate = predicate;
         _object = object;

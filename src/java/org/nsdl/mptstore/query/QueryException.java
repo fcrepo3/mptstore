@@ -12,7 +12,7 @@ public class QueryException extends Exception {
      *
      * @param message the detail message.
      */
-    public QueryException(String message) {
+    public QueryException(final String message) {
         super(message);
     }
 
@@ -22,7 +22,7 @@ public class QueryException extends Exception {
      * @param message the detail message.
      * @param cause the cause.
      */
-    public QueryException(String message, Throwable cause) {
+    public QueryException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

@@ -41,7 +41,7 @@ public interface DDLGenerator {
      * @param table The map table name.
      * @return The necessary DDL.
      */
-    public List<String> getCreateMapTableDDL(String table);
+    List<String> getCreateMapTableDDL(String table);
 
     /**
      * Get the DDL command(s) necessary to drop a map table
@@ -50,7 +50,7 @@ public interface DDLGenerator {
      * @param table The map table name.
      * @return The necessary DDL.
      */
-    public List<String> getDropMapTableDDL(String table);
+    List<String> getDropMapTableDDL(String table);
 
     /**
      * Get the DDL command(s) necessary to create a subject-object
@@ -59,7 +59,7 @@ public interface DDLGenerator {
      * @param table The relationship table name.
      * @return The necessary DDL.
      */
-    public List<String> getCreateSOTableDDL(String table);
+    List<String> getCreateSOTableDDL(String table);
 
     /**
      * Get the DDL command(s) necessary to drop a subject-object
@@ -68,6 +68,6 @@ public interface DDLGenerator {
      * @param table The relationship table name.
      * @return The necessary DDL.
      */
-    public List<String> getDropSOTableDDL(String table);
+    List<String> getDropSOTableDDL(String table);
 
 }

@@ -14,7 +14,7 @@ public class QuerySyntaxException extends QueryException {
      *
      * @param message the detail message.
      */
-    public QuerySyntaxException(String message) {
+    public QuerySyntaxException(final String message) {
         super(message);
     }
 
@@ -24,7 +24,7 @@ public class QuerySyntaxException extends QueryException {
      * @param message the detail message.
      * @param cause the cause.
      */
-    public QuerySyntaxException(String message, Throwable cause) {
+    public QuerySyntaxException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

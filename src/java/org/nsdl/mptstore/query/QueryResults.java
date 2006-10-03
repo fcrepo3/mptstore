@@ -17,7 +17,7 @@ public interface QueryResults extends ClosableIterator<List<Node>> {
      *
      * @return the ordered list of names.
      */
-    public List<String> getTargets();
+    List<String> getTargets();
 
     /**
      * Get the next row of results.
@@ -25,14 +25,14 @@ public interface QueryResults extends ClosableIterator<List<Node>> {
      * @return the next row.
      * @throws RuntimeQueryException if there's an error getting the next row.
      */
-    public List<Node> next() throws RuntimeQueryException;
+    List<Node> next() throws RuntimeQueryException;
 
     /**
      * Tell whether there's another row of results.
      *
      * @return true if there's another row, false if not.
      */
-    public boolean hasNext();
+    boolean hasNext();
 
     /**
      * Throws <code>UnsupportedOperationException</code>.
@@ -42,6 +42,6 @@ public interface QueryResults extends ClosableIterator<List<Node>> {
      *
      * @throws UnsupportedOperationException if this method is called.
      */
-    public void remove() throws UnsupportedOperationException;
+    void remove() throws UnsupportedOperationException;
 
 }

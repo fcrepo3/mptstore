@@ -11,6 +11,8 @@ import java.sql.SQLException;
  */
 public abstract class DBUtil {
 
+    private DBUtil() { }
+
     /**
      * Get a long string, which could be a TEXT or CLOB type.
      *
@@ -24,7 +26,8 @@ public abstract class DBUtil {
      * @throws SQLException if there is an database error accessing the value 
      *         from the ResultSet.
      */
-    public static String getLongString(ResultSet rs, int pos) 
+    public static String getLongString(final ResultSet rs, 
+                                       final int pos) 
             throws SQLException {
         String s = rs.getString(pos);
         if (s != null) {
@@ -32,8 +35,11 @@ public abstract class DBUtil {
         } else {
             Clob c = rs.getClob(pos);
             
-            if (c == null) {return null;}
-            return c.getSubString(1, (int) c.length());
+            if (c == null) {
+                return null;
+            } else {
+                return c.getSubString(1, (int) c.length());
+            }
         }
     }
 
@@ -50,8 +56,8 @@ public abstract class DBUtil {
      *        and thus need to be escaped themselves.
      * @return the escaped string.
      */
-    public static String quotedString(String in,
-                                      boolean backslashIsEscape) {
+    public static String quotedString(final String in,
+                                      final boolean backslashIsEscape) {
         StringBuffer out = new StringBuffer();
         out.append('\'');
         for (int i = 0; i < in.length(); i++) {

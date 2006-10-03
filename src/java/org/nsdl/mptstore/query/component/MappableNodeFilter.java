@@ -2,19 +2,20 @@ package org.nsdl.mptstore.query.component;
 
 import org.nsdl.mptstore.rdf.Node;
 
-/** Represents a constraint on the value of a particular mapped node pattern.
+/** 
+ * Represents a constraint on the value of a particular mapped node pattern.
  *
- * @param <T> The type of node that is being constrained by this filter.  Typically,
- * this is one of SubjectNode, PredicateNode, ObjectNode, or just Node if the
- * exact node type is unimportant or unknown.
+ * @param <T> The type of node that is being constrained by this filter.
+ *            Typically, this is one of SubjectNode, PredicateNode, 
+ *            ObjectNode, or just Node if the exact node type is unimportant 
+ *            or unknown.
  *   
  * @author birkland
- *
  */
 public class MappableNodeFilter<T extends Node> implements NodeFilter<T> {
-    private final MappableNodePattern<T> node;
-    private final MappableNodePattern<T> value;
-    private final String operator;
+    private final MappableNodePattern<T> theNode;
+    private final MappableNodePattern<T> theValue;
+    private final String theOperator;
 
     /** Create a filter on a particular node pattern.
      * 
@@ -22,11 +23,12 @@ public class MappableNodeFilter<T extends Node> implements NodeFilter<T> {
      * @param operator String representing some operator
      * @param constraint node pattern representing a constraint
      */
-    public MappableNodeFilter(MappableNodePattern<T> node, String operator, 
-            MappableNodePattern<T> constraint) {
-        this.node = node;
-        this.value = constraint;
-        this.operator = operator;
+    public MappableNodeFilter(final MappableNodePattern<T> node, 
+                              final String operator, 
+                              final MappableNodePattern<T> constraint) {
+        theNode = node;
+        theValue = constraint;
+        theOperator = operator;
     }
 
     /**
@@ -34,29 +36,29 @@ public class MappableNodeFilter<T extends Node> implements NodeFilter<T> {
      *
      * @param filter the existing filter.
      */
-    public  MappableNodeFilter(NodeFilter<T> filter) {
-        this.node = new MappableNodePattern<T>(filter.getNode());
-        this.value = new MappableNodePattern<T>(filter.getConstraint());
-        this.operator = filter.getOperator();
+    public MappableNodeFilter(final NodeFilter<T> filter) {
+        theNode = new MappableNodePattern<T>(filter.getNode());
+        theValue = new MappableNodePattern<T>(filter.getConstraint());
+        theOperator = filter.getOperator();
     }
 
     /** {@inheritDoc} */
     public MappableNodePattern<T> getNode() {
-        return node;
+        return theNode;
     }
     
     /** {@inheritDoc} */
     public MappableNodePattern<T> getConstraint() {
-        return value;
+        return theValue;
     }
     
     /** {@inheritDoc} */
     public String getOperator() {
-        return operator;
+        return theOperator;
     }
     
     /** {@inheritDoc} */
     public String toString() {
-        return node + " " + operator + " " + value;
+        return theNode + " " + theOperator + " " + theValue;
     }
 }

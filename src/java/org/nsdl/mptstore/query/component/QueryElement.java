@@ -18,17 +18,17 @@ public interface QueryElement {
      *
      * @return the type.
      */
-	public Type getType();
+    Type getType();
 
     /**
      * Possible element types.
      */
-	public enum Type {
+    enum Type {
 
         /** A graph query. */
-		GraphQuery,
+        GraphQuery,
 
         /** A graph pattern. */
-		GraphPattern
-	}
+        GraphPattern
+    }
 }

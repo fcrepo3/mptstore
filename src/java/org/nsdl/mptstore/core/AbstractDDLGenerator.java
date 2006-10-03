@@ -14,14 +14,14 @@ import java.util.List;
 public abstract class AbstractDDLGenerator implements DDLGenerator {
 
     /** {@inheritDoc} */
-    public List<String> getDropMapTableDDL(String table) {
+    public List<String> getDropMapTableDDL(final String table) {
         List<String> cmds = new ArrayList<String>();
         cmds.add("DROP TABLE " + table);
         return cmds;
     }
 
     /** {@inheritDoc} */
-    public List<String> getDropSOTableDDL(String table) {
+    public List<String> getDropSOTableDDL(final String table) {
         List<String> cmds = new ArrayList<String>();
         cmds.add("DROP TABLE " + table);
         return cmds;
