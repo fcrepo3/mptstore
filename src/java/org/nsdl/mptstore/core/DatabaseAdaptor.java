@@ -17,8 +17,8 @@ import org.nsdl.mptstore.rdf.Triple;
  *   and perform interpreted queries against the triplestore.
  * </p>
  * <p>
- *   Note that each method takes an existing JDBC <code>Connection</code> as a 
- *   parameter.  Client applications are expected to open/close or 
+ *   Note that each method takes an existing JDBC <code>Connection</code> as a
+ *   parameter.  Client applications are expected to open/close or
  *   borrow/release connections as needed.  In addition, transaction
  *   boundaries are expected to be managed externally.
  * </p>
@@ -34,7 +34,7 @@ public interface DatabaseAdaptor {
      * @param triples The triples to add.
      * @throws ModificationException if the operation failed for any reason.
      */
-    void addTriples(Connection conn, Iterator<Triple> triples) 
+    void addTriples(Connection conn, Iterator<Triple> triples)
             throws ModificationException;
 
     /**
@@ -44,7 +44,7 @@ public interface DatabaseAdaptor {
      * @param triples The triples to delete.
      * @throws ModificationException if the operation failed for any reason.
      */
-    void deleteTriples(Connection conn, Iterator<Triple> triples) 
+    void deleteTriples(Connection conn, Iterator<Triple> triples)
             throws ModificationException;
 
     /**
@@ -61,7 +61,7 @@ public interface DatabaseAdaptor {
      * and return the results.
      *
      * <p>
-     *   NOTE: When all query results have been exhausted, or if the query 
+     *   NOTE: When all query results have been exhausted, or if the query
      *   fails, the connection will be automatically closed/released.
      * </p>
      *
@@ -73,10 +73,10 @@ public interface DatabaseAdaptor {
      * @return the results.
      * @throws QueryException if the query failed for any reason.
      */
-    QueryResults query(Connection conn, 
-                       QueryLanguage lang, 
+    QueryResults query(Connection conn,
+                       QueryLanguage lang,
                        int fetchSize,
-                       String queryText) 
+                       String queryText)
             throws QueryException;
 
 }

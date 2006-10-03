@@ -10,7 +10,7 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  *
  * A literal has a lexical component and optionally has either a language
  * tag or a datatype (indicated by URIReference).
- * 
+ *
  * @author cwilper@cs.cornell.edu
  * @see <a href="http://www.w3.org/TR/rdf-concepts/#section-Graph-Literal">
  *      RDF Concepts and Abstract Syntax, Section 6.5</a>
@@ -66,8 +66,8 @@ public class Literal implements ObjectNode {
      * @throws ParseException if the language is syntactically
      *         invalid according to RFC3066.
      */
-    public Literal(final String value, 
-                   final String language) 
+    public Literal(final String value,
+                   final String language)
             throws ParseException {
         _value = value;
         if (language != null) {
@@ -81,7 +81,7 @@ public class Literal implements ObjectNode {
 
             String[] parts = language.split("-");
             for (int i = 0; i < parts.length; i++) {
-                if (parts[i].length() < 1 
+                if (parts[i].length() < 1
                         || parts[i].length() > SUBTAG_MAXLEN) {
                     throw new ParseException("Language subtags must be "
                             + "1-" + SUBTAG_MAXLEN + " characters long", 0);
@@ -107,7 +107,7 @@ public class Literal implements ObjectNode {
      * @param value The lexical value.
      * @param datatype The datatype.
      */
-    public Literal(final String value, 
+    public Literal(final String value,
                    final URIReference datatype) {
         _value = value;
         _datatype = datatype;

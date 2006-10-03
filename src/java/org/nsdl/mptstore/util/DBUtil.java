@@ -16,25 +16,25 @@ public abstract class DBUtil {
     /**
      * Get a long string, which could be a TEXT or CLOB type.
      *
-     * CLOBs require special handling.  This method normalizes the 
+     * CLOBs require special handling.  This method normalizes the
      * reading of them.
      *
      * @param rs The ResultSet whose current row contains the desired value.
      * @param pos The position (column) of the value in the current row.
      * @return The desired string, or <code>null</code> if the value in the
      *         ResultSet is null.
-     * @throws SQLException if there is an database error accessing the value 
+     * @throws SQLException if there is an database error accessing the value
      *         from the ResultSet.
      */
-    public static String getLongString(final ResultSet rs, 
-                                       final int pos) 
+    public static String getLongString(final ResultSet rs,
+                                       final int pos)
             throws SQLException {
         String s = rs.getString(pos);
         if (s != null) {
             return s;
         } else {
             Clob c = rs.getClob(pos);
-            
+
             if (c == null) {
                 return null;
             } else {
@@ -52,7 +52,7 @@ public abstract class DBUtil {
      *
      * @param in The input value.
      * @param backslashIsEscape Whether backslash characters are treated
-     *        as escape characters by the underlying database implementation, 
+     *        as escape characters by the underlying database implementation,
      *        and thus need to be escaped themselves.
      * @return the escaped string.
      */

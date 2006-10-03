@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/** 
+/**
  * Representation of an RDF graph query.
  *
- * <p> A GraphQuery contains a sets of required and optional 
- * {@link QueryElement} components that form a single graph query.  Since a 
- * GraphQuery is also a QueryElement, graph queries can be arbitrarily 
+ * <p> A GraphQuery contains a sets of required and optional
+ * {@link QueryElement} components that form a single graph query.  Since a
+ * GraphQuery is also a QueryElement, graph queries can be arbitrarily
  * nested.
  * </p>
- * 
+ *
  * @author birkland
  */
 public class GraphQuery implements QueryElement {
@@ -32,7 +32,7 @@ public class GraphQuery implements QueryElement {
     public void addRequired(final QueryElement e) {
         required.add(e);
     }
-    
+
     /**
      * Add an optional query element.
      *
@@ -50,7 +50,7 @@ public class GraphQuery implements QueryElement {
     public List<QueryElement> getRequired() {
         return new ArrayList<QueryElement>(required);
     }
-    
+
     /**
      * Get the optional query elements.
      *

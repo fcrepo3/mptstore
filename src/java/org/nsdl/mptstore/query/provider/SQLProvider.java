@@ -5,7 +5,7 @@ import java.util.List;
 import org.nsdl.mptstore.query.QueryException;
 
 /**
- * Provides a list of <code>SELECT</code> statements and targets 
+ * Provides a list of <code>SELECT</code> statements and targets
  * (column names) for RDF query.
  *
  * @author cwilper@cs.cornell.edu

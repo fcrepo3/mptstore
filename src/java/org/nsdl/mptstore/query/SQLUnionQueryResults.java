@@ -32,7 +32,7 @@ public class SQLUnionQueryResults implements QueryResults {
     /**
      * The Logger for this class.
      */
-    private static final Logger LOG = 
+    private static final Logger LOG =
             Logger.getLogger(SQLUnionQueryResults.class.getName());
 
     /**
@@ -76,7 +76,7 @@ public class SQLUnionQueryResults implements QueryResults {
     private List<Node> _nextTuple;
 
     /**
-     * Instantiate SQLUnionQueryResults to work with the given SQL on the 
+     * Instantiate SQLUnionQueryResults to work with the given SQL on the
      * given connection.
      *
      * @param conn the database connection to use.
@@ -86,7 +86,7 @@ public class SQLUnionQueryResults implements QueryResults {
      */
     public SQLUnionQueryResults(final Connection conn,
                                 final int fetchSize,
-                                final SQLProvider sqlProvider) 
+                                final SQLProvider sqlProvider)
             throws QueryException {
 
         _conn = conn;
@@ -110,9 +110,9 @@ public class SQLUnionQueryResults implements QueryResults {
     }
 
     /**
-     * Set _nextTuple to the next tuple.  
+     * Set _nextTuple to the next tuple.
      *
-     * If there are no more tuples, proactively close and set 
+     * If there are no more tuples, proactively close and set
      * <code>_nextTuple</code> to <code>null</code>.
      *
      * @throws QueryException if an unexpected error occurs.
@@ -139,7 +139,7 @@ public class SQLUnionQueryResults implements QueryResults {
                         }
                     } catch (ParseException e) {
                         throw new QueryException("Error parsing RDF node ("
-                                + nodeString + ") from database: " 
+                                + nodeString + ") from database: "
                                 + e.getMessage(), e);
                     }
                 }
@@ -212,16 +212,16 @@ public class SQLUnionQueryResults implements QueryResults {
     public void close() {
         if (!_closed) {
             if (_results != null) {
-                try { 
-                    _results.close(); 
-                } catch (Exception e) { 
+                try {
+                    _results.close();
+                } catch (Exception e) {
                     LOG.warn("Error closing result set", e);
                 }
             }
             if (_statement != null) {
-                try { 
-                    _statement.close(); 
-                } catch (Exception e) { 
+                try {
+                    _statement.close();
+                } catch (Exception e) {
                     LOG.warn("Error closing statement", e);
                 }
             }
@@ -229,12 +229,12 @@ public class SQLUnionQueryResults implements QueryResults {
                 if (!_conn.getAutoCommit()) {
                     _conn.setAutoCommit(true);
                 }
-            } catch (Exception e) { 
+            } catch (Exception e) {
                 LOG.warn("Error setting autocommit", e);
             }
-            try { 
-                _conn.close(); 
-            } catch (Exception e) { 
+            try {
+                _conn.close();
+            } catch (Exception e) {
                 LOG.warn("Error closing/releasing connection", e);
             }
             _closed = true;

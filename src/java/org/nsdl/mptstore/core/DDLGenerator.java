@@ -6,7 +6,7 @@ import java.util.List;
  * Provides RDBMS-specific DDL string(s) for table management functions.
  *
  * <p>
- *   The map table should have columns pKey (which holds an auto-incremented 
+ *   The map table should have columns pKey (which holds an auto-incremented
  *   integer) and p (which holds the actual predicate in N-Triples format).
  * </p>
  * <p>
@@ -16,9 +16,9 @@ import java.util.List;
  * <h2>Note on Datatypes</h2>
  * <p>
  *   Typically the s, p, and o datatypes be declared as TEXT or CLOB in the
- *   underlying database, but they can also be defined as varchars if the 
- *   data set is known to fit within some pre-determined range.  The 
- *   type should be such that comparisons are case sensitive, 
+ *   underlying database, but they can also be defined as varchars if the
+ *   data set is known to fit within some pre-determined range.  The
+ *   type should be such that comparisons are case sensitive,
  *   as N-Triples is a case sensitive format.
  * </p>
  * <h2>Note on Character Encoding</h2>

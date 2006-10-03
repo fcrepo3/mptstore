@@ -6,7 +6,7 @@ import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.SubjectNode;
 
 /** Generic implementation of {@link TriplePattern}.
- * 
+ *
  * @author birkland
  *
  */
@@ -22,29 +22,29 @@ public class BasicTriplePattern implements TriplePattern {
      * @param p the predicate pattern.
      * @param o the object pattern.
      */
-    public BasicTriplePattern(final NodePattern<SubjectNode> s, 
-                              final NodePattern<PredicateNode> p, 
+    public BasicTriplePattern(final NodePattern<SubjectNode> s,
+                              final NodePattern<PredicateNode> p,
                               final NodePattern<ObjectNode> o) {
         this.subject = s;
         this.predicate = p;
         this.object = o;
     }
-   
+
     /** {@inheritDoc} */
     public NodePattern<SubjectNode> getSubject() {
         return this.subject;
     }
-    
+
     /** {@inheritDoc} */
     public NodePattern<ObjectNode> getObject() {
         return this.object;
     }
-    
+
     /** {@inheritDoc} */
     public NodePattern<PredicateNode> getPredicate() {
         return this.predicate;
     }
-    
+
     /** {@inheritDoc} */
     public String toString() {
         return subject + " " + predicate + " " + object;

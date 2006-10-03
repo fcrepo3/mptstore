@@ -8,7 +8,7 @@ import org.nsdl.mptstore.core.AbstractDDLGenerator;
 /**
  * A <code>DDLGenerator</code> that works with Postgres.
  * <p>
- *   The map table DDL defines pKey as a <code>SERIAL</code> value 
+ *   The map table DDL defines pKey as a <code>SERIAL</code> value
  *   and p as a <code>TEXT</code> value, with indexes on each column.
  * </p>
  * <p>
@@ -28,7 +28,7 @@ public class PostgresDDLGenerator extends AbstractDDLGenerator {
     /**
      * Construct a PostgresDDLGenerator.
      */
-    public PostgresDDLGenerator() { 
+    public PostgresDDLGenerator() {
     }
 
     /** {@inheritDoc} */

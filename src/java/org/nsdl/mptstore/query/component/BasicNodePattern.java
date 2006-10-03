@@ -2,21 +2,21 @@ package org.nsdl.mptstore.query.component;
 
 import org.nsdl.mptstore.rdf.Node;
 
-/** 
+/**
  * Generic implementation of {@link NodePattern}.
  *
  * @param <T> The type of node that is described by the pattern.  Typically,
  * this is one of SubjectNode, PredicateNode, ObjectNode, or just Node if the
  * exact node type is unimportant or unknown.
- * 
+ *
  * @author birkland
  */
 public class BasicNodePattern<T extends Node> implements NodePattern<T> {
-    
+
     private final T nodeValue;
     private final boolean isVariable;
     private final String varName;
-    
+
     /**
      * Construct a BasicNodePattern representing an actual node.
      *
@@ -27,7 +27,7 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
         this.isVariable = false;
         this.varName = null;
     }
-    
+
     /**
      * Construct a BasicNodePattern representing a variable.
      *
@@ -38,12 +38,12 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
         this.isVariable = true;
         this.varName = variable;
     }
-   
+
     /** {@inheritDoc} */
     public T getNode() {
         return this.nodeValue;
     }
-    
+
     /** {@inheritDoc} */
     public String getVarName() {
         return this.varName;
@@ -53,7 +53,7 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
     public boolean isVariable() {
         return this.isVariable;
     }
-    
+
     /** Equality of Triple Pattern
      *  <p>
      *  Equality of triple patterns follow the following rules:
@@ -72,7 +72,7 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
             return false;
         }
         NodePattern comparison = (NodePattern) p;
-        
+
         if (this.isVariable() && comparison.isVariable()) {
             if (this.getVarName() == null || comparison.getVarName() == null) {
                 return false;
@@ -88,7 +88,7 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
             } catch (NullPointerException e) {
                 return false;
             }
-        } 
+        }
         return false;
     }
 
@@ -107,7 +107,7 @@ public class BasicNodePattern<T extends Node> implements NodePattern<T> {
             return nodeValue.hashCode();
         }
     }
-   
+
     /** {@inheritDoc} */
     public String toString() {
         if (isVariable) {

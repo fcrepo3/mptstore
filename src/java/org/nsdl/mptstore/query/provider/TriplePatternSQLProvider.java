@@ -23,7 +23,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
     /**
      * The Logger for this class.
      */
-    private static final Logger LOG = 
+    private static final Logger LOG =
             Logger.getLogger(TriplePatternSQLProvider.class.getName());
 
     /**
@@ -76,7 +76,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
         if (predicate != null) {
             addSelect(predicate);
         } else {
-            Iterator<PredicateNode> preds = 
+            Iterator<PredicateNode> preds =
                     _tableManager.getPredicates().iterator();
             while (preds.hasNext()) {
                 addSelect(preds.next());
@@ -99,7 +99,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
             StringBuffer select = new StringBuffer();
 
             select.append("SELECT s, ");
-            select.append(DBUtil.quotedString(predicate.toString(), 
+            select.append(DBUtil.quotedString(predicate.toString(),
                                              _backslashIsEscape));
             select.append(", o\nFROM ");
             select.append(table);
@@ -108,7 +108,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
                 select.append("\nWHERE ");
                 if (_subjectString != null) {
                     select.append("s = ");
-                    select.append(DBUtil.quotedString(_subjectString, 
+                    select.append(DBUtil.quotedString(_subjectString,
                             _backslashIsEscape));
                     if (_objectString != null) {
                         select.append("\nAND ");
@@ -116,7 +116,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
                 }
                 if (_objectString != null) {
                     select.append("o = ");
-                    select.append(DBUtil.quotedString(_objectString, 
+                    select.append(DBUtil.quotedString(_objectString,
                             _backslashIsEscape));
                 }
             }

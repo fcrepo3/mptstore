@@ -25,7 +25,7 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  * A <code>TableManager</code> designed to perform DDL operations
  * on separate connections from those used for DML.
  *
- * The DDL-in-a-separate-connection strategy employed by this 
+ * The DDL-in-a-separate-connection strategy employed by this
  * implementation should work with a wide variety of databases.
  *
  * @author cwilper@cs.cornell.edu
@@ -35,7 +35,7 @@ public class BasicTableManager implements TableManager {
     /**
      * The Logger for this class.
      */
-    private static final Logger LOG = 
+    private static final Logger LOG =
             Logger.getLogger(BasicTableManager.class.getName());
 
     /**
@@ -60,12 +60,12 @@ public class BasicTableManager implements TableManager {
      */
     private String _soTablePrefix;
 
-    /** 
+    /**
      * The in-memory predicate-to-table mapping.
      */
     private Map<PredicateNode, String> _map;
 
-    /** 
+    /**
      * The in-memory table-to-predicate mapping.
      */
     private Map<String, PredicateNode> _reverseMap;
@@ -73,7 +73,7 @@ public class BasicTableManager implements TableManager {
     /**
      * Initialize the table manager.
      *
-     * This will create the map table if it doesn't yet exist, 
+     * This will create the map table if it doesn't yet exist,
      * and will read the current mappings into memory.
      *
      * @param dataSource The DataSource from which to obtain
@@ -114,7 +114,7 @@ public class BasicTableManager implements TableManager {
     }
 
     /** {@inheritDoc} */
-    public String getOrMapTableFor(final PredicateNode predicate) 
+    public String getOrMapTableFor(final PredicateNode predicate)
             throws SQLException {
         String table = getTableFor(predicate);
         if (table != null) {
@@ -124,9 +124,9 @@ public class BasicTableManager implements TableManager {
             try {
                 return mapTableFor(predicate, conn);
             } finally {
-                try { 
-                    conn.close(); 
-                } catch (SQLException e) { 
+                try {
+                    conn.close();
+                } catch (SQLException e) {
                     LOG.warn("unable to close/release connection", e);
                 }
             }
@@ -295,7 +295,7 @@ public class BasicTableManager implements TableManager {
         if (table != null) {
             return table;
         } else {
-            LOG.info("Mapping new table for predicate: " 
+            LOG.info("Mapping new table for predicate: "
                     + predicate.toString());
             int id = addPredicateToMapTable(predicate, conn);
             try {
@@ -331,8 +331,8 @@ public class BasicTableManager implements TableManager {
      *         the name for the new predicate table.
      * @throws SQLException if a database error occurs.
      */
-    private int addPredicateToMapTable(final PredicateNode predicate, 
-                                       final Connection conn) 
+    private int addPredicateToMapTable(final PredicateNode predicate,
+                                       final Connection conn)
             throws SQLException {
 
         String pString = predicate.toString();
@@ -384,8 +384,8 @@ public class BasicTableManager implements TableManager {
      * @param conn The connection on which to perform the operation.
      * @throws SQLException if a database error occurrs.
      */
-    private void deletePredicateFromMapTable(final PredicateNode predicate, 
-                                             final Connection conn) 
+    private void deletePredicateFromMapTable(final PredicateNode predicate,
+                                             final Connection conn)
             throws SQLException {
         PreparedStatement ps = conn.prepareStatement(
                 "DELETE FROM " + _mapTable + " WHERE p = ?");
@@ -433,13 +433,13 @@ public class BasicTableManager implements TableManager {
      *
      * The <code>DataSource</code> given in the constructor
      * will be used for the connection.
-     * 
+     *
      * @param all Boolean indicating whether to drop all of them,
      *        or just the ones that are empty.
      * @return the number of dropped predicate tables.
      * @throws SQLException if a database error occurs.
      */
-    private synchronized int dropPredicateTables(final boolean all) 
+    private synchronized int dropPredicateTables(final boolean all)
             throws SQLException {
 
         int dropCount = 0;
@@ -478,8 +478,8 @@ public class BasicTableManager implements TableManager {
      * @return true if empty, false otherwise.
      * @throws SQLException if a database error occurs.
      */
-    private boolean isPredicateTableEmpty(final String table, 
-                                          final Connection conn) 
+    private boolean isPredicateTableEmpty(final String table,
+                                          final Connection conn)
             throws SQLException {
         Statement st = conn.createStatement();
         try {
@@ -513,7 +513,7 @@ public class BasicTableManager implements TableManager {
      */
     private void unmapPredicate(final PredicateNode predicate,
                                 final String table,
-                                final Connection conn) 
+                                final Connection conn)
             throws SQLException {
 
         String pString = predicate.toString();
@@ -539,7 +539,7 @@ public class BasicTableManager implements TableManager {
 
         executeDDL(conn,
                    _ddlGenerator.getDropSOTableDDL(table).iterator());
-         
+
     }
 
 }

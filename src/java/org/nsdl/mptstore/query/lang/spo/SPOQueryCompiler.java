@@ -30,7 +30,7 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  * </p>
  * <p>
  *   The grammar for SPO queries is the same as the N-Triples "triple"
- *   production, except it allows an asterisk in any node position and 
+ *   production, except it allows an asterisk in any node position and
  *   is not terminated with a dot.
  * </p>
  *
@@ -61,7 +61,7 @@ public class SPOQueryCompiler implements QueryCompiler {
     /**
      * Instantiate an SPOQueryCompiler.
      *
-     * @param tableManager The table manager to be used to look up table names 
+     * @param tableManager The table manager to be used to look up table names
      *                     for predicates.
      * @param backslashIsEscape Whether the backslash character should be
      *                          escaped in the output SQL.
@@ -73,11 +73,11 @@ public class SPOQueryCompiler implements QueryCompiler {
     }
 
     /** {@inheritDoc} */
-    public SQLProvider compile(final String query) 
+    public SQLProvider compile(final String query)
             throws QueryException {
         try {
             return new TriplePatternSQLProvider(
-                    _tableManager, 
+                    _tableManager,
                     _backslashIsEscape,
                     parseTriplePattern(query));
         } catch (ParseException e) {
@@ -92,7 +92,7 @@ public class SPOQueryCompiler implements QueryCompiler {
      * @return TriplePattern the triple pattern.
      * @throws ParseException if the query is malformed.
      */
-    private TriplePattern parseTriplePattern(final String query) 
+    private TriplePattern parseTriplePattern(final String query)
             throws ParseException {
 
         StringReader reader = new StringReader(query);
@@ -152,7 +152,7 @@ public class SPOQueryCompiler implements QueryCompiler {
                 try {
                     predicate = NTriplesUtil.parsePredicate(pBuf.toString());
                 } catch (ParseException e) {
-                    throw new ParseException(e.getMessage(), 
+                    throw new ParseException(e.getMessage(),
                             e.getErrorOffset() + i);
                 }
             }
@@ -181,7 +181,7 @@ public class SPOQueryCompiler implements QueryCompiler {
                 try {
                     o = NTriplesUtil.parseObject(query.substring(i));
                 } catch (ParseException e) {
-                    throw new ParseException(e.getMessage(), 
+                    throw new ParseException(e.getMessage(),
                             e.getErrorOffset() + i);
                 }
             }

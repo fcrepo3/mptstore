@@ -19,7 +19,7 @@ public interface TableManager {
     /**
      * Get the name of the table reserved for relationships of the given type.
      * <p>
-     *   If such a table does not yet exist, it will be automatically created 
+     *   If such a table does not yet exist, it will be automatically created
      *   and permanently associated with the given predicate.
      * </p>
      *
@@ -56,18 +56,18 @@ public interface TableManager {
     Set<String> getTables();
 
     /**
-     * Get the set of predicates for which a table mapping exists. 
+     * Get the set of predicates for which a table mapping exists.
      *
      * @return A set with zero or more predicates.
      */
     Set<PredicateNode> getPredicates();
 
     /**
-     * Drop all unused predicate tables and mappings. 
+     * Drop all unused predicate tables and mappings.
      *
      * @return the number of dropped predicate tables.
      * @throws SQLException if a database error occured during the operation.
-     */ 
+     */
     int dropEmptyPredicateTables() throws SQLException;
 
     /**

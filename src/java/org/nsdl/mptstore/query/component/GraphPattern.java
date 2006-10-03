@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.nsdl.mptstore.rdf.Node;
 
-/** A set of concrete triple patterns and value constraints defining an 
+/** A set of concrete triple patterns and value constraints defining an
  *  RDF subgraph.
  * <p>
  * Triple patterns and filters ({@link NodeFilter} constraints on triple
@@ -16,15 +16,15 @@ import org.nsdl.mptstore.rdf.Node;
  */
 public class GraphPattern implements QueryElement {
     private ArrayList<TriplePattern> steps = new ArrayList<TriplePattern>();
-    private ArrayList<NodeFilter<Node>> filters = 
+    private ArrayList<NodeFilter<Node>> filters =
             new ArrayList<NodeFilter<Node>>();
-    
+
 
     /** {@inheritDoc} */
     public QueryElement.Type getType() {
         return QueryElement.Type.GraphPattern;
     }
-    
+
     /**
      * Get the list of patterns.
      *
@@ -42,7 +42,7 @@ public class GraphPattern implements QueryElement {
     public List<NodeFilter<Node>> getFilters() {
         return new ArrayList<NodeFilter<Node>>(filters);
     }
-    
+
     /**
      * Add a triple pattern to the list of patterns.
      *
@@ -51,7 +51,7 @@ public class GraphPattern implements QueryElement {
     public void addTriplePattern(final TriplePattern s) {
         steps.add(s);
     }
-    
+
     /**
      * Remove the given triple pattern from the list of patterns.
      *
@@ -60,7 +60,7 @@ public class GraphPattern implements QueryElement {
     public void remove(final TriplePattern s) {
         steps.remove(s);
     }
-    
+
     /**
      * Add the given node filter to the list of filters.
      *
@@ -69,7 +69,7 @@ public class GraphPattern implements QueryElement {
     public void addFilter(final NodeFilter<Node> filter) {
         filters.add(filter);
     }
-    
+
     /**
      * Remove the given node filter from the list of filters.
      *
@@ -85,7 +85,7 @@ public class GraphPattern implements QueryElement {
         for (TriplePattern step : steps) {
             outString.append(step + " .\n");
         }
-        
+
         return outString.toString();
     }
 }

@@ -10,12 +10,12 @@ public interface Node {
     /**
      * Get the lexical value of the node.
      * <p>
-     *   The lexical value of a <code>URIReference</code> node is the URI 
+     *   The lexical value of a <code>URIReference</code> node is the URI
      *   as a string.
      * </p>
      * <p>
-     *   The lexical value of a <code>Literal</code> node is a string 
-     *   representation of the value, and does not include the language or 
+     *   The lexical value of a <code>Literal</code> node is a string
+     *   representation of the value, and does not include the language or
      *   data type, if any.
      * </p>
      *
@@ -38,10 +38,10 @@ public interface Node {
      * </p>
      * <p>
      *   Note:
-     *   <ul> 
+     *   <ul>
      *     <li> The returned string will consist of only 7-bit ASCII
      *          characters.</li>
-     *     <li> The $value part will be escaped according to the rules 
+     *     <li> The $value part will be escaped according to the rules
      *          set out by the N-Triples format.</li>
      *   </ul>
      * </p>
@@ -56,7 +56,7 @@ public interface Node {
      * Tell whether this <code>Node</code> should be considered equivalent
      * to the given object.
      * <p>
-     *   A <code>URIReference</code> node is equal to the given 
+     *   A <code>URIReference</code> node is equal to the given
      *   object if all of the following conditions are met:
      *   <ul>
      *     <li> <code>obj != null</code></li>
@@ -65,7 +65,7 @@ public interface Node {
      *   </ul>
      * </p>
      * <p>
-     *   A <code>Literal</code> node is equal to the given 
+     *   A <code>Literal</code> node is equal to the given
      *   object if all of the following conditions are met:
      *   <ul>
      *     <li> <code>obj != null</code></li>

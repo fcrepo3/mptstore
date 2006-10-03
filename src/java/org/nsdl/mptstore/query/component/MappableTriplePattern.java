@@ -8,17 +8,17 @@ import org.nsdl.mptstore.rdf.ObjectNode;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.SubjectNode;
 
-/** 
+/**
  * Represents a pattern that defines matching triples.
  * <p>
  * A triple pattern contains three {@link MappableNodePattern}s
- * representing the subject, predicate, and object of a triple. 
+ * representing the subject, predicate, and object of a triple.
  * </p>
  * <p>
- * In addition to representing a particular triple pattern, a TriplePattern 
- * may be bound to a apecific table (logically, the one that maps to its 
- * predicate).  When bound to a table, the TriplePattern may be used for 
- * selecting triples from its table or for joining triple selection results 
+ * In addition to representing a particular triple pattern, a TriplePattern
+ * may be bound to a apecific table (logically, the one that maps to its
+ * predicate).  When bound to a table, the TriplePattern may be used for
+ * selecting triples from its table or for joining triple selection results
  * with other TriplePatterns.
  * </p>
  *
@@ -28,7 +28,7 @@ public class MappableTriplePattern implements TriplePattern {
     private final MappableNodePattern<SubjectNode> subject;
     private final MappableNodePattern<PredicateNode> predicate;
     private final MappableNodePattern<ObjectNode> object;
-   
+
     /**
      * Construct a mappable triple pattern with the given component
      * patterns.
@@ -37,10 +37,10 @@ public class MappableTriplePattern implements TriplePattern {
      * @param p the predicate pattern.
      * @param o the object pattern.
      */
-    public MappableTriplePattern(final MappableNodePattern<SubjectNode> s, 
-                                 final MappableNodePattern<PredicateNode> p, 
+    public MappableTriplePattern(final MappableNodePattern<SubjectNode> s,
+                                 final MappableNodePattern<PredicateNode> p,
                                  final MappableNodePattern<ObjectNode> o) {
-        
+
         this.subject = s;
         this.predicate = p;
         this.object = o;
@@ -68,7 +68,7 @@ public class MappableTriplePattern implements TriplePattern {
     public MappableNodePattern<SubjectNode> getSubject() {
         return this.subject;
     }
-    
+
     /**
      * Get the predicate pattern.
      *
@@ -77,7 +77,7 @@ public class MappableTriplePattern implements TriplePattern {
     public MappableNodePattern<PredicateNode> getPredicate() {
         return this.predicate;
     }
-    
+
     /**
      * Get the object pattern.
      *
@@ -86,7 +86,7 @@ public class MappableTriplePattern implements TriplePattern {
     public MappableNodePattern<ObjectNode> getObject() {
         return this.object;
     }
-   
+
     /**
      * Bind this triple pattern to the given table.
      *
@@ -104,7 +104,7 @@ public class MappableTriplePattern implements TriplePattern {
      * @return a set containing the subject and object node patterns.
      */
     public Set<MappableNodePattern<? extends Node>> getNodes() {
-        Set<MappableNodePattern<? extends Node>> parts = 
+        Set<MappableNodePattern<? extends Node>> parts =
                 new HashSet<MappableNodePattern<? extends Node>>();
         parts.add(subject);
         parts.add(object);

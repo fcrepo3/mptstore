@@ -432,7 +432,7 @@
 
         <!--
           Lines should not end with spaces.
-335        -->
+        -->
         <module name="GenericIllegalRegexp">
             <property name="format" value="\s+$"/>
             <property name="message" value="Line has trailing spaces."/>
@@ -442,14 +442,18 @@
           Don't forget to address TODO: comments before a release.
           If they can't be addressed before a release, elevate the issue
           from the code to the release notes.
-        <module name="TodoComment"/>
+        -->
         <module name="TodoComment">
+          <property name="severity" value="warning"/>
+        </module>
+        <module name="TodoComment">
+          <property name="severity" value="warning"/>
           <property name="format" value="XXX"/>
         </module>
         <module name="TodoComment">
+          <property name="severity" value="warning"/>
           <property name="format" value="FIXME"/>
         </module>
-4        -->
 
         <!--
           Long constants should be defined with uppercase L syntax.

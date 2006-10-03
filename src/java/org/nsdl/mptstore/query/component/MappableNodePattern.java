@@ -13,7 +13,7 @@ import org.nsdl.mptstore.rdf.SubjectNode;
  * <ul>
  *  <li> It may be a varible or a {@link org.nsdl.mptstore.rdf.Node}</li>
  *  <li> It may be mapped to a specific column of a specific table </li>
- *  <li> If it is a variable, there exists a mapping between the variable name 
+ *  <li> If it is a variable, there exists a mapping between the variable name
  *   and its column name </li>
  * </ul>
  * </p>
@@ -29,24 +29,24 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
     private final String varName;
     private MPTable boundTable;
     private String theType;
-    
+
     /** Create a node pattern that is a variable.
-     * 
-     * @param variable any string representing the variable's name 
+     *
+     * @param variable any string representing the variable's name
      *        (e.g. "$value", "?person").
      * @param type the type of node this variable represents, which should be
      *        s, p, or o.
      */
     public MappableNodePattern(final String variable, final String type) {
-        
+
         this.varName = variable;
         this.isVariable = true;
         this.nodeValue = null;
         theType = type;
     }
-    
+
     /** Create a node pattern given a node value.
-     * 
+     *
      * @param node Node representing this pattern's value
      */
     public MappableNodePattern(final T node) {
@@ -57,15 +57,15 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         } else if (node instanceof PredicateNode) {
             theType = Types.PREDICATE;
         } else {
-            throw new IllegalArgumentException("Given node type is not a " 
+            throw new IllegalArgumentException("Given node type is not a "
                     + "SubjectNode, PredicateNode, or ObjectNode");
         }
-        
+
         this.varName = null;
         this.isVariable = false;
         this.nodeValue = node;
     }
-   
+
     /**
      * Create a mappable node pattern from an existing node pattern.
      *
@@ -75,11 +75,11 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
      * @param nodePattern the node pattern to base this one on.
      */
     public MappableNodePattern(final NodePattern<? extends T> nodePattern) {
-        
+
         this.varName = nodePattern.getVarName();
         this.isVariable = nodePattern.isVariable();
         this.nodeValue = nodePattern.getNode();
-        
+
         if (!nodePattern.isVariable()) {
             T node = nodePattern.getNode();
             if (node instanceof SubjectNode) {
@@ -104,16 +104,16 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
      * pattern will be set to <code>null</code>.
      *
      * @param nodePattern the node pattern to create the mappable pattern from.
-     * @param patternType constraint on the type of node allowed by this 
+     * @param patternType constraint on the type of node allowed by this
      *        pattern.
      */
-    public MappableNodePattern(final NodePattern<? extends T> nodePattern, 
+    public MappableNodePattern(final NodePattern<? extends T> nodePattern,
                                final Class<T> patternType) {
-        
+
         this.varName = nodePattern.getVarName();
         this.isVariable = nodePattern.isVariable();
         this.nodeValue = nodePattern.getNode();
-        
+
 
         if (SubjectNode.class.isAssignableFrom(patternType)) {
             theType = Types.SUBJECT;
@@ -122,7 +122,7 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         } else if (PredicateNode.class.isAssignableFrom(patternType)) {
             theType = Types.PREDICATE;
         } else {
-            throw new IllegalArgumentException("Given node type is not a " 
+            throw new IllegalArgumentException("Given node type is not a "
                     + "SubjectNode, PredicateNode, or ObjectNode");
         }
     }
@@ -135,7 +135,7 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
     public boolean isVariable() {
         return isVariable;
     }
-    
+
     /**
      * Bind this node pattern to the given table.
      *
@@ -147,7 +147,7 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         }
         this.boundTable = t;
     }
-    
+
     /**
      * Bind this node pattern to the given table and optionally set the type.
      *
@@ -159,20 +159,20 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
         if (t == null) {
             throw new NullPointerException("Cannot bind to null table");
         }
-        
+
         if (theType == null) {
-            if (!type.matches("^" + Types.SUBJECT + "|" + Types.PREDICATE 
+            if (!type.matches("^" + Types.SUBJECT + "|" + Types.PREDICATE
                     + "|" + Types.OBJECT + "$")) {
-                throw new IllegalArgumentException("Unknown type '" 
+                throw new IllegalArgumentException("Unknown type '"
                         + type + "'");
             }
             theType = type;
         }
         this.boundTable = t;
     }
-    
+
     /**
-     * Return the table/alias and column identifier of the RDBMS location of 
+     * Return the table/alias and column identifier of the RDBMS location of
      * this value or literal.
      *
      * @return the mapped name.
@@ -180,24 +180,24 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
     public String mappedName() {
         if (boundTable == null) {
             if (isVariable) {
-                throw new RuntimeException("Variable " + varName 
+                throw new RuntimeException("Variable " + varName
                         + " has not been bound");
             } else {
-                throw new RuntimeException("Node " + nodeValue 
+                throw new RuntimeException("Node " + nodeValue
                         + " has not been bound");
             }
         }
-        
+
         if (theType == null || theType.equals(
                 MappableNodePattern.Types.PREDICATE)) {
             return boundTable.alias();
-        } else { 
+        } else {
             return (boundTable.alias() + "." + theType);
-        } 
+        }
     }
-    
+
     /** Return the table to which this pattern is bound.
-     * 
+     *
      * @return the table this is bound to.
      */
     public MPTable boundTable() {
@@ -208,12 +208,12 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
     public T getNode() {
         return nodeValue;
     }
-    
+
     /** {@inheritDoc} */
     public String getVarName() {
         return this.varName;
     }
-    
+
     /** Equality of Triple Pattern.
      *  <p>
      *  Equality of triple patterns follow the following rules:
@@ -232,7 +232,7 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
             return false;
         }
         MappableNodePattern comparison = (MappableNodePattern) p;
-        
+
         if (this.isVariable() && comparison.isVariable()) {
             if (this.getVarName() == null || comparison.getVarName() == null) {
                 return false;
@@ -248,11 +248,11 @@ public class MappableNodePattern<T extends Node> implements NodePattern<T> {
             } catch (NullPointerException e) {
                 return false;
             }
-        } 
+        }
         return false;
     }
-   
-    /** 
+
+    /**
      * Get a string representation of this mappable node pattern.
      *
      * If variable, this is the variable.

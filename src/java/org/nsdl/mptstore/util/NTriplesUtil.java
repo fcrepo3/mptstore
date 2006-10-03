@@ -75,7 +75,7 @@ public abstract class NTriplesUtil {
      * @see <a href="http://www.w3.org/TR/rdf-testcases/#triple">
      *        N-Triples triple syntax</a>
      */
-    public static Triple parseTriple(final String ntTriple) 
+    public static Triple parseTriple(final String ntTriple)
             throws ParseException {
 
         StringReader reader = new StringReader(ntTriple);
@@ -127,7 +127,7 @@ public abstract class NTriplesUtil {
             try {
                 predicate = parsePredicate(pBuf.toString());
             } catch (ParseException e) {
-                throw new ParseException(e.getMessage(), 
+                throw new ParseException(e.getMessage(),
                         e.getErrorOffset() + i);
             }
 
@@ -179,7 +179,7 @@ public abstract class NTriplesUtil {
             try {
                 o = parseObject(oString);
             } catch (ParseException e) {
-                throw new ParseException(e.getMessage(), 
+                throw new ParseException(e.getMessage(),
                         e.getErrorOffset() + i);
             }
 
@@ -192,7 +192,7 @@ public abstract class NTriplesUtil {
 
     }
 
-    /** 
+    /**
      * Parse an RDF subject in N-Triples format.
      *
      * @param ntSubject the input string.
@@ -207,7 +207,7 @@ public abstract class NTriplesUtil {
         return parseURIReference(ntSubject);
     }
 
-    /** 
+    /**
      * Parse an RDF predicate in N-Triples format.
      *
      * @param ntPredicate the input string.
@@ -222,7 +222,7 @@ public abstract class NTriplesUtil {
         return parseURIReference(ntPredicate);
     }
 
-    /** 
+    /**
      * Parse an RDF object in N-Triples format.
      *
      * @param ntObject the input string.
@@ -244,7 +244,7 @@ public abstract class NTriplesUtil {
      * @return the parsed node.
      * @throws ParseException if the input syntax is incorrect
      */
-    public static Node parseNode(final String ntNode) 
+    public static Node parseNode(final String ntNode)
             throws ParseException {
 
         char first = ntNode.charAt(0);
@@ -279,7 +279,7 @@ public abstract class NTriplesUtil {
             }
 
             StringBuffer escaped = new StringBuffer();
-    
+
             int c = reader.read();
             int i = 1;
 
@@ -322,7 +322,7 @@ public abstract class NTriplesUtil {
                 try {
                     return new Literal(value, s.substring(i + 1));
                 } catch (ParseException e) {
-                    throw new ParseException(e.getMessage(), 
+                    throw new ParseException(e.getMessage(),
                                              e.getErrorOffset() + i + 1);
                 }
             } else if (c == '^') {
@@ -335,7 +335,7 @@ public abstract class NTriplesUtil {
                             s.substring(i + 1));
                     return new Literal(value, datatype);
                 } catch (ParseException e) {
-                    throw new ParseException(e.getMessage(), 
+                    throw new ParseException(e.getMessage(),
                                              e.getErrorOffset() + i);
                 }
             } else if (c == -1) {
@@ -383,10 +383,10 @@ public abstract class NTriplesUtil {
      *
      * <ul>
      *   <li> All input characters are validated to be 7-bit ASCII.</li>
-     *   <li> Unicode escapes (&#x5C;uxxxx and &#x5C;Uxxxxxxxx) are validated 
-     *        to be complete and legal, and are restored to the value indicated 
+     *   <li> Unicode escapes (&#x5C;uxxxx and &#x5C;Uxxxxxxxx) are validated
+     *        to be complete and legal, and are restored to the value indicated
      *        by the hexadecimal argument.</li>
-     *   <li> Backslash-escaped values (\t, \r, \n, \", and \\) are restored 
+     *   <li> Backslash-escaped values (\t, \r, \n, \", and \\) are restored
      *        to their original form (tab, carriage return, linefeed, quote,
      *        and backslash, respectively).</li>
      * </ul>
@@ -446,7 +446,7 @@ public abstract class NTriplesUtil {
                 if (backslashPos + SHORT_ESCAPE_LENGTH >= len) {
                     throw new ParseException(INCOMPLETE_ESCAPE, i);
                 }
-                String xx = s.substring(backslashPos + 2, 
+                String xx = s.substring(backslashPos + 2,
                         backslashPos + SHORT_ESCAPE_LENGTH + 1);
                 try {
                     c = (char) Integer.parseInt(xx, HEX);
@@ -459,7 +459,7 @@ public abstract class NTriplesUtil {
                 if (backslashPos + LONG_ESCAPE_LENGTH - 1 >= len) {
                     throw new ParseException(INCOMPLETE_ESCAPE, i);
                 }
-                String xx = s.substring(backslashPos + 2, 
+                String xx = s.substring(backslashPos + 2,
                         backslashPos + LONG_ESCAPE_LENGTH);
                 try {
                     c = (char) Integer.parseInt(xx, HEX);
@@ -484,7 +484,7 @@ public abstract class NTriplesUtil {
      *
      * <ul>
      *   <li> Unicode escaping (&#x5C;uxxxx or &#x5C;Uxxxxxxxx, a
-     *        appropriate) will be used for all characters in the 
+     *        appropriate) will be used for all characters in the
      *        following ranges:
      *        <ul>
      *          <li> 0x0 through 0x8</li>
@@ -493,15 +493,15 @@ public abstract class NTriplesUtil {
      *          <li> 0x7F through 0xFFFF</li>
      *          <li> 0x10000 through 0x10FFFF</li>
      *        </ul>
-     *   <li> Backslash escaping will be used for double quote (\"), 
-     *        backslash (\\), line feed (\n), carriage return (\r), 
+     *   <li> Backslash escaping will be used for double quote (\"),
+     *        backslash (\\), line feed (\n), carriage return (\r),
      *        and tab (\t) characters.</li>
      *   <li> All other characters will be represented as-is.</li>
      * </ul>
      *
      * @param s The input string.
      * @return The escaped string.
-     */ 
+     */
     public static String escapeLiteralValue(final String s) {
 
         int len = s.length();
@@ -538,7 +538,7 @@ public abstract class NTriplesUtil {
     }
 
     /**
-     * Get an uppercase hex string of the specified length, 
+     * Get an uppercase hex string of the specified length,
      * representing the given number.
      *
      * @param num The number to represent.

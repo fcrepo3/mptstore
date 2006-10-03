@@ -1,13 +1,13 @@
 package org.nsdl.mptstore.query.component;
 
-/** 
+/**
  * Mapped Predicate Table.
  * <p>
  * Represents a specific mapping of a predicate to a table.  This mapped
  * table has both a name and an alias.  The table name is determined by the
  * predicate mapping, but the alias is arbitrary.
  * </p>
- * 
+ *
  * @author birkland
  */
 public class MPTable {
@@ -23,7 +23,7 @@ public class MPTable {
     public MPTable(final String name, final String alias) {
         if (name == null || alias == null) {
             throw new IllegalArgumentException("Cannot create a table "
-                    + "without a name or alias.  Given " + name + " as name, " 
+                    + "without a name or alias.  Given " + name + " as name, "
                     + alias + " as alias\n");
         }
         theAlias = alias;
