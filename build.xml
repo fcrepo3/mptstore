@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="mptstore" default="dist" basedir=".">
 
+  <!-- defines build options and lib paths -->
   <loadproperties srcFile="build.properties"/>
 
   <!-- defines mptstore.version -->
   <loadproperties srcFile="src/java/org/nsdl/mptstore/MPTStore.properties"/>
 
-  <taskdef resource="checkstyletask.properties"
-           classpath="${lib.checkstyle}"/>
+  <!-- makes the checkstyle task available to ant -->
+  <taskdef resource="checkstyletask.properties" classpath="${lib.checkstyle}"/>
 
+  <!-- jars required to compile -->
   <path id="compile.path">
     <pathelement location="${lib.log4j}"/>
   </path>
+
+  <!-- jars required to compile and run tests -->
   <path id="test.path">
     <path refid="compile.path"/>
     <pathelement location="${lib.junit}"/>
@@ -24,6 +28,7 @@
     <pathelement location="src/config"/>
   </path>
 
+  <!-- classes -->
   <target name="classes" 
           depends="prep"
           description="build all java classes into build/classes">
@@ -37,7 +42,8 @@
            target="${target}">
         <compilerarg value="-Xlint:-serial"/>
     </javac>
-    <copy file="src/java/org/nsdl/mptstore/MPTStore.properties" tofile="build/classes/org/nsdl/mptstore/MPTStore.properties"/>
+    <copy file="src/java/org/nsdl/mptstore/MPTStore.properties" 
+          tofile="build/classes/org/nsdl/mptstore/MPTStore.properties"/>
     <propertyfile file="build/version.properties">
       <entry key="buildDate" type="date" value="now"/>
     </propertyfile>
@@ -48,6 +54,7 @@
     </replace>
   </target>
 
+  <!-- testclasses -->
   <target name="testclasses"
           depends="classes"
           description="build all test classes into build/testclasses">
@@ -58,26 +65,29 @@
            optimize="${optimize}" debug="${debug}"/>
   </target>
 
-  <target name="dist" depends="classes" description="Build the distribution in dist/">
+  <!-- dist -->
+  <target name="dist" 
+          depends="classes" 
+          description="Build the distribution in dist/">
     <mkdir dir="dist/lib"/>
-    <copy todir="dist/lib">
-      <fileset dir="lib">
-        <exclude name="junit.jar"/>
-        <exclude name="commons-collections-3.1.jar"/>
-        <exclude name="commons-dbcp-1.2.1.jar"/>
-        <exclude name="commons-pool-1.2.jar"/>
-        <exclude name="postgresql-8.1-407.jdbc3.jar"/>
-      </fileset>
+    <copy todir="dist">
+      <fileset dir=".">
+        <include name="${lib.log4j}"/>
+     </fileset>
     </copy>
     <copy todir="dist">
       <fileset dir="src/config"/>
     </copy>
-    <jar jarfile="dist/mptstore-${mptstore.version}.jar" basedir="build/classes"/>
+    <jar jarfile="dist/mptstore-${mptstore.version}.jar" 
+         basedir="build/classes"/>
   </target>
 
-  <target name="srcrelease" depends="clean">
+  <!-- srcrelease -->
+  <target name="srcrelease" 
+          description="Build the source release in dist/release">
     <copy todir="dist/release/mptstore-${mptstore.version}-src">
       <fileset dir=".">
+        <exclude name="build/**"/>
         <exclude name="dist/**"/>
       </fileset>
     </copy>
@@ -86,21 +96,31 @@
              propertyFile="src/java/org/nsdl/mptstore/MPTStore.properties">
       <replacefilter token="@mptstore.version@" property="mptstore.version"/>
     </replace>
-    <zip zipfile="dist/release/mptstore-${mptstore.version}-src.zip" basedir="dist/release" includes="mptstore-${mptstore.version}-src/**"/>
+    <zip zipfile="dist/release/mptstore-${mptstore.version}-src.zip" 
+         basedir="dist/release" 
+         includes="mptstore-${mptstore.version}-src/**"/>
     <delete dir="dist/release/mptstore-${mptstore.version}-src"/>
   </target>
 
-  <target name="binrelease" depends="dist,doc">
+  <!-- binrelease -->
+  <target name="binrelease" 
+          description="Build the binary release in dist/release"
+          depends="dist,doc">
     <copy todir="dist/release/mptstore-${mptstore.version}">
       <fileset dir="dist">
         <exclude name="release/**"/>
       </fileset>
     </copy>
-    <zip zipfile="dist/release/mptstore-${mptstore.version}.zip" basedir="dist/release" includes="mptstore-${mptstore.version}/**"/>
+    <zip zipfile="dist/release/mptstore-${mptstore.version}.zip" 
+         basedir="dist/release" 
+         includes="mptstore-${mptstore.version}/**"/>
     <delete dir="dist/release/mptstore-${mptstore.version}"/>
   </target>
 
-  <target name="release" depends="srcrelease,binrelease" description="Build the source and binary distributions in dist/release">
+  <!-- release -->
+  <target name="release" 
+          depends="clean,qa,srcrelease,binrelease" 
+          description="Build the source and binary releases in dist/release">
     <checksum fileext=".md5">
       <fileset dir="dist/release">
         <include name="*.zip"/>
@@ -108,9 +128,10 @@
     </checksum>
   </target>
 
+  <!-- doc -->
   <target name="doc"
           depends="prep"
-          description="Build the documentation in dist/doc">
+          description="Build all documentation in dist/doc">
     <copy todir="dist/doc">
       <fileset dir="src/doc"/>
     </copy>
@@ -137,8 +158,21 @@
     </javadoc>
   </target>
 
-  <target name="test" description="Run tests" depends="testclasses">
-    <junit printsummary="no" haltonfailure="yes" showoutput="true" filtertrace="true">
+  <!-- qa -->
+  <target name="qa"
+          description="Run QA checks (unit tests and code convention checks)"
+          depends="checkstyle, test">
+  </target>
+
+
+  <!-- test -->
+  <target name="test" 
+          description="Run tests via command-line" 
+          depends="testclasses">
+    <junit printsummary="no" 
+           haltonfailure="yes" 
+           showoutput="true" 
+           filtertrace="true">
       <formatter type="plain" usefile="false"/>
       <classpath refid="test.path"/>
       <sysproperty key="jetty.fork" value="false"/>
@@ -146,7 +180,10 @@
     </junit>
   </target>
 
-  <target name="itest" description="Run tests interactively" depends="testclasses">
+  <!-- itest -->
+  <target name="itest" 
+          description="Run tests using the interactive JUnit GUI" 
+          depends="testclasses">
     <java classname="org.nsdl.mptstore.MPTStorePackageTestSuite" fork="yes">
       <classpath refid="test.path"/>
       <sysproperty key="org.apache.commons.logging.LogFactory"
@@ -157,7 +194,10 @@
     </java>
   </target>
 
-  <target name="checkstyle" depends="classes">
+  <!-- checkstyle -->
+  <target name="checkstyle" 
+          description="Verify source code meets our standards"
+          depends="classes">
     <checkstyle config="src/doc/coding-standards.xml"
                 classpath="build/classes">
       <fileset dir="src/java" includes="**/*.java"/>
@@ -166,12 +206,14 @@
     </checkstyle>
   </target>
 
+  <!-- prep -->
   <target name="prep"
           description="prepare for a build">
     <mkdir dir="build"/>
     <mkdir dir="dist"/>
   </target>
 
+  <!-- clean -->
   <target name="clean"
           description="remove all build-generated stuff">
       <delete dir="build"/>
