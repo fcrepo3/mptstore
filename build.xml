@@ -153,8 +153,8 @@
              sourcepath="src/java"
              defaultexcludes="yes"
              destdir="dist/doc/api"
-             windowtitle="MPTStore Java API">
-        <doctitle><![CDATA[<h1>MPTStore Java API</h1>]]></doctitle>
+             windowtitle="MPTStore ${mptstore.version} Java API">
+        <doctitle><![CDATA[<h1>MPTStore ${mptstore.version} Java API</h1>]]></doctitle>
     </javadoc>
   </target>
 

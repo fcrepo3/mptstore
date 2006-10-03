@@ -5,6 +5,9 @@ import java.io.StringReader;
 
 import java.text.ParseException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.query.component.BasicNodePattern;
@@ -39,6 +42,18 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  * @author cwilper@cs.cornell.edu
  */
 public class SPOQueryCompiler implements QueryCompiler {
+
+    /**
+     * The targets are always "s", "p", "o".
+     */
+    public static final List<String> SPO_TARGETS;
+
+    static {
+        SPO_TARGETS = new ArrayList<String>();
+        SPO_TARGETS.add("s");
+        SPO_TARGETS.add("p");
+        SPO_TARGETS.add("o");
+    }
 
     private static final String EXPECTED_AQLST = "Expected '*', '\"',"
             + " '<', ' ', or TAB";
@@ -79,7 +94,8 @@ public class SPOQueryCompiler implements QueryCompiler {
             return new TriplePatternSQLProvider(
                     _tableManager,
                     _backslashIsEscape,
-                    parseTriplePattern(query));
+                    parseTriplePattern(query),
+                    SPO_TARGETS);
         } catch (ParseException e) {
             throw new QuerySyntaxException("Error parsing SPO query", e);
         }

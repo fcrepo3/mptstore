@@ -26,21 +26,14 @@ public class TriplePatternSQLProvider implements SQLProvider {
     private static final Logger LOG =
             Logger.getLogger(TriplePatternSQLProvider.class.getName());
 
-    /**
-     * The targets are always "s", "p", "o".
-     */
-    public static final List<String> SPO_TARGETS;
-
-    static {
-        SPO_TARGETS = new ArrayList<String>();
-        SPO_TARGETS.add("s");
-        SPO_TARGETS.add("p");
-        SPO_TARGETS.add("o");
-    }
-
     private TableManager _tableManager;
+
     private boolean _backslashIsEscape;
+
+    private List<String> _targets;
+
     private String _subjectString;
+
     private String _objectString;
 
     private List<String> _sql;
@@ -51,13 +44,16 @@ public class TriplePatternSQLProvider implements SQLProvider {
      * @param tableManager the table manager to use for getting table names.
      * @param backslashIsEscape whether backslash should be escaped in SQL.
      * @param pattern the triple pattern.
+     * @param targets the variable names to use.
      */
     public TriplePatternSQLProvider(final TableManager tableManager,
                                     final boolean backslashIsEscape,
-                                    final TriplePattern pattern) {
+                                    final TriplePattern pattern,
+                                    final List<String> targets) {
 
         _tableManager = tableManager;
         _backslashIsEscape = backslashIsEscape;
+        _targets = targets;
 
         SubjectNode subject = pattern.getSubject().getNode();
         PredicateNode predicate = pattern.getPredicate().getNode();
@@ -129,7 +125,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
 
     /** {@inheritDoc} */
     public List<String> getTargets() {
-        return SPO_TARGETS;
+        return _targets;
     }
 
     /** {@inheritDoc} */
