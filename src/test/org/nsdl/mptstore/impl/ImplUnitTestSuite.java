@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.swingui.TestRunner;
 
+import org.nsdl.mptstore.impl.derby.DerbyUnitTestSuite;
 import org.nsdl.mptstore.impl.postgres.PostgresUnitTestSuite;
 
 public class ImplUnitTestSuite extends TestCase {
@@ -17,6 +18,7 @@ public class ImplUnitTestSuite extends TestCase {
         //suite.addTestSuite(Whatever.class);
 
         // sub-package suites
+        suite.addTest(DerbyUnitTestSuite.suite());
         suite.addTest(PostgresUnitTestSuite.suite());
 
         return suite;

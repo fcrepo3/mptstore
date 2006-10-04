@@ -11,21 +11,21 @@
   <taskdef resource="checkstyletask.properties" classpath="${lib.checkstyle}"/>
 
   <!-- jars required to compile -->
-  <path id="compile.path">
+  <path id="compile.classpath">
     <pathelement location="${lib.log4j}"/>
-    <pathelement location="${lib.derby}"/>
   </path>
 
   <!-- jars required to compile and run tests -->
-  <path id="test.path">
-    <path refid="compile.path"/>
+  <path id="test.classpath">
+    <path refid="compile.classpath"/>
     <pathelement location="${lib.commons-collections}"/>
     <pathelement location="${lib.commons-dbcp}"/>
     <pathelement location="${lib.commons-pool}"/>
+    <pathelement location="${lib.derby}"/>
     <pathelement location="${lib.junit}"/>
     <pathelement location="${lib.postgres-driver}"/>
     <pathelement location="build/classes"/>
-    <pathelement location="build/testclasses"/>
+    <pathelement location="${test.dir}/classes"/>
     <pathelement location="src/config"/>
   </path>
 
@@ -36,7 +36,7 @@
     <mkdir dir="build/classes"/>
     <javac srcdir="src/java" destdir="build/classes" 
            includes="**" 
-           classpathref="compile.path"
+           classpathref="compile.classpath"
            optimize="${optimize}" 
            debug="${debug}"
            source="${source}"
@@ -55,15 +55,16 @@
     </replace>
   </target>
 
-  <!-- testclasses -->
-  <target name="testclasses"
+  <!-- test-classes -->
+  <target name="test-classes"
           depends="classes"
-          description="build all test classes into build/testclasses">
-    <mkdir dir="build/testclasses"/>
-    <javac srcdir="src/test" destdir="build/testclasses"
+          description="build all test classes into ${test.dir}/classes">
+    <mkdir dir="${test.dir}/classes"/>
+    <javac srcdir="src/test" destdir="${test.dir}/classes"
            includes="org/nsdl/mptstore/**"
-           classpathref="test.path"
+           classpathref="test.classpath"
            optimize="${optimize}" debug="${debug}"/>
+    <copy todir="${test.dir}" file="src/test/test.properties"/>
   </target>
 
   <!-- dist -->
@@ -151,7 +152,7 @@
                            org.nsdl.mptstore.query.lang.spo,
                            org.nsdl.mptstore.rdf,
                            org.nsdl.mptstore.util"
-             classpathref="compile.path"
+             classpathref="compile.classpath"
              sourcepath="src/java"
              defaultexcludes="yes"
              destdir="dist/doc/api"
@@ -176,13 +177,14 @@
   <!-- unit-test -->
   <target name="unit-test" 
           description="Run unit tests in batch mode" 
-          depends="testclasses">
+          depends="test-classes">
     <junit printsummary="no" 
            haltonfailure="yes" 
            showoutput="true" 
            filtertrace="true">
       <formatter type="plain" usefile="false"/>
-      <classpath refid="test.path"/>
+      <classpath refid="test.classpath"/>
+      <sysproperty key="test.dir" value="${test.dir}"/>
       <test name="org.nsdl.mptstore.MPTStoreUnitTestSuite"/>
     </junit>
   </target>
@@ -190,9 +192,10 @@
   <!-- unit-test-gui -->
   <target name="unit-test-gui" 
           description="Run unit tests using the JUnit GUI" 
-          depends="testclasses">
+          depends="test-classes">
     <java classname="org.nsdl.mptstore.MPTStoreUnitTestSuite" fork="yes">
-      <classpath refid="test.path"/>
+      <classpath refid="test.classpath"/>
+      <sysproperty key="test.dir" value="${test.dir}"/>
       <sysproperty key="org.apache.commons.logging.LogFactory"
                    value="org.apache.commons.logging.impl.Log4jFactory"/>
       <sysproperty key="org.apache.commons.logging.Log"
@@ -204,13 +207,14 @@
   <!-- integration-test -->
   <target name="integration-test" 
           description="Run integration tests in batch mode" 
-          depends="testclasses">
+          depends="test-classes">
     <junit printsummary="no" 
            haltonfailure="yes" 
            showoutput="true" 
            filtertrace="true">
       <formatter type="plain" usefile="false"/>
-      <classpath refid="test.path"/>
+      <classpath refid="test.classpath"/>
+      <sysproperty key="test.dir" value="${test.dir}"/>
       <test name="org.nsdl.mptstore.MPTStoreIntegrationTestSuite"/>
     </junit>
   </target>
@@ -218,9 +222,10 @@
   <!-- integration-test-gui -->
   <target name="integration-test-gui" 
           description="Run integration tests using the JUnit GUI" 
-          depends="testclasses">
+          depends="test-classes">
     <java classname="org.nsdl.mptstore.MPTStoreIntegrationTestSuite" fork="yes">
-      <classpath refid="test.path"/>
+      <classpath refid="test.classpath"/>
+      <sysproperty key="test.dir" value="${test.dir}"/>
       <sysproperty key="org.apache.commons.logging.LogFactory"
                    value="org.apache.commons.logging.impl.Log4jFactory"/>
       <sysproperty key="org.apache.commons.logging.Log"

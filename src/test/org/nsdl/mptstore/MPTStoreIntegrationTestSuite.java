@@ -5,6 +5,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.swingui.TestRunner;
 
+import org.nsdl.mptstore.impl.ImplIntegrationTestSuite;
+
 public class MPTStoreIntegrationTestSuite extends TestCase {
 
     public static Test suite() throws Exception {
@@ -12,14 +14,16 @@ public class MPTStoreIntegrationTestSuite extends TestCase {
         TestSuite suite = new TestSuite(MPTStoreIntegrationTestSuite.class.getName());
    
         // classes in this package
-        //suite.addIntegrationTestSuite(Whatever.class);
+        //suite.addTestSuite(Whatever.class);
 
         // sub-package suites
-        //suite.addTest(SomeClass.suite());
+        suite.addTest(ImplIntegrationTestSuite.suite());
 
         return suite;
 
     }
+
+
 
     public static void main(String[] args) throws Exception {
         if (System.getProperty("text") != null && System.getProperty("text").equals("true")) {
