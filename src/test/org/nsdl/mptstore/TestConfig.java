@@ -10,6 +10,10 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 
+import org.nsdl.mptstore.core.DDLGenerator;
+import org.nsdl.mptstore.impl.derby.DerbyDDLGenerator;
+import org.nsdl.mptstore.impl.postgres.PostgresDDLGenerator;
+
 /**
  * Provides static access to test configuration.
  *
@@ -89,6 +93,39 @@ public abstract class TestConfig {
     public static String getTestDatabase() {
         init();
         return getProp("test.database", true);
+    }
+
+    /**
+     * Get the DDLGenerator appropriate for <code>test.database</code>.
+     */
+    public static DDLGenerator getDDLGenerator() {
+        init();
+        String database = getTestDatabase();
+        if (database.equals("derby")) {
+            return new DerbyDDLGenerator();
+        } else if (database.equals("postgres")) {
+            return new PostgresDDLGenerator();
+        } else {
+            throw new RuntimeException("No known DDLGenerator for database: "
+                    + database);
+        }
+    }
+
+    /**
+     * Tell whether backslash should be treated as an escape character
+     * for <code>test.database</code>.
+     */
+    public static boolean getBackslashIsEscape() {
+        init();
+        String database = getTestDatabase();
+        if (database.equals("derby")) {
+            return false; // same for oracle, btw
+        } else if (database.equals("postgres")) {
+            return true;  // same for mysql, btw
+        } else {
+            throw new RuntimeException("Unrecognized test database: "
+                    + database);
+        }
     }
 
     /**

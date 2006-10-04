@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.swingui.TestRunner;
 
+import org.nsdl.mptstore.core.CoreIntegrationTestSuite;
 import org.nsdl.mptstore.impl.ImplIntegrationTestSuite;
 
 public class MPTStoreIntegrationTestSuite extends TestCase {
@@ -17,6 +18,7 @@ public class MPTStoreIntegrationTestSuite extends TestCase {
         //suite.addTestSuite(Whatever.class);
 
         // sub-package suites
+        suite.addTest(CoreIntegrationTestSuite.suite());
         suite.addTest(ImplIntegrationTestSuite.suite());
 
         return suite;
