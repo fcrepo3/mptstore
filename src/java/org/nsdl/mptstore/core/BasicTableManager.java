@@ -201,7 +201,8 @@ public class BasicTableManager implements TableManager {
                 results = st.executeQuery("SELECT COUNT(*) FROM " + _mapTable);
                 exists = results.next();
             } catch (SQLException e) {
-                throw e;
+                // assume the db is just telling us the table doesn't exist
+                return false;
             } finally {
                 try {
                     if (results != null) {

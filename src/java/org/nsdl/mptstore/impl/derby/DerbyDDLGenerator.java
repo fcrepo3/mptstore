@@ -8,19 +8,19 @@ import org.nsdl.mptstore.core.AbstractDDLGenerator;
 /**
  * A <code>DDLGenerator</code> that works with Derby.
  * <p>
- *   The map table DDL defines pKey as <code>INT NOT NULL GENERATED ALWAYS 
+ *   The map table DDL defines pKey as <code>INT NOT NULL GENERATED ALWAYS
  *   AS IDENTITY</code>, and p as a VARCHAR, with indexes on each column.
  * </p>
  * <p>
- *   The relationship table DDL defines s and o as <code>VARCHAR</code> 
+ *   The relationship table DDL defines s and o as <code>VARCHAR</code>
  *   values, with indexes on each column.
  * </p>
  * <p>
- *   The default VARCHAR length is 512, but this can be overridden by using 
- *   the appropriate constructor.  Note: Derby's limit for VARCHAR length 
- *   is actually 32,672 characters, but because these values are indexed, 
- *   the actual maximum possible here is lower and dependent on the page 
- *   size that Derby has been configured to use. See the <i>Derby Reference 
+ *   The default VARCHAR length is 512, but this can be overridden by using
+ *   the appropriate constructor.  Note: Derby's limit for VARCHAR length
+ *   is actually 32,672 characters, but because these values are indexed,
+ *   the actual maximum possible here is lower and dependent on the page
+ *   size that Derby has been configured to use. See the <i>Derby Reference
  *   Manual</i> for more information.
  * </p>
  *
@@ -45,8 +45,10 @@ public class DerbyDDLGenerator extends AbstractDDLGenerator {
     /**
      * Construct a DerbyDDLGenerator that uses the specified maximum length
      * for varchar columns that store URIs.
+     *
+     * @param varcharLength the length for all VARCHAR columns.
      */
-    public DerbyDDLGenerator(int varcharLength) {
+    public DerbyDDLGenerator(final int varcharLength) {
         _varcharLength = varcharLength;
     }
 
