@@ -761,6 +761,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         private HashMap<String, List<String>> predicateMap
                 = new HashMap<String, List<String>>();
         private TableManager adaptor;
+        private int noMap = 0;
+        private int allMap = 0;
 
         public MappingManager(final TableManager tableManager) {
             this.adaptor = tableManager;
@@ -772,9 +774,23 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                 throw new IllegalArgumentException("predicate must not "
                         + "be a variable");
             }
-            String tableName = adaptor.getTableFor(predicate.getNode());
+
+            String tableName;
             String alias;
-            if (predicateMap.containsKey(predicate.getNode().toString())) {
+
+            if (predicate.isVariable()) {
+                tableName = allTableQuery();
+                alias = "ap_" + ++allMap;
+            } else {
+                tableName = adaptor.getTableFor(predicate.getNode());
+            }
+
+            if (tableName == null) {
+                /* No predicate found.. create table that returns no results */
+                alias = "np_" + noMap++;
+                tableName = "(SELECT pkey AS s, pkey AS o from tmap where 1=0)";
+            } else if (predicateMap
+                    .containsKey(predicate.getNode().toString())) {
                 List<String> aliases = predicateMap.get(
                         predicate.getNode().toString());
                 alias = tableName + "_" + aliases.size();
@@ -788,6 +804,25 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
 
             MPTable table = new MPTable(tableName, alias);
             return table;
+        }
+
+        private String allTableQuery() {
+            boolean first = true;
+            StringBuilder allTable = new StringBuilder();
+            allTable.append("( ");
+            for (PredicateNode predicate : adaptor.getPredicates()) {
+                if (first) {
+                    first = false;
+                } else {
+                    allTable.append(" UNION ALL ");
+                }
+
+                allTable.append(" SELECT * from "
+                        + adaptor.getTableFor(predicate));
+            }
+
+            allTable.append(")");
+            return allTable.toString();
         }
     }
 }
