@@ -5,9 +5,9 @@ import java.text.ParseException;
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
-public class NTriplesUtilTest extends TestCase {
+public class NTriplesUtilUnitTest extends TestCase {
 
-    public NTriplesUtilTest(String name) { super (name); }
+    public NTriplesUtilUnitTest(String name) { super (name); }
 
     public void setUp() {
     }
@@ -118,7 +118,7 @@ public class NTriplesUtilTest extends TestCase {
     }
 
     public static void main(String[] args) {
-        TestRunner.run(NTriplesUtilTest.class);
+        TestRunner.run(NTriplesUtilUnitTest.class);
     }   
 
 }

@@ -13,15 +13,16 @@
   <!-- jars required to compile -->
   <path id="compile.path">
     <pathelement location="${lib.log4j}"/>
+    <pathelement location="${lib.derby}"/>
   </path>
 
   <!-- jars required to compile and run tests -->
   <path id="test.path">
     <path refid="compile.path"/>
-    <pathelement location="${lib.junit}"/>
-    <pathelement location="${lib.commons-dbcp}"/>
     <pathelement location="${lib.commons-collections}"/>
+    <pathelement location="${lib.commons-dbcp}"/>
     <pathelement location="${lib.commons-pool}"/>
+    <pathelement location="${lib.junit}"/>
     <pathelement location="${lib.postgres-driver}"/>
     <pathelement location="build/classes"/>
     <pathelement location="build/testclasses"/>
@@ -30,7 +31,7 @@
 
   <!-- classes -->
   <target name="classes" 
-          depends="prep"
+          depends="prepare"
           description="build all java classes into build/classes">
     <mkdir dir="build/classes"/>
     <javac srcdir="src/java" destdir="build/classes" 
@@ -130,7 +131,7 @@
 
   <!-- doc -->
   <target name="doc"
-          depends="prep"
+          depends="prepare"
           description="Build all documentation in dist/doc">
     <copy todir="dist/doc">
       <fileset dir="src/doc"/>
@@ -141,6 +142,7 @@
       <replacefilter token="@mptstore.version@" property="mptstore.version"/>
     </replace>
     <javadoc packagenames="org.nsdl.mptstore.core, 
+                           org.nsdl.mptstore.impl.derby,
                            org.nsdl.mptstore.impl.postgres,
                            org.nsdl.mptstore.query,
                            org.nsdl.mptstore.query.component,
@@ -160,14 +162,20 @@
 
   <!-- qa -->
   <target name="qa"
-          description="Run QA checks (unit tests and code convention checks)"
+          description="Run QA checks (tests and code convention checks)"
           depends="checkstyle, test">
   </target>
 
 
   <!-- test -->
-  <target name="test" 
-          description="Run tests via command-line" 
+  <target name="test"
+          description="Run all tests in batch mode"
+          depends="unit-test, integration-test">
+  </target>
+
+  <!-- unit-test -->
+  <target name="unit-test" 
+          description="Run unit tests in batch mode" 
           depends="testclasses">
     <junit printsummary="no" 
            haltonfailure="yes" 
@@ -175,16 +183,43 @@
            filtertrace="true">
       <formatter type="plain" usefile="false"/>
       <classpath refid="test.path"/>
-      <sysproperty key="jetty.fork" value="false"/>
-      <test name="org.nsdl.mptstore.MPTStorePackageTestSuite"/>
+      <test name="org.nsdl.mptstore.MPTStoreUnitTestSuite"/>
     </junit>
   </target>
 
-  <!-- itest -->
-  <target name="itest" 
-          description="Run tests using the interactive JUnit GUI" 
+  <!-- unit-test-gui -->
+  <target name="unit-test-gui" 
+          description="Run unit tests using the JUnit GUI" 
           depends="testclasses">
-    <java classname="org.nsdl.mptstore.MPTStorePackageTestSuite" fork="yes">
+    <java classname="org.nsdl.mptstore.MPTStoreUnitTestSuite" fork="yes">
+      <classpath refid="test.path"/>
+      <sysproperty key="org.apache.commons.logging.LogFactory"
+                   value="org.apache.commons.logging.impl.Log4jFactory"/>
+      <sysproperty key="org.apache.commons.logging.Log"
+                   value="org.apache.commons.logging.impl.Log4JLogger"/>
+      <sysproperty key="log4j.ignoreTCL" value="true"/>
+    </java>
+  </target>
+
+  <!-- integration-test -->
+  <target name="integration-test" 
+          description="Run integration tests in batch mode" 
+          depends="testclasses">
+    <junit printsummary="no" 
+           haltonfailure="yes" 
+           showoutput="true" 
+           filtertrace="true">
+      <formatter type="plain" usefile="false"/>
+      <classpath refid="test.path"/>
+      <test name="org.nsdl.mptstore.MPTStoreIntegrationTestSuite"/>
+    </junit>
+  </target>
+
+  <!-- integration-test-gui -->
+  <target name="integration-test-gui" 
+          description="Run integration tests using the JUnit GUI" 
+          depends="testclasses">
+    <java classname="org.nsdl.mptstore.MPTStoreIntegrationTestSuite" fork="yes">
       <classpath refid="test.path"/>
       <sysproperty key="org.apache.commons.logging.LogFactory"
                    value="org.apache.commons.logging.impl.Log4jFactory"/>
@@ -196,7 +231,7 @@
 
   <!-- checkstyle -->
   <target name="checkstyle" 
-          description="Verify source code meets our standards"
+          description="Verify the source code meets our standards"
           depends="classes">
     <checkstyle config="src/doc/coding-standards.xml"
                 classpath="build/classes">
@@ -206,16 +241,16 @@
     </checkstyle>
   </target>
 
-  <!-- prep -->
-  <target name="prep"
-          description="prepare for a build">
+  <!-- prepare -->
+  <target name="prepare"
+          description="Prepare for a build">
     <mkdir dir="build"/>
     <mkdir dir="dist"/>
   </target>
 
   <!-- clean -->
   <target name="clean"
-          description="remove all build-generated stuff">
+          description="Remove all build-generated files and directories">
       <delete dir="build"/>
       <delete dir="dist"/>
   </target>

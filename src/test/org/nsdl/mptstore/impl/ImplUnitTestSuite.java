@@ -1,23 +1,23 @@
-package org.nsdl.mptstore.query.lang;
+package org.nsdl.mptstore.impl;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.swingui.TestRunner;
 
-import org.nsdl.mptstore.query.lang.spo.SPOPackageTestSuite;
+import org.nsdl.mptstore.impl.postgres.PostgresUnitTestSuite;
 
-public class LangPackageTestSuite extends TestCase {
+public class ImplUnitTestSuite extends TestCase {
 
     public static Test suite() throws Exception {
 
-        TestSuite suite = new TestSuite(LangPackageTestSuite.class.getName());
+        TestSuite suite = new TestSuite(ImplUnitTestSuite.class.getName());
    
         // classes in this package
-        //suite.addTestSuite(SomeTest.class);
+        //suite.addTestSuite(Whatever.class);
 
         // sub-package suites
-        suite.addTest(SPOPackageTestSuite.suite());
+        suite.addTest(PostgresUnitTestSuite.suite());
 
         return suite;
 
@@ -25,9 +25,9 @@ public class LangPackageTestSuite extends TestCase {
 
     public static void main(String[] args) throws Exception {
         if (System.getProperty("text") != null && System.getProperty("text").equals("true")) {
-            junit.textui.TestRunner.run(LangPackageTestSuite.suite());
+            junit.textui.TestRunner.run(ImplUnitTestSuite.suite());
         } else {
-            TestRunner.run(LangPackageTestSuite.class);
+            TestRunner.run(ImplUnitTestSuite.class);
         }
     }
 }

@@ -7,11 +7,11 @@ import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.rdf.PredicateNode;
 
-public class SPOQueryCompilerTest extends TestCase {
+public class SPOQueryCompilerUnitTest extends TestCase {
 
     private SPOQueryCompiler _compiler;
 
-    public SPOQueryCompilerTest(String name) { super (name); }
+    public SPOQueryCompilerUnitTest(String name) { super (name); }
 
     public void setUp() {
         _compiler = new SPOQueryCompiler(new FakeTableManager(), true);
@@ -53,7 +53,7 @@ public class SPOQueryCompilerTest extends TestCase {
     }
 
     public static void main(String[] args) {
-        TestRunner.run(SPOQueryCompilerTest.class);
+        TestRunner.run(SPOQueryCompilerUnitTest.class);
     }
 
 private class FakeTableManager implements TableManager {
