@@ -143,49 +143,194 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
     }
 
     /**
+     * Test that after adding, then deleting our test set
+     * of triples, querying for all triples returns an
+     * empty set.
+     */
+    public void testDeleteTriples() throws Exception {
+        Set<Triple> input = getTestTriples();
+        add(input);
+        delete(input);
+        Set<Triple> output = spo("* * *");
+        assertEquals(0, output.size());
+    }
+
+    /**
      * Test that after adding our test set of triples,
      * querying for all triples returns the same set.
      */
     public void testAddTriples() throws Exception {
+        Set<Triple> input = getTestTriples();
+        add(input);
+        Set<Triple> output = spo("* * *");
+        assertEquals(input, output);
+    }
 
-        Set<Triple> triples = getTestTriples();
+    public void testQuerySPOAll() throws Exception {
+        // this case is covered by testAddTriples
+    }
+
+    public void testQuerySPOWithFixedS() throws Exception {
+        Set<Triple> input = getTestTriples();
+        add(input);
+
+        Set<Triple> output = spo("<urn:resource:1> * *");
+        assertEquals(5, output.size());
+
+        output = spo("<urn:resource:2> * *");
+        assertEquals(5, output.size());
+
+        output = spo("<urn:resource:bogus> * *");
+        assertEquals(0, output.size());
+    }
+
+    public void testQuerySPOWithFixedSP() throws Exception {
+        Set<Triple> input = getTestTriples();
+        add(input);
+
+        Set<Triple> output = spo("<urn:resource:1> <urn:pred:title> *");
+        assertEquals(1, output.size());
+
+        output = spo("<urn:resource:2> <urn:pred:title> *");
+        assertEquals(1, output.size());
+
+        output = spo("<urn:resource:2> <urn:pred:bogus> *");
+        assertEquals(0, output.size());
+
+        output = spo("<urn:resource:bogus> <urn:pred:title> *");
+        assertEquals(0, output.size());
+
+        output = spo("<urn:resource:bogus> <urn:pred:bogus> *");
+        assertEquals(0, output.size());
+    }
+
+    public void testQuerySPOWithFixedSPO() throws Exception {
+        Set<Triple> input = getTestTriples();
+        add(input);
+
+        Set<Triple> output = spo("<urn:resource:1> <urn:pred:title> \"Resource One\"");
+        assertEquals(1, output.size());
+
+        output = spo("<urn:resource:1> <urn:pred:title> \"Bogus\"");
+        assertEquals(0, output.size());
+
+        output = spo("<urn:resource:1> <urn:pred:bogus> \"Resource One\"");
+        assertEquals(0, output.size());
+
+        output = spo("<urn:resource:1> <urn:pred:bogus> \"Bogus\"");
+        assertEquals(0, output.size());
+
+        output = spo("<urn:resource:bogus> <urn:pred:title> \"Resource One\"");
+        assertEquals(0, output.size());
+
+        output = spo("<urn:resource:bogus> <urn:pred:title> \"Bogus\"");
+        assertEquals(0, output.size());
+
+        output = spo("<urn:resource:bogus> <urn:pred:bogus> \"Resource One\"");
+        assertEquals(0, output.size());
+
+        output = spo("<urn:resource:bogus> <urn:pred:bogus> \"Bogus\"");
+        assertEquals(0, output.size());
+    }
+
+    public void testQuerySPOWithFixedP() throws Exception {
+        Set<Triple> input = getTestTriples();
+        add(input);
+
+        Set<Triple> output = spo("* <urn:pred:title> *");
+        assertEquals(2, output.size());
+
+        output = spo("* <urn:pred:bogus> *");
+        assertEquals(0, output.size());
+    }
+
+    public void testQuerySPOWithFixedPO() throws Exception {
+        Set<Triple> input = getTestTriples();
+        add(input);
+
+        Set<Triple> output = spo("* <urn:pred:title> \"Resource One\"");
+        assertEquals(1, output.size());
+
+        output = spo("* <urn:pred:bogus> \"Resource One\"");
+        assertEquals(0, output.size());
+
+        output = spo("* <urn:pred:title> \"Bogus\"");
+        assertEquals(0, output.size());
+
+        output = spo("* <urn:pred:bogus> \"Bogus\"");
+        assertEquals(0, output.size());
+    }
+
+    public void testQuerySPOWithFixedO() throws Exception {
+        Set<Triple> input = getTestTriples();
+        add(input);
+
+        Set<Triple> output = spo("* * " + R1_TITLE.toString());
+        assertEquals(1, output.size());
+
+        output = spo("* * " + R1_ENGLISH_TITLE.toString());
+        assertEquals(1, output.size());
+
+        output = spo("* * " + R1_SPANISH_TITLE.toString());
+        assertEquals(1, output.size());
+
+        output = spo("* * " + R1_RESOURCE_NUM.toString());
+        assertEquals(1, output.size());
+
+        output = spo("* * \"Bogus\"");
+        assertEquals(0, output.size());
+
+    }
+
+    private Set<Triple> spo(String query) throws Exception {
+
+        Set<Triple> triples = new HashSet<Triple>();
 
         Connection conn = _pool.getConnection();
-
         try {
-
-            // add them in a transaction
-            conn.setAutoCommit(false);
-            _adaptor.addTriples(conn, triples.iterator());
-            conn.commit();
-
-            // query for all triples
             conn.setAutoCommit(false);
             QueryResults results = _adaptor.query(conn,
-                                                  QueryLanguage.SPO, 
+                                                  QueryLanguage.SPO,
                                                   TestConfig.getFetchSize(),
-                                                  "* * *");
-
-            // iterate results and add to output set
-            Set<Triple> resultTriples = new HashSet<Triple>();
-            int count = 0;
+                                                  query);
             while (results.hasNext()) {
                 List<Node> row = results.next();
                 if (row.size() == 3) {
-                    resultTriples.add(new Triple((SubjectNode) row.get(0),
-                                                 (PredicateNode) row.get(1),
-                                                 (ObjectNode) row.get(2)));
+                    triples.add(new Triple((SubjectNode) row.get(0),
+                                           (PredicateNode) row.get(1),
+                                           (ObjectNode) row.get(2)));
                 } else {
                     throw new RuntimeException("Error, query columns for row != 3");
                 }
             }
             results.close();
 
-            // see if the input/output sets are the same
-            assertTrue("Result triples did not match input triples",
-                    resultTriples.equals(triples));
+            return triples;
+        } catch (Exception e) {
+            try { conn.close(); } catch (Exception ex) { }
+            throw e;
+        }
+    }
+
+    private void add(Set<Triple> triples) throws Exception {
+        Connection conn = _pool.getConnection();
+        try {
+            conn.setAutoCommit(false);
+            _adaptor.addTriples(conn, triples.iterator());
         } finally {
-            try { conn.close(); } catch (Exception e) { }
+            conn.setAutoCommit(true);
+            conn.close();
+        }
+    }
+
+    private void delete(Set<Triple> triples) throws Exception {
+        Connection conn = _pool.getConnection();
+        try {
+            conn.setAutoCommit(false);
+            _adaptor.deleteTriples(conn, triples.iterator());
+        } finally {
+            conn.setAutoCommit(true);
+            conn.close();
         }
     }
 
