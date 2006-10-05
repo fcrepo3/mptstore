@@ -161,7 +161,6 @@
                                  Size and Complexity
             //////////////////////////////////////////////////////////////-->
 
-
         <!--
           Java files should be kept at or below 2000 lines.
         -->
@@ -187,8 +186,13 @@
         <module name="ParameterNumber"/>
 
         <!--
-          Cyclomatic complexity should not exceed 10 for any method.
+          Cyclomatic complexity should never exceed 20 (considered
+          "high risk") for a given method.  
+          Strive for 10 or below, which is considered "low risk".
         -->
+        <module name="CyclomaticComplexity">
+          <property name="max" value="20"/>
+        </module>
         <module name="CyclomaticComplexity">
           <property name="severity" value="warning"/>
           <property name="max" value="10"/>
