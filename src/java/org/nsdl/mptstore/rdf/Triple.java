@@ -78,4 +78,34 @@ public class Triple {
              + _object.toString() + " .";
     }
 
+    /**
+     * Tell whether the given object is equal to this triple.
+     *
+     * @param obj the object to compare with this one.
+     * @return true if it's a Triple and the subject, predicate, and
+     *         object all compare the same.
+     */
+    public boolean equals(final Object obj) {
+        if (obj instanceof Triple) {
+            Triple triple = (Triple) obj;
+            return (triple.getSubject().equals(_subject)
+                    && triple.getPredicate().equals(_predicate)
+                    && triple.getObject().equals(_object));
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Return a hash code for this triple.
+     *
+     * The hash code of a <code>Triple</code> is the sum of the subject,
+     * predicate, and object components.
+     *
+     * @return the hashcode.
+     */
+    public int hashCode() {
+        return _subject.hashCode() + _predicate.hashCode() + _object.hashCode();
+    }
+
 }

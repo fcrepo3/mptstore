@@ -134,6 +134,25 @@ public abstract class TestConfig {
     }
 
     /**
+     * Get a reasonable default fetch size for the database we're
+     * testing.
+     */
+    public static int getFetchSize() {
+        init();
+        String database = getTestDatabase();
+        if (database.equals("derby")) {
+            return 1000;
+        } else if (database.equals("h2")) {
+            return 1000;
+        } else if (database.equals("postgres")) {
+            return 1000;
+        } else {
+            throw new RuntimeException("Unrecognized test database: "
+                    + database);
+        }
+    }
+
+    /**
      * Get a JDBC DataSource based on the test configuration properties.
      */
     public static DataSource getTestDataSource(int maxActive) {

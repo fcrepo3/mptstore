@@ -16,7 +16,7 @@
   </appender>
 
   <category name="org.nsdl.mptstore">
-    <priority value="INFO" />
+    <priority value="WARN" />
   </category>
   
   <root>
