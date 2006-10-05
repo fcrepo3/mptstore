@@ -69,7 +69,7 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
 
             R1_TITLE         = new Literal("Resource One");
             R1_ENGLISH_TITLE = new Literal("Resource One", "en");
-            R1_SPANISH_TITLE = new Literal("Recurso Ono", "es");
+            R1_SPANISH_TITLE = new Literal("\u00BFHabla espa\u00F1ol?", "es");
             R1_RESOURCE_NUM  = new Literal("1", XSD_INT);
 
             R2_TITLE         = new Literal("Resource Two");
