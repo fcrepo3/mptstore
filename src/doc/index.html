@@ -23,6 +23,7 @@
 		<li><a href="#inst">Downloading and Installing</a></li>
 		<li><a href="#api">API Documentation</a></li>
 		<li><a href="#issues">Known Issues / Bugs</a></li>
+		<li><a href="#coding">Coding Standards</a></li>
 		<li><a href="#license">License Information</a></li>
     </ol>
     </div>
@@ -152,11 +153,35 @@ of triples" approach.
 </div>
 
 <div class="sec2">
-  <h2><a name="license">6. License Information</a></h2>
+  <h2><a name="coding">6. Coding Standards</a></h2>
+  <p>
+    Coding standards are documented in <a href="coding-standards.xml">
+    coding-standards.xml</a>.
+  </p>
+  <p>
+    These can be automatically checked using the "ant checkstyle"
+    task.  Committed code in subversion should pass the tests
+    but may generate warnings.  Most tests generate errors.
+    Warnings are generated for the following:
+    <ul>
+      <li> Javadoc problems.  These must be fixed before a release.</li>
+      <li> Inline TODO comments.  
+           These should be addressed before a release by either fixing the 
+           issue or documenting it in Known Issues.</li>
+      <li> Per-method 
+           <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity">cyclomatic 
+           complexity</a> over 10.</li>
+    </ul>
+  <p>
+</div>
+
+<div class="sec2">
+  <h2><a name="license">7. License Information</a></h2>
   <p>
 MPTStore is distributed under the Educational Community License (ECL), v1.0.  
 </p>
 <p>
+
 The distribution also includes several third-party, open-source libraries, each with
 it's own license terms.
 </p>
