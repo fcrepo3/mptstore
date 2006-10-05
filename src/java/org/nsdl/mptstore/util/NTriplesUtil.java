@@ -17,11 +17,16 @@ import org.nsdl.mptstore.rdf.Triple;
 import org.nsdl.mptstore.rdf.URIReference;
 
 /**
- * Utility for parsing and outputting strings in N-Triples format.
+ * Utility for parsing, validating, and printing strings in N-Triples format.
  *
  * @author cwilper@cs.cornell.edu
  */
 public abstract class NTriplesUtil {
+
+    /**
+     * Maximum characters for a language code subtag.
+     */
+    private static final int SUBTAG_MAXLEN = 8;
 
     private static final int HIGHEST_ASCII_CHAR = 127;
     private static final int HEX = 16;
@@ -660,6 +665,74 @@ public abstract class NTriplesUtil {
 
         return out.toString();
     }
+
+    /**
+     * Validate the given language tag according to RFC3066.
+     *
+     * The grammar for a language tag is:
+     * <pre>
+     *   LANGUAGE-TAG   = PRIMARY-SUBTAG ("-" SUBTAG)*
+     *   PRIMARY-SUBTAG = 1-8(ALPHA)
+     *   SUBTAG         = 1-8(ALPHA/DIGIT)
+     * </pre>
+     *
+     * @param language the language to validate.
+     * @throws ParseException if the language is syntactically invalid.
+     */
+    public static void validateLanguage(final String language)
+            throws ParseException {
+        if (language == null || language.length() == 0) {
+            throw new ParseException("Language tag must not be empty", 0);
+        } else if (language.indexOf(" ") != -1) {
+            throw new ParseException("Space character not allowed in "
+                    + "language tag", language.indexOf(" "));
+        } else if (language.startsWith("-") || language.endsWith("-")) {
+            throw new ParseException("Language tag cannot start or end with -",
+                    0);
+        } else {
+            validateLanguageSubtags(language.split("-"));
+        }
+    }
+
+    /**
+     * Validate each subtag of a language tag.
+     *
+     * @param subtags one or more subtags.
+     * @throws ParseException if any of the subtags are syntactically invalid.
+     */
+    private static void validateLanguageSubtags(final String[] subtags)
+            throws ParseException {
+        for (int i = 0; i < subtags.length; i++) {
+            if (subtags[i].length() < 1
+                    || subtags[i].length() > SUBTAG_MAXLEN) {
+                throw new ParseException("Language subtags must be "
+                        + "1-" + SUBTAG_MAXLEN + " characters long", 0);
+            }
+            validateLanguageSubtagChars(subtags[i], i == 0);
+        }
+    }
+
+    /**
+     * Validate each character of a language subtag.
+     *
+     * @param subtag the subtag to validate.
+     * @param isFirst whether the subtag is the first one in the language tag.
+     * @throws ParseException if any of the characters are invalid.
+     */
+    private static void validateLanguageSubtagChars(final String subtag,
+                                                    final boolean isFirst)
+            throws ParseException {
+        for (int i = 0; i < subtag.length(); i++) {
+            char c = subtag.charAt(i);
+            if (!((c >= 'a' && c <= 'z')
+                    || (c >= 'A' && c <= 'Z')
+                    || (c >= '0' && c <= '9' && !isFirst))) {
+                throw new ParseException("Language subtag cannot "
+                        + "contain character '" + c + "'", 0);
+            }
+        }
+    }
+
 
     /**
      * Tell whether the given character is in the "low unicode"

@@ -12,7 +12,7 @@ public class RDFUnitTestSuite extends TestCase {
         TestSuite suite = new TestSuite(RDFUnitTestSuite.class.getName());
    
         // classes in this package
-        //suite.addTestSuite(LiteralTest.class);
+        suite.addTestSuite(LiteralUnitTest.class);
 
         return suite;
 

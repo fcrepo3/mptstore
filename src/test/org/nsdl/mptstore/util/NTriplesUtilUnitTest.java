@@ -15,9 +15,32 @@ public class NTriplesUtilUnitTest extends TestCase {
     public void tearDown() {
     }
 
-    //
-    // Parse Tests
-    //
+    private boolean isValidLanguage(String lang) {
+        try {
+            NTriplesUtil.validateLanguage(lang);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    public void testParseGoodLanguages() {
+        assertTrue(isValidLanguage("en"));
+        assertTrue(isValidLanguage("en-US"));
+        assertTrue(isValidLanguage("en-US2"));
+        assertTrue(isValidLanguage("en-US-XYZ"));
+        assertTrue(isValidLanguage("a-2-c-4-e-f-g-h-i-jklmnopq"));
+    }
+
+    public void testParseBadLanguages() {
+        assertFalse(isValidLanguage(""));
+        assertFalse(isValidLanguage("-"));
+        assertFalse(isValidLanguage("en-"));
+        assertFalse(isValidLanguage("-en"));
+        assertFalse(isValidLanguage("en2-US"));
+        assertFalse(isValidLanguage("abcdefghi"));
+        assertFalse(isValidLanguage("en-abcdefghi"));
+    }
 
     private String checkTriple(String ntTriple) {
         try {
@@ -89,7 +112,7 @@ public class NTriplesUtilUnitTest extends TestCase {
 
     }
 
-    public void testLiteralUnicodeUnescaping() throws Exception {
+    public void testUnicodeUnescaping() throws Exception {
 
         String notEscaped = "\u00BFHabla espa\u00F1ol?";
         String escaped    = "\\u00BFHabla espa\\u00F1ol?";
@@ -97,7 +120,7 @@ public class NTriplesUtilUnitTest extends TestCase {
         assertEquals(notEscaped, NTriplesUtil.unescapeLiteralValue(escaped));
     }
 
-    public void testLiteralAsciiUnescaping() throws Exception {
+    public void testAsciiUnescaping() throws Exception {
         checkUnescapingCombos("\t", "\\t");
         checkUnescapingCombos("\r", "\\r");
         checkUnescapingCombos("\n", "\\n");
@@ -117,7 +140,7 @@ public class NTriplesUtilUnitTest extends TestCase {
         assertEquals(unescaped, NTriplesUtil.unescapeLiteralValue(escaped));
     }
 
-    public void testLiteralUnicodeEscaping() throws Exception {
+    public void testUnicodeEscaping() throws Exception {
 
         String notEscaped = "\u00BFHabla espa\u00F1ol?";
         String escaped    = "\\u00BFHabla espa\\u00F1ol?";

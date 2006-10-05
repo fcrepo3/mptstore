@@ -1,6 +1,5 @@
 package org.nsdl.mptstore.rdf;
 
-
 import java.text.ParseException;
 
 import org.nsdl.mptstore.util.NTriplesUtil;
@@ -18,17 +17,12 @@ import org.nsdl.mptstore.util.NTriplesUtil;
 public class Literal implements ObjectNode {
 
     /**
-     * Maximum characters for a language code subtag.
-     */
-    private static final int SUBTAG_MAXLEN = 8;
-
-    /**
      * The lexical value of this literal.
      */
     private String _value;
 
     /**
-     * The language tag of this literal, if any.
+     * The normalized language tag of this literal, if any.
      */
     private String _language;
 
@@ -48,55 +42,21 @@ public class Literal implements ObjectNode {
 
     /**
      * Construct a plain literal with a language tag.
-     * <p>
-     *   The language tag must be of the following form:
-     *   <pre>
-     *     Language-Tag = Primary-subtag *( "-" Subtag )
-     *     Primary-subtag = 1*8ALPHA
-     *     Subtag = 1*8(ALPHA / DIGIT)
-     *   </pre>
-     * </p>
-     * <p>
-     *   As per "RDF Concepts and Abstract Syntax", the
-     *   language tag will be normalized to lowercase.
-     * </p>
+     *
+     * As per "RDF Concepts and Abstract Syntax", it will
+     * be normalized to lowercase.
      *
      * @param value The lexical value.
      * @param language The language tag.
-     * @throws ParseException if the language is syntactically
-     *         invalid according to RFC3066.
+     * @throws ParseException if the language tag is syntactically invalid.
+     * @see NTriplesUtil#validateLanguage(String)
      */
     public Literal(final String value,
                    final String language)
             throws ParseException {
         _value = value;
         if (language != null) {
-            if (language.length() == 0) {
-                throw new ParseException("Language tag must not be empty", 0);
-            }
-            if (language.indexOf(" ") != -1) {
-                throw new ParseException("Space character not allowed in "
-                        + "language tag", language.indexOf(" "));
-            }
-
-            String[] parts = language.split("-");
-            for (int i = 0; i < parts.length; i++) {
-                if (parts[i].length() < 1
-                        || parts[i].length() > SUBTAG_MAXLEN) {
-                    throw new ParseException("Language subtags must be "
-                            + "1-" + SUBTAG_MAXLEN + " characters long", 0);
-                }
-                for (int j = 0; j < parts[i].length(); j++) {
-                    char c = parts[i].charAt(j);
-                    if (!((c >= 'a' && c <= 'z')
-                            || (c >= 'A' && c <= 'Z')
-                            || (c >= '0' && c <= '9' && i > 0))) {
-                        throw new ParseException("Language subtag cannot "
-                                + "contain character '" + c + "'", 0);
-                    }
-                }
-            }
-
+            NTriplesUtil.validateLanguage(language);
             _language = language.toLowerCase();
         }
     }
