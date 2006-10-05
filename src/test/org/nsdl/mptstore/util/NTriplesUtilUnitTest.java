@@ -89,6 +89,42 @@ public class NTriplesUtilUnitTest extends TestCase {
 
     }
 
+    public void testLiteralUnicodeUnescaping() throws Exception {
+
+        String notEscaped = "\u00BFHabla espa\u00F1ol?";
+        String escaped    = "\\u00BFHabla espa\\u00F1ol?";
+
+        assertEquals(notEscaped, NTriplesUtil.unescapeLiteralValue(escaped));
+    }
+
+    public void testLiteralAsciiUnescaping() throws Exception {
+        checkUnescapingCombos("\t", "\\t");
+        checkUnescapingCombos("\r", "\\r");
+        checkUnescapingCombos("\n", "\\n");
+        checkUnescapingCombos("\"", "\\\"");
+        checkUnescapingCombos("\\", "\\\\");
+    }
+
+    private void checkUnescapingCombos(String unescaped, String escaped) throws Exception {
+        checkUnescaping(unescaped, escaped);
+        checkUnescaping(" " + unescaped, " " + escaped);
+        checkUnescaping("a" + unescaped, "a" + escaped);
+        checkUnescaping(unescaped + " ", escaped + " ");
+        checkUnescaping(unescaped + "a", escaped + "a");
+    }
+
+    private void checkUnescaping(String unescaped, String escaped) throws Exception {
+        assertEquals(unescaped, NTriplesUtil.unescapeLiteralValue(escaped));
+    }
+
+    public void testLiteralUnicodeEscaping() throws Exception {
+
+        String notEscaped = "\u00BFHabla espa\u00F1ol?";
+        String escaped    = "\\u00BFHabla espa\\u00F1ol?";
+
+        assertEquals(escaped, NTriplesUtil.escapeLiteralValue(notEscaped));
+    }
+
     public void testParseBadTriples() {
 
         assertNotNull(checkTriple(""));
