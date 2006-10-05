@@ -80,15 +80,15 @@ public abstract class NTriplesUtil {
      *
      * This will advance the reader through the next '&gt;' character.
      *
-     * @param the reader to get characters from.
-     * @param the current position in the overall input.
+     * @param reader the reader to get characters from.
+     * @param pos the current position in the overall input.
      * @return all characters up to an including the terminal, '&gt;'.
      * @throws IOException if there's an I/O error reading the input.
      * @throws ParseException if the reader is exhausted before the terminal
      *         is encountered.
      */
-    private static String consumeURIReference(final Reader reader,
-                                              final int pos)
+    public static String consumeURIReference(final Reader reader,
+                                             final int pos)
             throws IOException, ParseException {
 
         int i = 0;
@@ -131,12 +131,12 @@ public abstract class NTriplesUtil {
      * @param reader the reader.
      * @param pos the current position in the reader.
      * @return the number of whitespaces encountered.
-     * @throw IOException if there is an error reading.
-     * @throw ParseException if the first character is not a whitespace or
-     *        EOF is reached before a non-whitespace char.
+     * @throws IOException if there is an error reading.
+     * @throws ParseException if the first character is not a whitespace or
+     *         EOF is reached before a non-whitespace char.
      */
-    private static int consumeWhitespace(final Reader reader,
-                                         final int pos)
+    public static int consumeWhitespace(final Reader reader,
+                                        final int pos)
             throws IOException, ParseException {
 
         int i = 0;
@@ -732,7 +732,6 @@ public abstract class NTriplesUtil {
             }
         }
     }
-
 
     /**
      * Tell whether the given character is in the "low unicode"

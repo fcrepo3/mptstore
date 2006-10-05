@@ -116,86 +116,56 @@ public class SPOQueryCompiler implements QueryCompiler {
         try {
 
             int i = 0;
-            int c = reader.read();
 
-            // start with subject
+            // subject
             SubjectNode subject;
+            int c = reader.read();
             if (c == '*') {
                 subject = null;
-            } else {
-                StringBuffer sBuf = new StringBuffer();
-                while (c != '>') {
-                    if (c == -1) {
-                        throw new ParseException(EXPECTED_G, i);
-                    }
-                    sBuf.append((char) c);
-                    i++;
-                    c = reader.read();
-                }
-                sBuf.append((char) c);
-                subject = NTriplesUtil.parseSubject(sBuf.toString());
-            }
-
-            // followed by one or more whitespace
-            i++;
-            c = reader.read();
-            if (c != ' ' && c != '\t') {
-                throw new ParseException(EXPECTED_ST, i);
-            }
-            while (c == ' ' || c == '\t') {
-                if (c == -1) {
-                    throw new ParseException(EXPECTED_ALST, i);
-                }
                 i++;
-                c = reader.read();
+            } else {
+                reader.reset();
+                String sString = NTriplesUtil.consumeURIReference(reader, i);
+                subject = NTriplesUtil.parseSubject(sString);
+                i += sString.length();
             }
 
-            // followed by predicate
+            // whitespace
+            i += NTriplesUtil.consumeWhitespace(reader, i);
+
+            // predicate
+            reader.mark(Integer.MAX_VALUE);
             PredicateNode predicate;
+            c = reader.read();
             if (c == '*') {
                 predicate = null;
+                i++;
             } else {
-                StringBuffer pBuf = new StringBuffer();
-                while (c != '>') {
-                    if (c == -1) {
-                        throw new ParseException(EXPECTED_G, i);
-                    }
-                    pBuf.append((char) c);
-                    i++;
-                    c = reader.read();
-                }
-                pBuf.append((char) c);
+                reader.reset();
+                String pString = NTriplesUtil.consumeURIReference(reader, i);
                 try {
-                    predicate = NTriplesUtil.parsePredicate(pBuf.toString());
+                    predicate = NTriplesUtil.parsePredicate(pString);
                 } catch (ParseException e) {
                     throw new ParseException(e.getMessage(),
                             e.getErrorOffset() + i);
                 }
+                i += pString.length();
             }
 
-            // followed by one or more whitespace
-            i++;
+            // whitespace
+            i += NTriplesUtil.consumeWhitespace(reader, i);
+
+            // object
+            ObjectNode object;
             c = reader.read();
-            if (c != ' ' && c != '\t') {
-                throw new ParseException(EXPECTED_ST, i);
-            }
-            while (c == ' ' || c == '\t') {
-                if (c == -1) {
-                    throw new ParseException(EXPECTED_AQLST, i);
-                }
-                i++;
-                c = reader.read();
-            }
-            // followed by object
-            ObjectNode o;
             if (c == '*') {
-                o = null;
+                object = null;
                 if (reader.read() != -1) {
                     throw new ParseException(EXPECTED_EOS, i + 1);
                 }
             } else {
                 try {
-                    o = NTriplesUtil.parseObject(query.substring(i));
+                    object = NTriplesUtil.parseObject(query.substring(i));
                 } catch (ParseException e) {
                     throw new ParseException(e.getMessage(),
                             e.getErrorOffset() + i);
@@ -203,36 +173,49 @@ public class SPOQueryCompiler implements QueryCompiler {
             }
             reader.close();
 
-            // construct the pattern from the components and return
-
-            NodePattern<SubjectNode> sPattern;
-            if (subject != null) {
-                sPattern = new BasicNodePattern<SubjectNode>(subject);
-            } else {
-                sPattern = new BasicNodePattern<SubjectNode>("s");
-            }
-
-            NodePattern<PredicateNode> pPattern;
-            if (predicate != null) {
-                pPattern = new BasicNodePattern<PredicateNode>(predicate);
-            } else {
-                pPattern = new BasicNodePattern<PredicateNode>("p");
-            }
-
-            NodePattern<ObjectNode> oPattern;
-            if (o != null) {
-                oPattern = new BasicNodePattern<ObjectNode>(o);
-            } else {
-                oPattern = new BasicNodePattern<ObjectNode>("o");
-            }
-
-            return new BasicTriplePattern(sPattern, pPattern, oPattern);
+            // triple pattern
+            return getTriplePattern(subject, predicate, object);
 
         } catch (IOException e) {
             // should not happen -- we're using a StringReader
             throw new RuntimeException("Unexpected IO error", e);
         }
 
+    }
+
+    /**
+     * Get a <code>TriplePattern</code> from the given components.
+     *
+     * @param subject the subject, or <code>null</code> if unbound.
+     * @param predicate the predicate, or <code>null</code> if unbound.
+     * @param object the object, or <code>null</code> if unbound.
+     * @return the triple pattern.
+     */
+    private static TriplePattern getTriplePattern(final SubjectNode subject,
+                                                  final PredicateNode predicate,
+                                                  final ObjectNode object) {
+        NodePattern<SubjectNode> sPattern;
+        if (subject != null) {
+            sPattern = new BasicNodePattern<SubjectNode>(subject);
+        } else {
+            sPattern = new BasicNodePattern<SubjectNode>("s");
+        }
+
+        NodePattern<PredicateNode> pPattern;
+        if (predicate != null) {
+            pPattern = new BasicNodePattern<PredicateNode>(predicate);
+        } else {
+            pPattern = new BasicNodePattern<PredicateNode>("p");
+        }
+
+        NodePattern<ObjectNode> oPattern;
+        if (object != null) {
+            oPattern = new BasicNodePattern<ObjectNode>(object);
+        } else {
+            oPattern = new BasicNodePattern<ObjectNode>("o");
+        }
+
+        return new BasicTriplePattern(sPattern, pPattern, oPattern);
     }
 
 }

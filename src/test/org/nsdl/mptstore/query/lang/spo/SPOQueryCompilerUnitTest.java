@@ -33,15 +33,17 @@ public class SPOQueryCompilerUnitTest extends TestCase {
         }
     }
 
-    public void testParseValidQueries() {
+    public void testParseValidSPOQueries() {
         assertTrue(isValidQuery("* * *"));
         assertTrue(isValidQuery("* * \"test\""));
         assertTrue(isValidQuery("* * \"Here's a quote: \\\"\""));
         assertTrue(isValidQuery("<urn:a> <urn:b> <urn:c>"));
         assertTrue(isValidQuery("<urn:a> <urn:b> \"test\""));
+        assertTrue(isValidQuery("<urn:a> <urn:b> \"test\"@en-US"));
+        assertTrue(isValidQuery("<urn:a> <urn:b> \"1\"^^<urn:someDatatype>"));
     }
 
-    public void testParseInvalidQueries() {
+    public void testParseInvalidSPOQueries() {
         assertFalse(isValidQuery(""));
         assertFalse(isValidQuery("* *"));
         assertFalse(isValidQuery("* * * *"));
@@ -50,6 +52,8 @@ public class SPOQueryCompilerUnitTest extends TestCase {
         assertFalse(isValidQuery("* <urn:test> \""));
         assertFalse(isValidQuery("* <urn:test> \'"));
         assertFalse(isValidQuery("<urn:test> <urn:test> 2"));
+        assertFalse(isValidQuery("<urn:a> <urn:b> \"test\"@en-"));
+        assertFalse(isValidQuery("<urn:a> <urn:b> \"1\"^^<urn:some badDatatype>"));
     }
 
     public static void main(String[] args) {
