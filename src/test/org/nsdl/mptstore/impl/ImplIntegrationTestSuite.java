@@ -8,6 +8,7 @@ import junit.swingui.TestRunner;
 import org.nsdl.mptstore.MPTStoreIntegrationTestSuite;
 import org.nsdl.mptstore.TestConfig;
 import org.nsdl.mptstore.impl.derby.DerbyIntegrationTestSuite;
+import org.nsdl.mptstore.impl.h2.H2IntegrationTestSuite;
 import org.nsdl.mptstore.impl.postgres.PostgresIntegrationTestSuite;
 
 public class ImplIntegrationTestSuite extends TestCase {
@@ -24,6 +25,8 @@ public class ImplIntegrationTestSuite extends TestCase {
 
         if (testDatabase.equals("derby")) {
             suite.addTest(DerbyIntegrationTestSuite.suite());
+        } else if (testDatabase.equals("h2")) {
+            suite.addTest(H2IntegrationTestSuite.suite());
         } else if (testDatabase.equals("postgres")) {
             suite.addTest(PostgresIntegrationTestSuite.suite());
         } else {

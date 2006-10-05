@@ -12,6 +12,7 @@ import org.apache.commons.dbcp.BasicDataSourceFactory;
 
 import org.nsdl.mptstore.core.DDLGenerator;
 import org.nsdl.mptstore.impl.derby.DerbyDDLGenerator;
+import org.nsdl.mptstore.impl.h2.H2DDLGenerator;
 import org.nsdl.mptstore.impl.postgres.PostgresDDLGenerator;
 
 /**
@@ -103,6 +104,8 @@ public abstract class TestConfig {
         String database = getTestDatabase();
         if (database.equals("derby")) {
             return new DerbyDDLGenerator();
+        } else if (database.equals("h2")) {
+            return new H2DDLGenerator();
         } else if (database.equals("postgres")) {
             return new PostgresDDLGenerator();
         } else {
@@ -120,6 +123,8 @@ public abstract class TestConfig {
         String database = getTestDatabase();
         if (database.equals("derby")) {
             return false; // same for oracle, btw
+        } else if (database.equals("h2")) {
+            return false;
         } else if (database.equals("postgres")) {
             return true;  // same for mysql, btw
         } else {
