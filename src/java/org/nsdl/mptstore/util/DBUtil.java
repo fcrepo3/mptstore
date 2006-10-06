@@ -1,8 +1,11 @@
 package org.nsdl.mptstore.util;
 
 import java.sql.Clob;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.apache.log4j.Logger;
 
 /**
  * Database-related utilities.
@@ -10,6 +13,12 @@ import java.sql.SQLException;
  * @author cwilper@cs.cornell.edu
  */
 public abstract class DBUtil {
+
+    /**
+     * Logger for this class.
+     */
+    private static final Logger LOG =
+            Logger.getLogger(DBUtil.class.getName());
 
     private DBUtil() { }
 
@@ -72,6 +81,27 @@ public abstract class DBUtil {
         }
         out.append('\'');
         return out.toString();
+    }
+
+    /**
+     * Ensure the given connection is in auto-commit mode (default)
+     * and close/release it.
+     *
+     * Any errors encountered will be logged.
+     */
+    public static void release(Connection conn) {
+        try {
+            if (!conn.getAutoCommit()) {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            LOG.warn("Error setting autocommit", e);
+        }
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            LOG.warn("Error closing/releasing connection", e);
+        }
     }
 
 }

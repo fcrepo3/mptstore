@@ -19,6 +19,7 @@ import org.nsdl.mptstore.query.lang.spo.SPOQueryCompiler;
 import org.nsdl.mptstore.query.provider.SQLProvider;
 import org.nsdl.mptstore.rdf.PredicateNode;
 import org.nsdl.mptstore.rdf.Triple;
+import org.nsdl.mptstore.util.DBUtil;
 
 /**
  * A <code>DatabaseAdaptor</code> designed to work with any database.
@@ -164,18 +165,30 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
 
 
     /** {@inheritDoc} */
-    public QueryResults query(final Connection conn,
-                              final QueryLanguage lang,
+    public QueryResults query(final Connection connection,
+                              final QueryLanguage language,
                               final int fetchSize,
+                              final boolean autoReleaseConnection,
                               final String query)
             throws QueryException {
-        QueryCompiler compiler = _compilerMap.get(lang);
-        if (compiler != null) {
-            SQLProvider provider = compiler.compile(query);
-            return new SQLUnionQueryResults(conn, fetchSize, provider);
-        } else {
-            throw new QueryException("Query language not supported: "
-                    + lang.getName());
+        QueryResults results = null;
+        try {
+            QueryCompiler compiler = _compilerMap.get(language);
+            if (compiler != null) {
+                SQLProvider provider = compiler.compile(query);
+                results = new SQLUnionQueryResults(connection, 
+                                                   provider, 
+                                                   fetchSize, 
+                                                   autoReleaseConnection);
+                return results;
+            } else {
+                throw new QueryException("Query language not supported: "
+                        + language.getName());
+            }
+        } finally {
+            if (results == null && autoReleaseConnection) {
+                DBUtil.release(connection);
+            }
         }
     }
 

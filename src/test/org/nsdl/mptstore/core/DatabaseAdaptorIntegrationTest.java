@@ -287,29 +287,25 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         Set<Triple> triples = new HashSet<Triple>();
 
         Connection conn = _pool.getConnection();
-        try {
-            conn.setAutoCommit(false);
-            QueryResults results = _adaptor.query(conn,
-                                                  QueryLanguage.SPO,
-                                                  TestConfig.getFetchSize(),
-                                                  query);
-            while (results.hasNext()) {
-                List<Node> row = results.next();
-                if (row.size() == 3) {
-                    triples.add(new Triple((SubjectNode) row.get(0),
-                                           (PredicateNode) row.get(1),
-                                           (ObjectNode) row.get(2)));
-                } else {
-                    throw new RuntimeException("Error, query columns for row != 3");
-                }
+        conn.setAutoCommit(false);
+        QueryResults results = _adaptor.query(conn,
+                                              QueryLanguage.SPO,
+                                              TestConfig.getFetchSize(),
+                                              true,
+                                              query);
+        while (results.hasNext()) {
+            List<Node> row = results.next();
+            if (row.size() == 3) {
+                triples.add(new Triple((SubjectNode) row.get(0),
+                                       (PredicateNode) row.get(1),
+                                       (ObjectNode) row.get(2)));
+            } else {
+                throw new RuntimeException("Error, query columns for row != 3");
             }
-            results.close();
-
-            return triples;
-        } catch (Exception e) {
-            try { conn.close(); } catch (Exception ex) { }
-            throw e;
         }
+        results.close();
+
+        return triples;
     }
 
     private void add(Set<Triple> triples) throws Exception {

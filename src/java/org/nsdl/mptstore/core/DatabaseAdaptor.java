@@ -65,17 +65,21 @@ public interface DatabaseAdaptor {
      *   fails, the connection will be automatically closed/released.
      * </p>
      *
-     * @param conn The database connection to use.
+     * @param connection The database connection to use.
      * @param lang The language of the query.
      * @param fetchSize The number of results to request from the database
-     *                  at one time.
+     *                  at a time.
+     * @param autoReleaseConnection whether to automatically release/close
+     *                  the connection when the results are closed, or
+     *                  in the event of query syntax error.
      * @param queryText The query.
      * @return the results.
      * @throws QueryException if the query failed for any reason.
      */
-    QueryResults query(Connection conn,
+    QueryResults query(Connection connection,
                        QueryLanguage lang,
                        int fetchSize,
+                       boolean autoReleaseConnection,
                        String queryText)
             throws QueryException;
 

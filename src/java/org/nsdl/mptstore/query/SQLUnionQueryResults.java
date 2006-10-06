@@ -41,14 +41,20 @@ public class SQLUnionQueryResults implements QueryResults {
     private Connection _conn;
 
     /**
+     * Provides the SQL and column names for the query.
+     */
+    private SQLProvider _sqlProvider;
+
+    /**
      * The JDBC fetchSize to use for each SQL query.
      */
     private int _fetchSize;
 
     /**
-     * Provides the SQL and column names for the query.
+     * Whether to automatically release/close the connection when the 
+     * results are closed.
      */
-    private SQLProvider _sqlProvider;
+    private boolean _autoReleaseConnection;
 
     /**
      * The SQL queries to execute.
@@ -80,18 +86,22 @@ public class SQLUnionQueryResults implements QueryResults {
      * given connection.
      *
      * @param conn the database connection to use.
-     * @param fetchSize the JDBC fetchSize to use for each SQL query.
      * @param sqlProvider provides the SQL and column names for the query.
+     * @param fetchSize the JDBC fetchSize to use for each SQL query.
+     * @param autoReleaseConnection whether to automatically close/release
+     *        the connection when the results are closed.
      * @throws QueryException if an unexpected error occurs starting the query.
      */
     public SQLUnionQueryResults(final Connection conn,
+                                final SQLProvider sqlProvider,
                                 final int fetchSize,
-                                final SQLProvider sqlProvider)
+                                final boolean autoReleaseConnection) 
             throws QueryException {
 
         _conn = conn;
-        _fetchSize = fetchSize;
         _sqlProvider = sqlProvider;
+        _fetchSize = fetchSize;
+        _autoReleaseConnection = autoReleaseConnection;
 
         _closed = false;
 
@@ -208,7 +218,14 @@ public class SQLUnionQueryResults implements QueryResults {
         throw new UnsupportedOperationException();
     }
 
-    /** {@inheritDoc} */
+    /** 
+     * Close database resources held by this object.
+     *
+     * This closes any open <code>ResultSet</code> and <code>Statement</code>
+     * objects.  In addition, if <code>autoReleaseConnection</code> was
+     * specified as <code>true</code>, the database connection will also
+     * be closed/released.
+     */
     public void close() {
         if (!_closed) {
             if (_results != null) {
@@ -225,17 +242,8 @@ public class SQLUnionQueryResults implements QueryResults {
                     LOG.warn("Error closing statement", e);
                 }
             }
-            try {
-                if (!_conn.getAutoCommit()) {
-                    _conn.setAutoCommit(true);
-                }
-            } catch (Exception e) {
-                LOG.warn("Error setting autocommit", e);
-            }
-            try {
-                _conn.close();
-            } catch (Exception e) {
-                LOG.warn("Error closing/releasing connection", e);
+            if (_autoReleaseConnection) {
+                DBUtil.release(_conn);
             }
             _closed = true;
         }
