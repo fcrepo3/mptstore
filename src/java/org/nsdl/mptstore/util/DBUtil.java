@@ -88,8 +88,10 @@ public abstract class DBUtil {
      * and close/release it.
      *
      * Any errors encountered will be logged.
+     *
+     * @param conn the connection.
      */
-    public static void release(Connection conn) {
+    public static void release(final Connection conn) {
         try {
             if (!conn.getAutoCommit()) {
                 conn.setAutoCommit(true);

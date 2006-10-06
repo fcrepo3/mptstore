@@ -176,9 +176,9 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
             QueryCompiler compiler = _compilerMap.get(language);
             if (compiler != null) {
                 SQLProvider provider = compiler.compile(query);
-                results = new SQLUnionQueryResults(connection, 
-                                                   provider, 
-                                                   fetchSize, 
+                results = new SQLUnionQueryResults(connection,
+                                                   provider,
+                                                   fetchSize,
                                                    autoReleaseConnection);
                 return results;
             } else {

@@ -51,7 +51,7 @@ public class SQLUnionQueryResults implements QueryResults {
     private int _fetchSize;
 
     /**
-     * Whether to automatically release/close the connection when the 
+     * Whether to automatically release/close the connection when the
      * results are closed.
      */
     private boolean _autoReleaseConnection;
@@ -95,7 +95,7 @@ public class SQLUnionQueryResults implements QueryResults {
     public SQLUnionQueryResults(final Connection conn,
                                 final SQLProvider sqlProvider,
                                 final int fetchSize,
-                                final boolean autoReleaseConnection) 
+                                final boolean autoReleaseConnection)
             throws QueryException {
 
         _conn = conn;
@@ -218,7 +218,7 @@ public class SQLUnionQueryResults implements QueryResults {
         throw new UnsupportedOperationException();
     }
 
-    /** 
+    /**
      * Close database resources held by this object.
      *
      * This closes any open <code>ResultSet</code> and <code>Statement</code>
