@@ -36,7 +36,7 @@ public class DerbyDDLGenerator extends AbstractDDLGenerator {
 
     /**
      * Construct a DerbyDDLGenerator that uses the default maximum length (512)
-     * for varchar columns that store URIs.
+     * for varchar columns that store URIs and literals.
      */
     public DerbyDDLGenerator() {
         _varcharLength = DEFAULT_VARCHAR_LENGTH;
@@ -44,7 +44,7 @@ public class DerbyDDLGenerator extends AbstractDDLGenerator {
 
     /**
      * Construct a DerbyDDLGenerator that uses the specified maximum length
-     * for varchar columns that store URIs.
+     * for varchar columns that store URIs and literals.
      *
      * @param varcharLength the length for all VARCHAR columns.
      */

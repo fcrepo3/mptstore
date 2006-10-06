@@ -56,6 +56,34 @@
     </replace>
   </target>
 
+  <!-- classes14 -->
+  <target name="classes14" 
+          depends="prepare"
+          description="build all classes for Java 1.4 into build/classes14">
+    <mkdir dir="build/classes14"/>
+    <javac srcdir="src/java" destdir="build/classes14" 
+           includes="**" 
+           classpathref="compile.classpath"
+           optimize="${optimize}" 
+           debug="${debug}"
+           source="${source}"
+           target="jsr14">
+        <compilerarg value="-Xlint:-serial"/>
+    </javac>
+    <copy file="src/java/org/nsdl/mptstore/MPTStore.properties" 
+          tofile="build/classes14/org/nsdl/mptstore/MPTStore.properties"/>
+    <propertyfile file="build/version.properties">
+      <entry key="buildDate" type="date" value="now"/>
+    </propertyfile>
+    <replace file="build/classes14/org/nsdl/mptstore/MPTStore.properties"
+             value="value not found in version.properties"
+             propertyFile="build/version.properties">
+      <replacefilter token="@buildDate@" property="buildDate"/>
+    </replace>
+  </target>
+
+
+
   <!-- test-classes -->
   <target name="test-classes"
           depends="classes"
@@ -85,6 +113,23 @@
          basedir="build/classes"/>
   </target>
 
+  <!-- dist14 -->
+  <target name="dist14" 
+          depends="classes14" 
+          description="Build the distribution for Java 1.4 in dist/">
+    <mkdir dir="dist/lib"/>
+    <copy todir="dist">
+      <fileset dir=".">
+        <include name="${lib.log4j}"/>
+     </fileset>
+    </copy>
+    <copy todir="dist">
+      <fileset dir="src/config"/>
+    </copy>
+    <jar jarfile="dist/mptstore-${mptstore.version}.jar14" 
+         basedir="build/classes14"/>
+  </target>
+
   <!-- srcrelease -->
   <target name="srcrelease" 
           description="Build the source release in dist/release">
@@ -108,7 +153,7 @@
   <!-- binrelease -->
   <target name="binrelease" 
           description="Build the binary release in dist/release"
-          depends="dist,doc">
+          depends="dist,dist14,doc">
     <copy todir="dist/release/mptstore-${mptstore.version}">
       <fileset dir="dist">
         <exclude name="release/**"/>
@@ -143,8 +188,12 @@
              propertyFile="src/java/org/nsdl/mptstore/MPTStore.properties">
       <replacefilter token="@mptstore.version@" property="mptstore.version"/>
     </replace>
+    <replace file="dist/doc/index.html"
+             token="@lib.log4j@"
+             value="${lib.log4j}"/>
     <javadoc packagenames="org.nsdl.mptstore.core, 
                            org.nsdl.mptstore.impl.derby,
+                           org.nsdl.mptstore.impl.h2,
                            org.nsdl.mptstore.impl.postgres,
                            org.nsdl.mptstore.query,
                            org.nsdl.mptstore.query.component,

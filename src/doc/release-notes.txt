@@ -1,0 +1,22 @@
+
+                         MPTStore Release Notes
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Version 0.9 - October 6th, 2006
+===============================
+
+ o This is the first official release of MPTStore.
+
+ o Derby and H2 have not been tested with MPTStore as thoroughly as Postgres.
+
+ o This version is compatible with Java 1.4.
+
+   - The binary distribution has a jar file compiled for Java 1.5 
+     (mptstore-0.9.jar) and a legacy jar for 1.4 (mptstore-0.9.jar14)
+
+   - The source must be compiled with a 1.5 JDK.
+
+   - Starting with version 1.0, we will not maintain Java 1.4 
+     compatibility.
+

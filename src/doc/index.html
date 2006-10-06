@@ -4,7 +4,7 @@
                       
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
 <head>
-    <title>MPTStore RDF Storage Engine</title>
+    <title>MPTStore @mptstore.version@ Documentation</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
@@ -45,9 +45,10 @@
   </p>
   <p>
     MPTStore is implemented as a lightweight layer on top of JDBC.
-    It was developed and tested using Postgres as the underlying
-    database, but can be easily adapted to work with other RDBMS 
-    engines.
+    It was originally developed using Postgres as the underlying
+    database, but be easily made to work with other databases
+    by writing a <a href="api/org/nsdl/mptstore/core/DDLGenerator.html">
+    DDLGenerator</a>.  
   </p>
 </div>
 
@@ -67,35 +68,68 @@ is different.  Recognizing that the number of
 relationship types in real RDF data is much
 lower than the number of nodes, MPT distributes
 triples across several tables, each holding all
-the relationships of a certain type.  This offers
-an obvious opportunity to scale across multiple
-storage devices.  
-  </p>
-  <p>
-Although we have initially focused on supporting
-simple queries, we believe that the efficiency
-of query plans for complex RDF queries can be
-much higher with MPT than with the "big table
-of triples" approach.
+the relationships of a certain type.  This 
+design offers efficient query plans for complex
+queries as well as an opportunity to scale 
+across storage devices.
   </p>
 </div>
 
 
 <div class="sec2">
-  <h2><a name="inst">2. Downloading and Installing</a></h2>
+  <h2><a name="inst">3. Downloading and Installing</a></h2>
   <p>
-    The latest distribution (source and binary) can be downloaded from
-    <a href="http://www.sf.net/projects/mptstore">http://www.sf.net/projects/mptstore</a>
-  </p>
-  <p>
-    Note: The binary distribution is compiled for Java 1.5.
+    <ul>
+      <li> <a href="http://www.sourceforge.net/projects/mptstore">Download the latest release</a> from SourceForge.</li>
+      <li> <a href="release-notes.txt">View the release notes</a>.</li>
+      <li> Make sure <code>mptstore-@mptstore.version@.jar</code> and
+           <code>@lib.log4j@</code> are in your <code>CLASSPATH</code>.
+      </li>
+      <li> To configure logging:
+        <ul>
+          <li> If you don't already have Log4J set up for your project,
+               edit the included <code>log4j.xml</code> and make sure 
+               it's in your CLASSPATH.  For some help with Log4J configuration,
+               see the <a href="http://wiki.apache.org/logging-log4j/Log4jXmlFormat">
+               Log4J XML Configuration Primer</a>.</li>
+          <li> If you're already using Log4J, add MPTStore logging
+               categories to your existing configuration, if desired.</li>
+        </ul>
+      </li>
+    </ul>
   </p>
 </div>
 
 <div class="sec2">
-  <h2><a name="api">3. API Documentation</a></h2>
+  <h2><a name="api">4. API Documentation</a></h2>
 <p>
-  See the <a href="api/index.html">API Javadocs</a> 
+  The main interface you work with is the
+  <a href="api/org/nsdl/mptstore/core/DatabaseAdaptor.html">DatabaseAdaptor</a>.
+  This interface allows you to add and delete triples and execute RDF
+  queries.
+</p>
+  The only current implementation of this interface is 
+  <a href="api/org/nsdl/mptstore/core/GenericDatabaseAdaptor.html">GenericDatabaseAdaptor</a>.
+  In order to construct one, you'll need a 
+  <a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/sql/DataSource.html">JDBC
+  DataSource</a> (which your application must provide on it's own), and a
+  <a href="api/org/nsdl/mptstore/core/DDLGenerator.html">DDLGenerator</a>.
+</p>  
+<p>
+  A <code>DDLGenerator</code> tells MPTStore how to create and drop tables for
+  a particular database type.  Existing implementations include:
+  <ul>
+    <li> <a href="api/org/nsdl/mptstore/impl/derby/DerbyDDLGenerator.html">DerbyDDLGenerator</a></li>
+    <li> <a href="api/org/nsdl/mptstore/impl/h2/H2DDLGenerator.html">H2DDLGenerator</a></li>
+    <li> <a href="api/org/nsdl/mptstore/impl/postgres/PostgresDDLGenerator.html">PostgresDDLGenerator</a></li>
+  </ul>
+</p>
+  Once you have a <code>DataSource</code> and a <code>DDLGenerator</code>,
+  you can construct a <a href="api/org/nsdl/mptstore/core/BasicTableManager.html">BasicTableManager</a>,
+  which can then be used to construct a <code>GenericDatabaseAdaptor</code>.
+</p>
+<p>
+  See the <a href="api/index.html">Full API Javadocs</a> 
   for more detailed information.
 </p>
 </div>
@@ -104,17 +138,14 @@ of triples" approach.
   <h2><a name="issues">5. Known Issues / Bugs</a></h2>
   <ul>
   <li>
-    Blank nodes are not supported.
-  </li>
-  <li>
     Literal values are not normalized.  Applications should take
-    care to pre-normalize the value part of the literal before
-    adding it, if normalization is required.
+    care to pre-normalize the value parts of the literals before
+    adding them, if normalization is required.
   </li>
   <li>
     Unbound predicate queries are relatively slow when the graph
-    contains statements using many distinct predicates.
-    In the future, this might be addressed in one of the following ways:
+    contains statements using many (hundreds of) distinct predicates.
+    Here are some ideas we might employ to address this.
     <ol>
       <li> Storage of every triple in a complete triple
            table in addition to the predicate-specific tables.
@@ -149,14 +180,18 @@ of triples" approach.
       </li>
     </ol>
   </li>
+  <li>
+    <a href="http://www.w3.org/TR/rdf-mt/#unlabel">Blank nodes</a> 
+    are not supported.  This is not a priority.
+  </li>
   </ul>
 </div>
 
 <div class="sec2">
   <h2><a name="coding">6. Coding Standards</a></h2>
   <p>
-    Coding standards are documented in <a href="coding-standards.xml">
-    coding-standards.xml</a>.
+    Coding standards for the project are documented in 
+    <a href="coding-standards.xml">coding-standards.xml</a>.
   </p>
   <p>
     These can be automatically checked using the "ant checkstyle"
@@ -166,8 +201,8 @@ of triples" approach.
     <ul>
       <li> Javadoc problems.  These must be fixed before a release.</li>
       <li> Inline TODO comments.  
-           These should be addressed before a release by either fixing the 
-           issue or documenting it in Known Issues.</li>
+           These should be addressed before a (1.0+) point release by either 
+           fixing the issue or documenting it in Known Issues.</li>
       <li> Per-method 
            <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity">cyclomatic 
            complexity</a> over 10.</li>
@@ -178,16 +213,15 @@ of triples" approach.
 <div class="sec2">
   <h2><a name="license">7. License Information</a></h2>
   <p>
-MPTStore is distributed under the Educational Community License (ECL), v1.0.  
-</p>
-<p>
-
-The distribution also includes several third-party, open-source libraries, each with
-it's own license terms.
-</p>
-<p>
-See the <a href="license/index.html">License Information Page</a> for specific terms of
-all relevant licenses.
+    MPTStore is distributed under the Educational Community License (ECL), v1.0.  
+  </p>
+  <p>
+    The distribution also includes several third-party, open-source libraries,
+    each with it's own license terms.
+  </p>
+  <p>
+    See the <a href="license/index.html">License Information Page</a> for 
+    specific terms of all relevant licenses.
   </p>
 </div>
 
@@ -199,7 +233,7 @@ all relevant licenses.
     <div id="lastModified">
       Last Modified <script type="text/javascript">
       //<![CDATA[
-            var cvsDate = "$Date: 2006/05/01 01:11:27 $";
+            var cvsDate = "$Date$";
             var parts = cvsDate.split(" ");
             var modifiedDate = parts[1];
             document.write(modifiedDate);
