@@ -9,6 +9,8 @@ Version 0.9 - October 6th, 2006
  o This is the first official release of MPTStore.
 
  o Derby and H2 have not been tested with MPTStore as thoroughly as Postgres.
+   Users of PostgreSQL might read http://www.powerpostgresql.com/PerfList/
+   for various tuning options.
 
  o This version is compatible with Java 1.4.
 
