@@ -16,8 +16,7 @@
       MPTStore @mptstore.version@
     </h1>
     <div class="tocbox">
-        
-    <ol>
+      <ol>
 		<li><a href="#intro">What is MPTStore?</a></li>
 		<li><a href="#diff">How does it differ from existing approaches?</a></li>
 		<li><a href="#inst">Downloading and Installing</a></li>
@@ -25,7 +24,7 @@
 		<li><a href="#issues">Known Issues / Bugs</a></li>
 		<li><a href="#coding">Coding Standards</a></li>
 		<li><a href="#license">License Information</a></li>
-    </ol>
+      </ol>
     </div>
 </div>
 
@@ -55,26 +54,25 @@
 <div class="sec2">
   <h2><a name="diff">2. How does it differ from existing approaches?</a></h2>
   <p>
-The traditional way of storing RDF in a relational database
-is to use a "big table of triples".  Variations on this basic 
-approach are employed by popular RDF storage engines including 
-<a href="http://jena.sourceforge.net/">Jena</a>, 
-<a href="http://www.openrdf.org/">Sesame</a>,
-and <a href="http://sourceforge.net/projects/threestore/">3store</a>.
+    The traditional way of storing RDF in a relational database
+    is to use a "big table of triples".  Variations on this basic 
+    approach are employed by popular RDF storage engines including 
+    <a href="http://jena.sourceforge.net/">Jena</a>, 
+    <a href="http://www.openrdf.org/">Sesame</a>,
+    and <a href="http://sourceforge.net/projects/threestore/">3store</a>.
   </p>
   <p>
-Our approach, MPT ("Mapped Predicate Tables"),
-is different.  Recognizing that the number of
-relationship types in real RDF data is much
-lower than the number of nodes, MPT distributes
-triples across several tables, each holding all
-the relationships of a certain type.  This 
-design offers efficient query plans for complex
-queries as well as an opportunity to scale 
-across storage devices.
+    Our approach, MPT ("Mapped Predicate Tables"),
+    is different.  Recognizing that the number of
+    relationship types in real RDF data is much
+    lower than the number of nodes, MPT distributes
+    triples across several tables, each holding all
+    the relationships of a certain type.  This 
+    design offers efficient query plans for complex
+    queries as well as an opportunity to scale 
+    across storage devices.
   </p>
 </div>
-
 
 <div class="sec2">
   <h2><a name="inst">3. Downloading and Installing</a></h2>
@@ -127,10 +125,73 @@ across storage devices.
   Once you have a <code>DataSource</code> and a <code>DDLGenerator</code>,
   you can construct a <a href="api/org/nsdl/mptstore/core/BasicTableManager.html">BasicTableManager</a>,
   which can then be used to construct a <code>GenericDatabaseAdaptor</code>.
+  Here is an example of putting the above pieces together and exercising the
+  functionality of the <code>DatabaseAdaptor</code> interface.
+</p>
+
+<div class="code"><pre>
+  // initialize the adaptor
+  TableManager tableMan = new BasicTableManager(dataSource,
+                                                new PostgresDDLGenerator(),
+                                                "tMap",
+                                                "t");
+  DatabaseAdaptor adaptor = new GenericDatabaseAdaptor(tableMan, true);
+
+  // instantiate a couple triples
+  Set&lt;Triple&gt; triples = new HashSet&lt;Triple&gt;();
+  triples.add(new Triple(new URIReference("urn:resource:1"),
+                         new URIReference("urn:title"),
+                         new Literal("Resource One")));
+  triples.add(new Triple(new URIReference("urn:resource:2"),
+                         new URIReference("urn:title"),
+                         new Literal("Resource Two")));
+
+  // add the triples in a transaction
+  Connection conn = dataSource.getConnection();
+  conn.setAutoCommit(false);
+  adaptor.addTriples(conn, triples.iterator());
+  conn.commit();
+  conn.setAutoCommit(true);
+  conn.close();
+
+  // query for all titles
+  QueryResults results = adaptor.query(dataSource.getConnection(),
+                                       QueryLanguage.SPO,
+                                       0, true, "* &lt;urn:title&gt; *");
+  while (results.hasNext()) {
+      List&lt;Node&gt; row = results.next();
+      System.out.println("The title of " + row.get(0).toString()
+              + " is " + row.get(2).toString());
+  }
+  results.close();
+
+  // delete the triples in a transaction
+  conn = dataSource.getConnection();
+  conn.setAutoCommit(false);
+  adaptor.deleteTriples(conn, triples.iterator());
+  conn.commit();
+  conn.setAutoCommit(true);
+  conn.close();
+
+</pre></div>
+<p>
+  Once you have a populated triplestore, more advanced queries are possible.
+  However, we don't yet have a SPARQL parser, so you must work at a lower 
+  level to perform these kinds of queries.  The basic steps are:
+  <ol>
+    <li> Instantiate a <a href="api/org/nsdl/mptstore/query/component/GraphQuery.html">GraphQuery</a>
+         object.</li>
+    <li> Add optional and required <a href="api/org/nsdl/mptstore/query/component/QueryElement.html">QueryElement</a>s to it.</li>
+    <li> Instantiate a <a href="api/org/nsdl/mptstore/query/provider/GraphQuerySQLProvider.html">GraphQuerySQLProvider</a> using your <code>GraphQuery</code> and a <code>TableManager</code> instance.</li>
+    <li> Set the names of the values that are being selected by using <code>setTargets(List&lt;String&gt;)</code></li>
+    <li> Instantiate a <a href="api/org/nsdl/mptstore/query/SQLUnionQueryResults.html">SQLUnionQueryResults</a> object by passing your <code>GraphQuerySQLProvider</code> and a <code>Connection</code> in the constructor.</li>
+    <li> Iterate the results as in the example above.  The values in the result rows
+         will be <a href="api/org/nsdl/mptstore/rdf/Node.html">Node</a> objects (or <code>null</code>).</li>
+  </ol>
 </p>
 <p>
   See the <a href="api/index.html">Full API Javadocs</a> 
-  for more detailed information.
+  for more details.
 </p>
 </div>
 
