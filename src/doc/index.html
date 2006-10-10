@@ -199,6 +199,15 @@
   <h2><a name="issues">5. Known Issues / Bugs</a></h2>
   <ul>
   <li>
+    Unique constraints are not enabled in the included DDLGenerator
+    implementations.  So when using these, it's possible to add 
+    duplicate triples without recieving a warning.  We plan
+    to make unique constraints an optional setting for the
+    bundled <code>DDLGenerator</code> implementations.  
+    When enabled, the idea is that an attempt to re-add a 
+    triple will throw a <code>ModificationException</code>.
+  </li>
+  <li>
     Literal values are not normalized.  Applications should take
     care to pre-normalize the value parts of the literals before
     adding them, if normalization is required.
