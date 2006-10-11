@@ -83,14 +83,18 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
     public void addTriples(final Connection conn,
                            final Iterator<Triple> triples)
             throws ModificationException {
+        LOG.debug("Started adding triples to database");
         updateTriples(conn, triples, false);
+        LOG.debug("Finished adding triples to database");
     }
 
     /** {@inheritDoc} */
     public void deleteTriples(final Connection conn,
                               final Iterator<Triple> triples)
             throws ModificationException {
+        LOG.debug("Started deleting triples from database");
         updateTriples(conn, triples, true);
+        LOG.debug("Finished deleting triples from database");
     }
 
     /**
@@ -114,6 +118,17 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
             while (triples.hasNext()) {
 
                 Triple triple = triples.next();
+
+                if (LOG.isDebugEnabled()) {
+                    String prefix;
+                    if (delete) {
+                        prefix = "Deleting ";
+                    } else {
+                        prefix = "Adding ";
+                    }
+                    LOG.debug(prefix + triple.toString());
+                }
+
                 PredicateNode predicate = triple.getPredicate();
 
                 PreparedStatement statement = statements.get(predicate);
@@ -127,7 +142,6 @@ public class GenericDatabaseAdaptor implements DatabaseAdaptor {
                         sql = "INSERT INTO " + table
                                 + " (s, o) VALUES (?, ?)";
                     }
-                    LOG.info("Preparing update: " + sql);
                     statement = conn.prepareStatement(sql);
                     statements.put(predicate, statement);
                 }
