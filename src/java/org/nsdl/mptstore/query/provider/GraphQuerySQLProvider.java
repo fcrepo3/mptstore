@@ -203,8 +203,10 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
          * an optional clause: It would probably be wise to either check
          * here, or prove that an exception would have been thrown already.
          */
+
+        StringBuilder additional = new StringBuilder();
         if (valueBindings.size() > 0) {
-            sql.append(" WHERE ");
+            additional.append(" WHERE ");
             ArrayList<String> valueKeys =
                     new ArrayList<String>(valueBindings.keySet());
             for (int i = 0; i < valueKeys.size(); i++) {
@@ -214,9 +216,16 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                     if (i > 0 || j > 0) {
                         sql.append(" AND ");
                     }
-                    sql.append(values.get(j));
+
+                    LOG.debug("Adding remaining unused binding for "
+                            + valueKeys.get(i) + ", " + values.get(j) + "\n");
+                    additional.append(values.get(j));
                 }
             }
+        }
+
+        if (!additional.toString().equals(" WHERE ")) {
+            sql.append(additional.toString());
         }
 
         if (ordering != null) {
@@ -383,6 +392,15 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                             + getBoundValue(p, variableBindings) + "\n");
                     conditions.addCondition(p.mappedName(), " = ",
                             getBoundValue(p, variableBindings));
+
+                    if (valueBindings.containsKey(p.boundTable().alias())) {
+                        LOG.debug("Removing value binding from queue: "
+                                + p.mappedName() + " = "
+                                + getBoundValue(p, variableBindings) + "\n");
+                        valueBindings.get(p.boundTable().alias()).remove(
+                                p.mappedName() + " = "
+                                + getBoundValue(p, variableBindings));
+                    }
                 }
             }
         }
