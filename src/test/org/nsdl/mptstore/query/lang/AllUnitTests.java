@@ -1,23 +1,10 @@
 package org.nsdl.mptstore.query.lang;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-public class AllUnitTests extends TestCase {
-
-    public static Test suite() throws Exception {
-
-        TestSuite suite = new TestSuite(AllUnitTests.class.getName());
-   
-        // classes in this package
-        //suite.addTestSuite(SomeTest.class);
-
-        // sub-package suites
-        suite.addTest(org.nsdl.mptstore.query.lang.spo.AllUnitTests.suite());
-
-        return suite;
-
-    }
-
-}
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    org.nsdl.mptstore.query.lang.spo.AllUnitTests.class
+})
+public class AllUnitTests { }

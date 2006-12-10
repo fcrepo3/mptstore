@@ -1,43 +1,31 @@
 package org.nsdl.mptstore.query.lang.spo;
 
-import junit.framework.TestCase;
-import junit.swingui.TestRunner;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.nsdl.mptstore.TestConfig;
 import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.rdf.PredicateNode;
 
-public class SPOQueryCompilerUnitTest extends TestCase {
+public class SPOQueryCompilerUnitTest {
 
     private SPOQueryCompiler _compiler;
 
-    static {
+    @BeforeClass
+    public static void setUpClass() {
         TestConfig.init();
     }
 
-    public SPOQueryCompilerUnitTest(String name) { super (name); }
-
+    @Before
     public void setUp() {
         _compiler = new SPOQueryCompiler(new FakeTableManager(), true);
     }
             
-    public void tearDown() {
-    }
-
-    //
-    // Parse Tests
-    //
-
-    private boolean isValidQuery(String query) {
-        try {
-            _compiler.compile(query);
-            return true;
-        } catch (QueryException e) {
-            return false;
-        }
-    }
-
+    @Test
     public void testParseValidSPOQueries() {
         assertTrue(isValidQuery("* * *"));
         assertTrue(isValidQuery("* * \"test\""));
@@ -48,6 +36,7 @@ public class SPOQueryCompilerUnitTest extends TestCase {
         assertTrue(isValidQuery("<urn:a> <urn:b> \"1\"^^<urn:someDatatype>"));
     }
 
+    @Test
     public void testParseInvalidSPOQueries() {
         assertFalse(isValidQuery(""));
         assertFalse(isValidQuery("* *"));
@@ -61,8 +50,13 @@ public class SPOQueryCompilerUnitTest extends TestCase {
         assertFalse(isValidQuery("<urn:a> <urn:b> \"1\"^^<urn:some badDatatype>"));
     }
 
-    public static void main(String[] args) {
-        TestRunner.run(SPOQueryCompilerUnitTest.class);
+    private boolean isValidQuery(String query) {
+        try {
+            _compiler.compile(query);
+            return true;
+        } catch (QueryException e) {
+            return false;
+        }
     }
 
 private class FakeTableManager implements TableManager {

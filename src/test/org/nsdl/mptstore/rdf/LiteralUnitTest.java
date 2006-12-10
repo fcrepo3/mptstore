@@ -2,25 +2,22 @@ package org.nsdl.mptstore.rdf;
 
 import java.text.ParseException;
 
-import junit.framework.TestCase;
-import junit.swingui.TestRunner;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 import org.nsdl.mptstore.TestConfig;
 
-public class LiteralUnitTest extends TestCase {
+public class LiteralUnitTest {
 
-    static {
+    @BeforeClass
+    public static void setUpClass() {
         TestConfig.init();
     }
 
-    public LiteralUnitTest(String name) { super (name); }
-
-    public void setUp() {
-    }
-            
-    public void tearDown() {
-    }
-
+    @Test
     public void testPlainLiteralNoLanguage() throws Exception {
 
         Literal l = new Literal("1");
@@ -55,6 +52,7 @@ public class LiteralUnitTest extends TestCase {
 
     }
 
+    @Test
     public void testPlainLiteralWithLanguage() throws Exception {
 
         Literal l = new Literal("1", "EN");
@@ -91,6 +89,7 @@ public class LiteralUnitTest extends TestCase {
 
     }
 
+    @Test
     public void testTypedLiteral() throws Exception {
 
         URIReference type = new URIReference("urn:someDatatype");
@@ -125,9 +124,5 @@ public class LiteralUnitTest extends TestCase {
         assertFalse(l.equals(l4));
 
     }
-
-    public static void main(String[] args) {
-        TestRunner.run(LiteralUnitTest.class);
-    }   
 
 }

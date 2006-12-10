@@ -11,8 +11,12 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import junit.framework.TestCase;
-import junit.swingui.TestRunner;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import org.nsdl.mptstore.query.QueryResults;
 import org.nsdl.mptstore.query.lang.QueryLanguage;
@@ -27,34 +31,40 @@ import org.nsdl.mptstore.rdf.URIReference;
 
 import org.nsdl.mptstore.TestConfig;
 
-public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
+public abstract class DatabaseAdaptorIntegrationTest {
 
     private static final String XSD_NS = "http://www.w3.org/2001/XMLSchema#";
 
-    private static final URIReference XSD_INT;
+    private static URIReference XSD_INT;
 
-    private static final URIReference RESOURCE_ONE;
-    private static final URIReference RESOURCE_TWO;
+    private static URIReference RESOURCE_ONE;
+    private static URIReference RESOURCE_TWO;
 
-    private static final URIReference TITLE;
-    private static final URIReference ENGLISH_TITLE;
-    private static final URIReference SPANISH_TITLE;
-    private static final URIReference RESOURCE_NUM;
-    private static final URIReference NEXT_RESOURCE;
-    private static final URIReference PREV_RESOURCE;
+    private static URIReference TITLE;
+    private static URIReference ENGLISH_TITLE;
+    private static URIReference SPANISH_TITLE;
+    private static URIReference RESOURCE_NUM;
+    private static URIReference NEXT_RESOURCE;
+    private static URIReference PREV_RESOURCE;
 
-    private static final Literal      R1_TITLE;
-    private static final Literal      R1_ENGLISH_TITLE;
-    private static final Literal      R1_SPANISH_TITLE;
-    private static final Literal      R1_RESOURCE_NUM;
+    private static Literal      R1_TITLE;
+    private static Literal      R1_ENGLISH_TITLE;
+    private static Literal      R1_SPANISH_TITLE;
+    private static Literal      R1_RESOURCE_NUM;
 
-    private static final Literal      R2_TITLE;
-    private static final Literal      R2_ENGLISH_TITLE;
-    private static final Literal      R2_SPANISH_TITLE;
-    private static final Literal      R2_RESOURCE_NUM;
+    private static Literal      R2_TITLE;
+    private static Literal      R2_ENGLISH_TITLE;
+    private static Literal      R2_SPANISH_TITLE;
+    private static Literal      R2_RESOURCE_NUM;
 
-    static {
+    private static DataSource POOL;
+
+    private static DatabaseAdaptor ADAPTOR;
+
+    @BeforeClass
+    public static void setUpClass() {
         TestConfig.init();
+        POOL = TestConfig.getTestDataSource(2);
         try {
             XSD_INT          = new URIReference(XSD_NS + "int");
  
@@ -83,24 +93,16 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         }
     }
 
-    private DataSource _pool;
-
-    private DatabaseAdaptor _adaptor;
-
-    protected DatabaseAdaptorIntegrationTest(String name) {
-        super(name); 
-    }
-
+    @Before
     public void setUp() throws Exception {
-        _pool = TestConfig.getTestDataSource(2);
-        _adaptor = initAdaptor(_pool, "tMap", "t");
+        ADAPTOR = getAdaptor(POOL, "tMap", "t");
         clearTriples(false);
     }
 
-    private void clearTriples(boolean andMapTable) throws Exception {
-        Connection conn = _pool.getConnection();
+    private static void clearTriples(boolean andMapTable) throws Exception {
+        Connection conn = POOL.getConnection();
         try {
-            _adaptor.deleteAllTriples(conn);
+            ADAPTOR.deleteAllTriples(conn);
             if (andMapTable) {
             try {
                 executeUpdates(conn, TestConfig.getDDLGenerator().getDropMapTableDDL("tMap"));
@@ -112,42 +114,27 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         }
     }
 
+    @After
     public void tearDown() throws Exception {
+        clearTriples(false); 
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
         clearTriples(true); 
     }
 
-    public abstract DatabaseAdaptor initAdaptor(DataSource pool,
-                                                String mapTable,
-                                                String soTablePrefix) 
+    public abstract DatabaseAdaptor getAdaptor(DataSource pool,
+                                               String mapTable,
+                                               String soTablePrefix) 
             throws Exception;
-
-    /**
-     * Get our test set of ten triples.
-     */
-    private Set<Triple> getTestTriples() throws Exception {
-
-        Set<Triple> triples = new HashSet<Triple>();
-
-        triples.add(new Triple(RESOURCE_ONE, TITLE, R1_TITLE));
-        triples.add(new Triple(RESOURCE_ONE, ENGLISH_TITLE, R1_ENGLISH_TITLE));
-        triples.add(new Triple(RESOURCE_ONE, SPANISH_TITLE, R1_SPANISH_TITLE));
-        triples.add(new Triple(RESOURCE_ONE, RESOURCE_NUM, R1_RESOURCE_NUM));
-        triples.add(new Triple(RESOURCE_ONE, NEXT_RESOURCE, RESOURCE_TWO));
-
-        triples.add(new Triple(RESOURCE_TWO, TITLE, R2_TITLE));
-        triples.add(new Triple(RESOURCE_TWO, ENGLISH_TITLE, R2_ENGLISH_TITLE));
-        triples.add(new Triple(RESOURCE_TWO, SPANISH_TITLE, R2_SPANISH_TITLE));
-        triples.add(new Triple(RESOURCE_TWO, RESOURCE_NUM, R2_RESOURCE_NUM));
-        triples.add(new Triple(RESOURCE_TWO, PREV_RESOURCE, RESOURCE_ONE));
-
-        return triples;
-    }
 
     /**
      * Test that after adding, then deleting our test set
      * of triples, querying for all triples returns an
      * empty set.
      */
+    @Test
     public void testDeleteTriples() throws Exception {
         Set<Triple> input = getTestTriples();
         add(input);
@@ -160,6 +147,7 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
      * Test that after adding our test set of triples,
      * querying for all triples returns the same set.
      */
+    @Test
     public void testAddTriples() throws Exception {
         Set<Triple> input = getTestTriples();
         add(input);
@@ -167,10 +155,12 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         assertEquals(input, output);
     }
 
+    @Test
     public void testQuerySPOAll() throws Exception {
         // this case is covered by testAddTriples
     }
 
+    @Test
     public void testQuerySPOWithFixedS() throws Exception {
         Set<Triple> input = getTestTriples();
         add(input);
@@ -185,6 +175,7 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         assertEquals(0, output.size());
     }
 
+    @Test
     public void testQuerySPOWithFixedSP() throws Exception {
         Set<Triple> input = getTestTriples();
         add(input);
@@ -205,6 +196,7 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         assertEquals(0, output.size());
     }
 
+    @Test
     public void testQuerySPOWithFixedSPO() throws Exception {
         Set<Triple> input = getTestTriples();
         add(input);
@@ -234,6 +226,7 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         assertEquals(0, output.size());
     }
 
+    @Test
     public void testQuerySPOWithFixedP() throws Exception {
         Set<Triple> input = getTestTriples();
         add(input);
@@ -245,6 +238,7 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         assertEquals(0, output.size());
     }
 
+    @Test
     public void testQuerySPOWithFixedPO() throws Exception {
         Set<Triple> input = getTestTriples();
         add(input);
@@ -262,6 +256,7 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
         assertEquals(0, output.size());
     }
 
+    @Test
     public void testQuerySPOWithFixedO() throws Exception {
         Set<Triple> input = getTestTriples();
         add(input);
@@ -283,13 +278,35 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
 
     }
 
+    /**
+     * Get our test set of ten triples.
+     */
+    private static Set<Triple> getTestTriples() throws Exception {
+
+        Set<Triple> triples = new HashSet<Triple>();
+
+        triples.add(new Triple(RESOURCE_ONE, TITLE, R1_TITLE));
+        triples.add(new Triple(RESOURCE_ONE, ENGLISH_TITLE, R1_ENGLISH_TITLE));
+        triples.add(new Triple(RESOURCE_ONE, SPANISH_TITLE, R1_SPANISH_TITLE));
+        triples.add(new Triple(RESOURCE_ONE, RESOURCE_NUM, R1_RESOURCE_NUM));
+        triples.add(new Triple(RESOURCE_ONE, NEXT_RESOURCE, RESOURCE_TWO));
+
+        triples.add(new Triple(RESOURCE_TWO, TITLE, R2_TITLE));
+        triples.add(new Triple(RESOURCE_TWO, ENGLISH_TITLE, R2_ENGLISH_TITLE));
+        triples.add(new Triple(RESOURCE_TWO, SPANISH_TITLE, R2_SPANISH_TITLE));
+        triples.add(new Triple(RESOURCE_TWO, RESOURCE_NUM, R2_RESOURCE_NUM));
+        triples.add(new Triple(RESOURCE_TWO, PREV_RESOURCE, RESOURCE_ONE));
+
+        return triples;
+    }
+
     private Set<Triple> spo(String query) throws Exception {
 
         Set<Triple> triples = new HashSet<Triple>();
 
-        Connection conn = _pool.getConnection();
+        Connection conn = POOL.getConnection();
         conn.setAutoCommit(false);
-        QueryResults results = _adaptor.query(conn,
+        QueryResults results = ADAPTOR.query(conn,
                                               QueryLanguage.SPO,
                                               TestConfig.getFetchSize(),
                                               true,
@@ -310,10 +327,10 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
     }
 
     private void add(Set<Triple> triples) throws Exception {
-        Connection conn = _pool.getConnection();
+        Connection conn = POOL.getConnection();
         try {
             conn.setAutoCommit(false);
-            _adaptor.addTriples(conn, triples.iterator());
+            ADAPTOR.addTriples(conn, triples.iterator());
         } finally {
             conn.setAutoCommit(true);
             conn.close();
@@ -321,17 +338,17 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
     }
 
     private void delete(Set<Triple> triples) throws Exception {
-        Connection conn = _pool.getConnection();
+        Connection conn = POOL.getConnection();
         try {
             conn.setAutoCommit(false);
-            _adaptor.deleteTriples(conn, triples.iterator());
+            ADAPTOR.deleteTriples(conn, triples.iterator());
         } finally {
             conn.setAutoCommit(true);
             conn.close();
         }
     }
 
-    private void executeUpdates(Connection conn, 
+    private static void executeUpdates(Connection conn, 
                                 List<String> sql) throws SQLException {
 
         Iterator<String> iter = sql.iterator();

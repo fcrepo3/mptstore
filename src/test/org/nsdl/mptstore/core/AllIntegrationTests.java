@@ -1,21 +1,11 @@
 package org.nsdl.mptstore.core;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.swingui.TestRunner;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-public class AllIntegrationTests extends TestCase {
-
-    public static Test suite() throws Exception {
-
-        TestSuite suite = new TestSuite(AllIntegrationTests.class.getName());
-   
-        // classes in this package
-        suite.addTestSuite(GenericDatabaseAdaptorIntegrationTest.class);
-
-        return suite;
-
-    }
-
-}
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    GenericDatabaseAdaptorIntegrationTest.class,
+    DDLGeneratorIntegrationTest.class
+})
+public class AllIntegrationTests { }

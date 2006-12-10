@@ -2,22 +2,21 @@ package org.nsdl.mptstore.core;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-import junit.swingui.TestRunner;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import org.nsdl.mptstore.TestConfig;
 
-public abstract class DDLGeneratorUnitTest extends TestCase {
+public abstract class DDLGeneratorUnitTest {
 
     private String _className;
 
-    static {
+    public static void setUpClass() {
         TestConfig.init();
     }
 
-    protected DDLGeneratorUnitTest(String name,
-                                   String className) { 
-        super(name); 
+    protected DDLGeneratorUnitTest(String className) { 
         _className = className;
     }
 
@@ -36,24 +35,28 @@ public abstract class DDLGeneratorUnitTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetCreateMapTableDDL() {
         List<String> ddl = getInstance().getCreateMapTableDDL("tableName");
         assertTrue(_className + ".getCreateMapTableDDL returned empty list", 
                 ddl.size() > 0);
     }
-            
+       
+    @Test
     public void testGetDropMapTableDDL() {
         List<String> ddl = getInstance().getDropMapTableDDL("tableName");
         assertTrue(_className + ".getDropMapTableDDL returned empty list", 
                 ddl.size() > 0);
     }
-            
+    
+    @Test
     public void testGetCreateSOTableDDL() {
         List<String> ddl = getInstance().getCreateSOTableDDL("tableName");
         assertTrue(_className + ".getCreateSOTableDDL returned empty list", 
                 ddl.size() > 0);
     }
-            
+    
+    @Test
     public void testGetDropSOTableDDL() {
         List<String> ddl = getInstance().getDropSOTableDDL("tableName");
         assertTrue(_className + ".getDropSOTableDDL returned empty list", 

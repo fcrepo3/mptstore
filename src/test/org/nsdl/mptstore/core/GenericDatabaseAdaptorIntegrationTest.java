@@ -2,25 +2,25 @@ package org.nsdl.mptstore.core;
 
 import javax.sql.DataSource;
 
-import junit.framework.TestCase;
-import junit.swingui.TestRunner;
-
 import org.nsdl.mptstore.TestConfig;
 
 public class GenericDatabaseAdaptorIntegrationTest 
         extends DatabaseAdaptorIntegrationTest {
 
-    static {
-        TestConfig.init();
+    private static DatabaseAdaptor ADAPTOR;
+
+    public synchronized DatabaseAdaptor getAdaptor(DataSource dataSource,
+            String mapTable, String soTablePrefix)
+            throws Exception {
+        if (ADAPTOR == null) {
+            ADAPTOR = initAdaptor(dataSource, mapTable, soTablePrefix);
+        }
+        return ADAPTOR;
     }
 
-    public GenericDatabaseAdaptorIntegrationTest(String name) { 
-        super(name);
-    }
-
-    public DatabaseAdaptor initAdaptor(DataSource dataSource,
-                                       String mapTable,
-                                       String soTablePrefix) throws Exception {
+    private static DatabaseAdaptor initAdaptor(DataSource dataSource,
+            String mapTable, String soTablePrefix)
+            throws Exception {
 
         TableManager tableManager = 
                 new BasicTableManager(dataSource, 
@@ -32,9 +32,5 @@ public class GenericDatabaseAdaptorIntegrationTest
                                           TestConfig.getBackslashIsEscape());
 
     }
-
-    public static void main(String[] args) {
-        TestRunner.run(GenericDatabaseAdaptorIntegrationTest.class);
-    }   
 
 }

@@ -2,34 +2,24 @@ package org.nsdl.mptstore.util;
 
 import java.text.ParseException;
 
-import junit.framework.TestCase;
-import junit.swingui.TestRunner;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.nsdl.mptstore.TestConfig;
 
-public class NTriplesUtilUnitTest extends TestCase {
+public class NTriplesUtilUnitTest {
 
-    static {
+    @BeforeClass
+    public static void setUpClass() {
         TestConfig.init();
     }
 
-    public NTriplesUtilUnitTest(String name) { super (name); }
-
-    public void setUp() {
-    }
-            
-    public void tearDown() {
-    }
-
-    private boolean isValidLanguage(String lang) {
-        try {
-            NTriplesUtil.validateLanguage(lang);
-            return true;
-        } catch (ParseException e) {
-            return false;
-        }
-    }
-
+    @Test
     public void testParseGoodLanguages() {
         assertTrue(isValidLanguage("en"));
         assertTrue(isValidLanguage("en-US"));
@@ -38,6 +28,7 @@ public class NTriplesUtilUnitTest extends TestCase {
         assertTrue(isValidLanguage("a-2-c-4-e-f-g-h-i-jklmnopq"));
     }
 
+    @Test
     public void testParseBadLanguages() {
         assertFalse(isValidLanguage(""));
         assertFalse(isValidLanguage("-"));
@@ -48,16 +39,7 @@ public class NTriplesUtilUnitTest extends TestCase {
         assertFalse(isValidLanguage("en-abcdefghi"));
     }
 
-    private String checkTriple(String ntTriple) {
-        try {
-            NTriplesUtil.parseTriple(ntTriple);
-            return null;
-        } catch (ParseException e) {
-            return e.getMessage() + " at character " + e.getErrorOffset() 
-                    + " of input: " + ntTriple; 
-        }
-    }
-
+    @Test
     public void testParseGoodTriples() {
 
         String msg;
@@ -118,6 +100,7 @@ public class NTriplesUtilUnitTest extends TestCase {
 
     }
 
+    @Test
     public void testUnicodeUnescaping() throws Exception {
 
         String notEscaped = "\u00BFHabla espa\u00F1ol?";
@@ -126,6 +109,7 @@ public class NTriplesUtilUnitTest extends TestCase {
         assertEquals(notEscaped, NTriplesUtil.unescapeLiteralValue(escaped));
     }
 
+    @Test
     public void testAsciiUnescaping() throws Exception {
         checkUnescapingCombos("\t", "\\t");
         checkUnescapingCombos("\r", "\\r");
@@ -134,18 +118,7 @@ public class NTriplesUtilUnitTest extends TestCase {
         checkUnescapingCombos("\\", "\\\\");
     }
 
-    private void checkUnescapingCombos(String unescaped, String escaped) throws Exception {
-        checkUnescaping(unescaped, escaped);
-        checkUnescaping(" " + unescaped, " " + escaped);
-        checkUnescaping("a" + unescaped, "a" + escaped);
-        checkUnescaping(unescaped + " ", escaped + " ");
-        checkUnescaping(unescaped + "a", escaped + "a");
-    }
-
-    private void checkUnescaping(String unescaped, String escaped) throws Exception {
-        assertEquals(unescaped, NTriplesUtil.unescapeLiteralValue(escaped));
-    }
-
+    @Test
     public void testUnicodeEscaping() throws Exception {
 
         String notEscaped = "\u00BFHabla espa\u00F1ol?";
@@ -154,8 +127,8 @@ public class NTriplesUtilUnitTest extends TestCase {
         assertEquals(escaped, NTriplesUtil.escapeLiteralValue(notEscaped));
     }
 
+    @Test
     public void testParseBadTriples() {
-
         assertNotNull(checkTriple(""));
         assertNotNull(checkTriple("."));
         assertNotNull(checkTriple("<urn:a> ."));
@@ -182,8 +155,35 @@ public class NTriplesUtilUnitTest extends TestCase {
         assertNotNull(checkTriple("\"bad literal position\" <urn:b> <urn:c> ."));
     }
 
-    public static void main(String[] args) {
-        TestRunner.run(NTriplesUtilUnitTest.class);
-    }   
+    private boolean isValidLanguage(String lang) {
+        try {
+            NTriplesUtil.validateLanguage(lang);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    private String checkTriple(String ntTriple) {
+        try {
+            NTriplesUtil.parseTriple(ntTriple);
+            return null;
+        } catch (ParseException e) {
+            return e.getMessage() + " at character " + e.getErrorOffset() 
+                    + " of input: " + ntTriple; 
+        }
+    }
+
+    private void checkUnescapingCombos(String unescaped, String escaped) throws Exception {
+        checkUnescaping(unescaped, escaped);
+        checkUnescaping(" " + unescaped, " " + escaped);
+        checkUnescaping("a" + unescaped, "a" + escaped);
+        checkUnescaping(unescaped + " ", escaped + " ");
+        checkUnescaping(unescaped + "a", escaped + "a");
+    }
+
+    private void checkUnescaping(String unescaped, String escaped) throws Exception {
+        assertEquals(unescaped, NTriplesUtil.unescapeLiteralValue(escaped));
+    }
 
 }
