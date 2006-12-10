@@ -54,6 +54,7 @@ public abstract class DatabaseAdaptorIntegrationTest extends TestCase {
     private static final Literal      R2_RESOURCE_NUM;
 
     static {
+        TestConfig.init();
         try {
             XSD_INT          = new URIReference(XSD_NS + "int");
  

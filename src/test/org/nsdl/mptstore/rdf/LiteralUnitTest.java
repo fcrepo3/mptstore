@@ -5,7 +5,13 @@ import java.text.ParseException;
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
+import org.nsdl.mptstore.TestConfig;
+
 public class LiteralUnitTest extends TestCase {
+
+    static {
+        TestConfig.init();
+    }
 
     public LiteralUnitTest(String name) { super (name); }
 

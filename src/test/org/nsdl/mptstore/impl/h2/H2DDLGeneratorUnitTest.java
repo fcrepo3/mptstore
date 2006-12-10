@@ -3,9 +3,14 @@ package org.nsdl.mptstore.impl.h2;
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
+import org.nsdl.mptstore.TestConfig;
 import org.nsdl.mptstore.core.DDLGeneratorUnitTest;
 
 public class H2DDLGeneratorUnitTest extends DDLGeneratorUnitTest {
+
+    static {
+        TestConfig.init();
+    }
 
     public H2DDLGeneratorUnitTest(String name) { 
         super(name, H2DDLGenerator.class.getName());

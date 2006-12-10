@@ -10,6 +10,10 @@ import org.nsdl.mptstore.TestConfig;
 public class GenericDatabaseAdaptorIntegrationTest 
         extends DatabaseAdaptorIntegrationTest {
 
+    static {
+        TestConfig.init();
+    }
+
     public GenericDatabaseAdaptorIntegrationTest(String name) { 
         super(name);
     }

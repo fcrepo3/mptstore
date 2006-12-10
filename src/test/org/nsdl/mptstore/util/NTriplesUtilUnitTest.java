@@ -5,7 +5,13 @@ import java.text.ParseException;
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
+import org.nsdl.mptstore.TestConfig;
+
 public class NTriplesUtilUnitTest extends TestCase {
+
+    static {
+        TestConfig.init();
+    }
 
     public NTriplesUtilUnitTest(String name) { super (name); }
 

@@ -3,6 +3,7 @@ package org.nsdl.mptstore.query.lang.spo;
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
+import org.nsdl.mptstore.TestConfig;
 import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.rdf.PredicateNode;
@@ -10,6 +11,10 @@ import org.nsdl.mptstore.rdf.PredicateNode;
 public class SPOQueryCompilerUnitTest extends TestCase {
 
     private SPOQueryCompiler _compiler;
+
+    static {
+        TestConfig.init();
+    }
 
     public SPOQueryCompilerUnitTest(String name) { super (name); }
 

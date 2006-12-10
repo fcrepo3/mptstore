@@ -5,9 +5,15 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.swingui.TestRunner;
 
+import org.nsdl.mptstore.TestConfig;
+
 public abstract class DDLGeneratorUnitTest extends TestCase {
 
     private String _className;
+
+    static {
+        TestConfig.init();
+    }
 
     protected DDLGeneratorUnitTest(String name,
                                    String className) { 

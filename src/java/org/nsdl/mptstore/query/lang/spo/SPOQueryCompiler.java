@@ -8,6 +8,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.query.component.BasicNodePattern;
@@ -47,6 +49,10 @@ public class SPOQueryCompiler implements QueryCompiler {
      * The targets are always "s", "p", "o".
      */
     public static final List<String> SPO_TARGETS;
+
+    /** Logger for this class. */
+    private static final Logger LOG = Logger.getLogger(
+            SPOQueryCompiler.class.getName());
 
     static {
         SPO_TARGETS = new ArrayList<String>();
@@ -91,6 +97,7 @@ public class SPOQueryCompiler implements QueryCompiler {
     public SQLProvider compile(final String query)
             throws QueryException {
         try {
+            LOG.info("Compiling query: " + query);
             return new TriplePatternSQLProvider(
                     _tableManager,
                     _backslashIsEscape,
@@ -129,6 +136,9 @@ public class SPOQueryCompiler implements QueryCompiler {
                 subject = NTriplesUtil.parseSubject(sString);
                 i += sString.length();
             }
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Parsed subject pattern as " + subject);
+            }
 
             // whitespace
             i += NTriplesUtil.consumeWhitespace(reader, i);
@@ -151,6 +161,9 @@ public class SPOQueryCompiler implements QueryCompiler {
                 }
                 i += pString.length();
             }
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Parsed predicate pattern as " + predicate);
+            }
 
             // whitespace
             i += NTriplesUtil.consumeWhitespace(reader, i);
@@ -170,6 +183,9 @@ public class SPOQueryCompiler implements QueryCompiler {
                     throw new ParseException(e.getMessage(),
                             e.getErrorOffset() + i);
                 }
+            }
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Parsed object pattern as " + object);
             }
             reader.close();
 

@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 
+import org.apache.log4j.PropertyConfigurator;
+
 import org.nsdl.mptstore.core.DDLGenerator;
 import org.nsdl.mptstore.impl.derby.DerbyDDLGenerator;
 import org.nsdl.mptstore.impl.h2.H2DDLGenerator;
@@ -31,20 +33,48 @@ public abstract class TestConfig {
     private TestConfig() { }
 
     /**
-     * Import system properties from ${test.dir}/test.properties
-     * and set derby.system.home to ${test.dir}/derby.
+     * Imports system properties from ${test.dir}/test.properties,
+     * sets derby.system.home to ${test.dir}/derby,
+     * and initializes logging
      */
-    private static void init() {
+    public static void init() {
 
         if (!_initialized) {
 
             try {
 
+                // put everything in test.properties into system properties
                 File testPropFile = new File(getTestDir(), "test.properties");
                 System.getProperties().load(new FileInputStream(testPropFile));
 
+                // tell derby where to store stuff 
                 System.setProperty("derby.system.home", 
                                    new File(getTestDir(), "derby").getPath());
+
+                // configure log4j
+                final String rootPackage = "org.nsdl.mptstore";
+                Properties logProps = new Properties();
+                logProps.setProperty("log4j.appender.TESTLOG", 
+                        "org.apache.log4j.FileAppender");
+                logProps.setProperty("log4j.appender.TESTLOG.File", 
+                        new File(getTestDir(), "test.log").getPath());
+                logProps.setProperty("log4j.appender.TESTLOG.layout",
+                        "org.apache.log4j.PatternLayout");
+                logProps.setProperty("log4j.appender.TESTLOG.layout.ConversionPattern",
+                        "%p %d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] (%c{1}) %m%n");
+                logProps.setProperty("log4j.rootLogger", "WARN, TESTLOG");
+                logProps.setProperty("log4j.logger." + rootPackage, 
+                        System.getProperty("test.loglevel", "INFO")
+                        + ", TESTLOG");
+                logProps.setProperty("log4j.additivity." + rootPackage,
+                        "false");
+                PropertyConfigurator.configure(logProps);
+
+                // tell commons-logging to use log4j
+                System.setProperty("org.apache.commons.logging.LogFactory",
+                        "org.apache.commons.logging.impl.Log4jFactory");
+                System.setProperty("org.apache.commons.logging.Log",
+                        "org.apache.commons.logging.impl.Log4JLogger");
 
                 _initialized = true;
 

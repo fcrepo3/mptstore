@@ -20,6 +20,10 @@ public abstract class DDLGeneratorIntegrationTest extends TestCase {
 
     private Connection _conn;
 
+    static {
+        TestConfig.init();
+    }
+
     protected DDLGeneratorIntegrationTest(String name,
                                           String className) { 
         super(name);
