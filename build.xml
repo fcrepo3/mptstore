@@ -235,20 +235,8 @@
       <classpath refid="test.classpath"/>
       <sysproperty key="test.dir" value="${test.dir}"/>
       <sysproperty key="test.loglevel" value="${test.loglevel}"/>
-      <test name="org.nsdl.mptstore.MPTStoreUnitTestSuite"/>
+      <test name="org.nsdl.mptstore.AllUnitTests"/>
     </junit>
-  </target>
-
-  <!-- unit-test-gui -->
-  <target name="unit-test-gui" 
-          description="Run unit tests using the JUnit GUI" 
-          depends="test-classes">
-    <java classname="org.nsdl.mptstore.MPTStoreUnitTestSuite" fork="yes">
-      <classpath refid="test.classpath"/>
-      <sysproperty key="test.dir" value="${test.dir}"/>
-      <sysproperty key="test.loglevel" value="${test.loglevel}"/>
-      <sysproperty key="log4j.ignoreTCL" value="true"/>
-    </java>
   </target>
 
   <!-- integration-test -->
@@ -263,20 +251,8 @@
       <classpath refid="test.classpath"/>
       <sysproperty key="test.dir" value="${test.dir}"/>
       <sysproperty key="test.loglevel" value="${test.loglevel}"/>
-      <test name="org.nsdl.mptstore.MPTStoreIntegrationTestSuite"/>
+      <test name="org.nsdl.mptstore.AllIntegrationTests"/>
     </junit>
-  </target>
-
-  <!-- integration-test-gui -->
-  <target name="integration-test-gui" 
-          description="Run integration tests using the JUnit GUI" 
-          depends="test-classes">
-    <java classname="org.nsdl.mptstore.MPTStoreIntegrationTestSuite" fork="yes">
-      <classpath refid="test.classpath"/>
-      <sysproperty key="test.dir" value="${test.dir}"/>
-      <sysproperty key="test.loglevel" value="${test.loglevel}"/>
-      <sysproperty key="log4j.ignoreTCL" value="true"/>
-    </java>
   </target>
 
   <!-- checkstyle -->
