@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 
 import java.util.Properties;
 
+import java.sql.SQLException;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -12,10 +14,16 @@ import org.apache.commons.dbcp.BasicDataSourceFactory;
 
 import org.apache.log4j.PropertyConfigurator;
 
+import org.nsdl.mptstore.core.BasicTableManager;
+import org.nsdl.mptstore.core.DatabaseAdaptor;
 import org.nsdl.mptstore.core.DDLGenerator;
+import org.nsdl.mptstore.core.GenericDatabaseAdaptor;
+import org.nsdl.mptstore.core.TableManager;
 import org.nsdl.mptstore.impl.derby.DerbyDDLGenerator;
 import org.nsdl.mptstore.impl.h2.H2DDLGenerator;
 import org.nsdl.mptstore.impl.postgres.PostgresDDLGenerator;
+
+import org.nsdl.mptstore.perftest.TestTripleFactory;
 
 /**
  * Provides static access to test configuration.
@@ -96,6 +104,19 @@ public abstract class TestConfig {
             throw new RuntimeException("Property must be defined: " + name);
         } else {
             return value;
+        }
+    }
+
+    /**
+     * Get a required system property as an <code>int</code> value.
+     */
+    private static int getIntProp(String name) {
+        String value = getProp(name, true);
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Property must be an int value: " 
+                    + name);
         }
     }
 
@@ -213,6 +234,33 @@ public abstract class TestConfig {
                     + "connection pool", th);
         }
         
+    }
+
+    public static int getNumTestSubjects() {
+        init();
+        return getIntProp("test.perf.subjects");
+    }
+
+    public static int getNumTestSubjectsPerTransaction() {
+        init();
+        return getIntProp("test.perf.subjectsPerTransaction");
+    }
+
+    public static TestTripleFactory getTestTripleFactory() {
+        init();
+        return new TestTripleFactory(getIntProp("test.perf.rels"), 
+                getIntProp("test.perf.plains"), getIntProp("test.perf.locals"), 
+                getIntProp("test.perf.longs"), getIntProp("test.perf.doubles"), 
+                getIntProp("test.perf.dateTimes"));
+    }
+
+    public static DatabaseAdaptor getTestDatabaseAdaptor(
+            DataSource dataSource) 
+            throws SQLException {
+        init();
+        TableManager mgr = new BasicTableManager(dataSource, getDDLGenerator(),
+                "tMap", "t");
+        return new GenericDatabaseAdaptor(mgr, getBackslashIsEscape());
     }
 
 }

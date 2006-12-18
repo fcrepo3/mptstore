@@ -235,7 +235,7 @@
       <classpath refid="test.classpath"/>
       <sysproperty key="test.dir" value="${test.dir}"/>
       <sysproperty key="test.loglevel" value="${test.loglevel}"/>
-      <test name="org.nsdl.mptstore.AllUnitTests"/>
+      <test name="${unit.test}"/>
     </junit>
   </target>
 
@@ -251,7 +251,7 @@
       <classpath refid="test.classpath"/>
       <sysproperty key="test.dir" value="${test.dir}"/>
       <sysproperty key="test.loglevel" value="${test.loglevel}"/>
-      <test name="org.nsdl.mptstore.AllIntegrationTests"/>
+      <test name="${integration.test}"/>
     </junit>
   </target>
 
