@@ -130,7 +130,8 @@
 </p>
 
 <div class="code"><pre>
-  // initialize the adaptor
+  // initialize the tablemanager+adaptor with an existing javax.sql.DataSource
+  // note: apps only have to do this once
   TableManager tableMan = new BasicTableManager(dataSource,
                                                 new PostgresDDLGenerator(),
                                                 "tMap",
@@ -188,7 +189,69 @@
     <li> Iterate the results as in the example above.  The values in the result rows
          will be <a href="api/org/nsdl/mptstore/rdf/Node.html">Node</a> objects (or <code>null</code>).</li>
   </ol>
+  Here's an example that performs a query to get the URIs and titles of all resources with content type "book" and status "pending", in reverse alphabetical order by title.
 </p>
+<div class="code"><pre>
+
+  // initialize the tablemanager with an existing javax.sql.DataSource
+  // note: apps only have to do this once
+  TableManager tableMan = new BasicTableManager(dataSource,
+                                                new PostgresDDLGenerator(),
+                                                "tMap",
+                                                "t");
+
+  //
+  // build the graph query and translate it to SQL
+  //
+
+  GraphQuery gQuery = new GraphQuery();
+  GraphPattern gPattern = new GraphPattern();
+
+  // ?resource &lt;urn:example:contentType&gt; "book"
+  TriplePattern firstPart = new BasicTriplePattern(
+          new BasicNodePattern("resource"),
+          new BasicNodePattern(new URIReference("urn:example:contentType")),
+          new BasicNodePattern(new Literal("book")));
+
+  // ?resource &lt;urn:example:status&gt; "pending"
+  TriplePattern secondPart = new BasicTriplePattern(
+          new BasicNodePattern("resource"),
+          new BasicNodePattern(new URIReference("urn:example:status")),
+          new BasicNodePattern(new Literal("pending")));
+
+  // ?resource &lt;urn:example:title&gt; ?title
+  TriplePattern secondPart = new BasicTriplePattern(
+          new BasicNodePattern("resource"),
+          new BasicNodePattern(new URIReference("urn:example:title")),
+          new BasicNodePattern("title"));
+
+  gPattern.addTriplePattern(secondPart);
+  gPattern.addTriplePattern(firstPart);
+
+  // gPattern is a required component of our query
+  gQuery.addRequired(gPattern);
+
+  // translate to SQL and indicate we want descending order by title
+  GraphQuerySQLProvider provider = new GraphQuerySQLProvider(tableMan, gQuery);
+  provider.setTargets(Arrays.asList(new String[] {"resource", "title"}));
+  provider.orderBy("title", true);
+
+
+  //
+  // execute and print the results
+  //
+
+  QueryResults results = new SQLUnionQueryResults(
+          dataSource.getConnection(), provider, 0, true);
+
+  while (results.hasNext()) {
+      List&lt;Node&gt; row = results.next();
+      System.out.println("Match: " + row.get(0).toString()
+              + ", title : " + row.get(1).toString());
+  }
+  results.close();
+
+</div>
 <p>
   See the <a href="api/index.html">Full API Javadocs</a> 
   for more details.
