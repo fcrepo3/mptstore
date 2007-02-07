@@ -220,13 +220,14 @@
           new BasicNodePattern(new Literal("pending")));
 
   // ?resource &lt;urn:example:title&gt; ?title
-  TriplePattern secondPart = new BasicTriplePattern(
+  TriplePattern thirdPart = new BasicTriplePattern(
           new BasicNodePattern("resource"),
           new BasicNodePattern(new URIReference("urn:example:title")),
           new BasicNodePattern("title"));
 
-  gPattern.addTriplePattern(secondPart);
   gPattern.addTriplePattern(firstPart);
+  gPattern.addTriplePattern(secondPart);
+  gPattern.addTriplePattern(thirdPart);
 
   // gPattern is a required component of our query
   gQuery.addRequired(gPattern);
