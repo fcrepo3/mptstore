@@ -22,6 +22,7 @@ import org.nsdl.mptstore.query.component.QueryElement;
 import org.nsdl.mptstore.query.component.TriplePattern;
 import org.nsdl.mptstore.rdf.Node;
 import org.nsdl.mptstore.rdf.PredicateNode;
+import org.nsdl.mptstore.util.DBUtil;
 
 /**
  * Translates a {@link GraphQuery} into a series of SQL statements.
@@ -53,6 +54,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     private final MappingManager manager;
     private List<String> targets;
 
+    private final boolean backslashEscape;
+
     private String ordering;
     private String orderingDirection;
 
@@ -65,12 +68,16 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      *
      * @param tableManager the table manager to use for looking up table names.
      * @param graphQuery the graph query.
+     * @param backslashIsEscape whether backslash should be escaped in SQL
+     * (Database specific)
      */
     public GraphQuerySQLProvider(final TableManager tableManager,
-                                 final GraphQuery graphQuery) {
+                                 final GraphQuery graphQuery,
+                                 final boolean backslashIsEscape) {
 
         this.manager = new MappingManager(tableManager);
         this.query = graphQuery;
+        this.backslashEscape = backslashIsEscape;
     }
 
 
@@ -427,7 +434,9 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                             left = getBoundValue(f.getNode(),
                                     variableBindings);
                         } else {
-                            left = "'" + f.getNode().getNode() + "'";
+                            left = DBUtil.quotedString(
+                                    f.getNode().getNode().toString(),
+                                    backslashEscape);
                         }
 
                         if (f.getConstraint().isVariable()
@@ -439,7 +448,9 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                             right = getBoundValue(f.getConstraint(),
                                     variableBindings);
                         } else {
-                            right = "'" + f.getConstraint().getNode() + "'";
+                            right = DBUtil.quotedString(
+                                    f.getConstraint().getNode().toString(),
+                                    backslashEscape);
                         }
 
                         conditions.addCondition(left, f.getOperator(),
@@ -484,8 +495,10 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                         + "It's probably not legal to be here...");
             } else {
                 valueBindings.get(mappedName).add(
-                        mappedName + " " + f.getOperator() + " '"
-                        + f.getConstraint().getNode() + "'");
+                        mappedName + " " + f.getOperator() + " "
+                        + DBUtil.quotedString(
+                                f.getConstraint().getNode().toString(),
+                                backslashEscape));
                 LOG.debug("Remaining Filters: " + mappedName + " "
                         + f.getOperator() + " '"
                         + f.getConstraint().getNode() + "'" + "\n");
@@ -498,7 +511,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                         + "variable?  It's probably not legal to be here...");
             } else {
                 valueBindings.get(mappedName).add(
-                        "'" + f.getNode().getNode() + "' "
+                        DBUtil.quotedString(f.getNode().getNode().toString(),
+                                backslashEscape) + " "
                         + f.getOperator() + " " + mappedName);
                 LOG.debug("Remaining Filters: " + "'"
                         + f.getNode().getNode() + "' "
@@ -548,7 +562,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         if (n.isVariable()) {
             return variableBindings.get(n.getVarName());
         } else {
-            return "'" + n.getNode().toString() + "'";
+            return DBUtil.quotedString(n.getNode().toString(), backslashEscape);
         }
     }
 
@@ -584,7 +598,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             LOG.debug("bindNode: adding valueBinding " + p.mappedName()
                     + " = " + "'" + p.getNode() + "'\n");
             valueBindings.get(p.boundTable().alias()).add(p.mappedName()
-                    + " = " + "'" + p.getNode() + "'");
+                    + " = " + DBUtil.quotedString(p.getNode().toString(),
+                            backslashEscape));
         }
     }
 
@@ -806,7 +821,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             if (tableName == null) {
                 /* No predicate found.. create table that returns no results */
                 alias = "np_" + noMap++;
-                tableName = "(SELECT pkey AS s, pkey AS o from tmap where 1=0)";
+                tableName = "(SELECT p AS s, p AS o from tmap where 1=0)";
             } else if (predicateMap
                     .containsKey(predicate.getNode().toString())) {
                 List<String> aliases = predicateMap.get(
