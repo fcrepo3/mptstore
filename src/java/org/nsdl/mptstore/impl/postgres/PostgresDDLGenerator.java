@@ -25,10 +25,47 @@ import org.nsdl.mptstore.core.AbstractDDLGenerator;
  */
 public class PostgresDDLGenerator extends AbstractDDLGenerator {
 
+    private final String[] _users;
+
+    private final String[] _groups;
+
     /**
      * Construct a PostgresDDLGenerator.
      */
     public PostgresDDLGenerator() {
+        _users = splitProperty("mptstore.postgres.autoGrantUsers");
+        _groups = splitProperty("mptstore.postgres.autoGrantGroups");
+    }
+
+    public PostgresDDLGenerator(String[] users, String[] groups) {
+        if (users == null) {
+            _users = new String[0];
+        } else {
+            _users = users;
+        }
+        if (groups == null) {
+            _groups = new String[0];
+        } else {
+            _groups = groups;
+        }
+    }
+
+    private static String[] splitProperty(String name) {
+        String val = System.getProperty(name);
+        if (val == null || val.trim().length() == 0) {
+            return new String[0];
+        } else {
+            return val.trim().split(" +");
+        }
+    }
+
+    private void addSelectGrants(List<String> cmds, String table) {
+        for (String name : _users) {
+            cmds.add("GRANT SELECT ON TABLE " + table + " TO " + name);
+        }
+        for (String name : _groups) {
+            cmds.add("GRANT SELECT ON TABLE " + table + " TO GROUP " + name);
+        }
     }
 
     /** {@inheritDoc} */
@@ -44,6 +81,7 @@ public class PostgresDDLGenerator extends AbstractDDLGenerator {
                + " on " + table + " (pKey)");
         cmds.add("CREATE INDEX " + table + "_p "
                + " on " + table + " (p)");
+        addSelectGrants(cmds, table);
 
         return cmds;
     }
@@ -61,6 +99,7 @@ public class PostgresDDLGenerator extends AbstractDDLGenerator {
                + " on " + table + " (s)");
         cmds.add("CREATE INDEX " + table + "_o "
                + " on " + table + " (o)");
+        addSelectGrants(cmds, table);
 
         return cmds;
     }
