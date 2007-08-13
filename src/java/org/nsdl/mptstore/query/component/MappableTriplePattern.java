@@ -111,6 +111,26 @@ public class MappableTriplePattern implements TriplePattern {
         return parts;
     }
 
+    public boolean equals(final Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (!o.getClass().equals(MappableTriplePattern.class)) {
+            return false;
+        }
+
+        MappableTriplePattern pattern = (MappableTriplePattern) o;
+
+        return (this.subject.equals(pattern.subject)
+                && this.predicate.equals(pattern.predicate)
+                && this.object.equals(pattern.object));
+    }
+
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
+
     /** {@inheritDoc} */
     public String toString() {
         return subject + " " + predicate + " " + object;

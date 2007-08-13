@@ -1,6 +1,7 @@
 package org.nsdl.mptstore.query.provider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -51,31 +52,33 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
 
     private final GraphQuery query;
 
-    private final MappingManager manager;
+    private final TableManager tableManager;
+
+    private MappingManager manager;
     private List<String> targets;
 
     private final boolean backslashEscape;
 
+    private Set<MappableTriplePattern> encounteredPatterns;
+
     private String ordering;
     private String orderingDirection;
 
-    private HashMap<String, Set<String>> valueBindings =
-            new HashMap<String, Set<String>>();
+    private HashMap<String, Set<String>> valueBindings;
 
 
     /**
      * Create an instance.
      *
-     * @param tableManager the table manager to use for looking up table names.
+     * @param tm the table manager to use for looking up table names.
      * @param graphQuery the graph query.
      * @param backslashIsEscape whether backslash should be escaped in SQL
      * (Database specific)
      */
-    public GraphQuerySQLProvider(final TableManager tableManager,
+    public GraphQuerySQLProvider(final TableManager tm,
                                  final GraphQuery graphQuery,
                                  final boolean backslashIsEscape) {
-
-        this.manager = new MappingManager(tableManager);
+        this.tableManager = tm;
         this.query = graphQuery;
         this.backslashEscape = backslashIsEscape;
     }
@@ -140,6 +143,12 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      */
     public List<String> getSQL() throws QueryException {
 
+        this.manager = new MappingManager(tableManager);
+        this.encounteredPatterns = new HashSet<MappableTriplePattern>();
+
+        valueBindings =
+            new HashMap<String, Set<String>>();
+
         /* These are bindings of variables in the 'required' query portions */
         HashMap<String, String> requiredBindings =
                 new HashMap<String, String>();
@@ -201,9 +210,13 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
 
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT " + generateTargets(allBindings)
+        if (joinSeq == null) {
+            /* No tables to join means no query parts submitted */
+            return Arrays.asList("SELECT 1 WHERE 1=0");
+        } else {
+            sql.append("SELECT " + generateTargets(allBindings)
                 + " FROM " + joinSeq);
-
+        }
         /*
          * If there are any values or constraints that remain to be added to
          * the query, add them in a WHERE clause.  NB: They better not be from
@@ -315,7 +328,10 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
          */
         MappableTriplePattern step = steps.removeFirst();
 
-        bindPattern(step, variableBindings);
+        if (!bindPattern(step, variableBindings)) {
+            return null;
+        }
+
         JoinSequence joins = new JoinSequence(new JoinTable(step));
 
         /* We keep track of all tje variables that are available to join on */
@@ -418,7 +434,7 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             final HashMap<String, Set<MappableNodeFilter>> filters,
             final Set<MappableNodePattern> joinableVars,
             final HashMap<String, String> variableBindings) {
-        for (String filterVar : filters.keySet()) {
+        for (String filterVar : new ArrayList<String>(filters.keySet())) {
             for (MappableNodePattern joinableVar : joinableVars) {
                 if (joinableVar.isVariable()
                         && joinableVar.getVarName().equals(filterVar)) {
@@ -571,14 +587,22 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      * - Placing any new variables into the master bings map,
      * - Placing any literal values into the literals map
      */
-    private void bindPattern(final MappableTriplePattern t,
+    private boolean bindPattern(final MappableTriplePattern t,
                              final HashMap<String, String> variableBindings) {
-        t.bindTo(manager.mapPredicateTable(t.getPredicate()));
 
-        bindNode(t.getSubject(), variableBindings);
-        //bindNode(t.predicate, variableBindings);
-        bindNode(t.getObject(), variableBindings);
+        if (!encounteredPatterns.contains(t)) {
+            encounteredPatterns.add(t);
+            LOG.debug("Processing new pattern " + t);
+            t.bindTo(manager.mapPredicateTable(t.getPredicate()));
 
+            bindNode(t.getSubject(), variableBindings);
+            //bindNode(t.predicate, variableBindings);
+            bindNode(t.getObject(), variableBindings);
+            return true;
+        } else {
+            LOG.info("Already encountered pattern " + t);
+            return false;
+        }
     }
 
     /* TODO: be able to bind a predicate node */
@@ -610,10 +634,15 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
      * @param m map to remove the value from
      */
     private <K, V> void removeFromMap(final V value, final Map<K, V> m) {
+        Set<K> toRemove = new HashSet<K>();
         for (Map.Entry<K, V> e : m.entrySet()) {
             if (e.getValue().equals(value)) {
-                m.remove(e.getKey());
+                toRemove.add(e.getKey());
             }
+        }
+
+        for (K key : toRemove) {
+            m.remove(key);
         }
     }
 
@@ -693,6 +722,10 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
         public void addJoin(final String joinType,
                             final Joinable j,
                             final String joinConstraints) {
+            if (j == null) {
+                LOG.info("Skipping join");
+                return;
+            }
             join.append(" " + joinType + " " + j.declaration());
             joined.add(j);
             if (joinConstraints != null && joinConstraints != "") {
@@ -711,6 +744,10 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                             final Joinable j,
                             final HashMap<String, String> variableBindings) {
 
+            if (j == null) {
+                LOG.info("Skipping join");
+                return;
+            }
             JoinConditions conditions = new JoinConditions();
 
 
@@ -793,12 +830,13 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
     private class MappingManager {
         private HashMap<String, List<String>> predicateMap
                 = new HashMap<String, List<String>>();
-        private TableManager adaptor;
-        private int noMap = 0;
+        private HashMap<PredicateNode, MPTable> nonexistantMappings =
+            new HashMap<PredicateNode, MPTable>();
+        private final TableManager adaptor;
         private int allMap = 0;
 
-        public MappingManager(final TableManager tableManager) {
-            this.adaptor = tableManager;
+        public MappingManager(final TableManager mgr) {
+            this.adaptor = mgr;
         }
 
         public MPTable mapPredicateTable(
@@ -820,8 +858,15 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
 
             if (tableName == null) {
                 /* No predicate found.. create table that returns no results */
-                alias = "np_" + noMap++;
-                tableName = "(SELECT p AS s, p AS o from tmap where 1=0)";
+                if (!nonexistantMappings.containsKey(predicate.getNode())) {
+                    alias = "np_" + nonexistantMappings.size();
+                    LOG.debug("No table for '" + predicate.getNode()
+                            + "'.  Using empty table as " + alias);
+                    tableName = "(SELECT p AS s, p AS o from tmap where 1=0)";
+                    nonexistantMappings.put(
+                            predicate.getNode(), new MPTable(tableName, alias));
+                }
+                return nonexistantMappings.get(predicate.getNode());
             } else if (predicateMap
                     .containsKey(predicate.getNode().toString())) {
                 List<String> aliases = predicateMap.get(
@@ -835,6 +880,8 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
                 alias = tableName;
             }
 
+            LOG.debug("Mapping predicate " + predicate.getNode().getValue()
+                    + " to " + tableName + " as " + alias);
             MPTable table = new MPTable(tableName, alias);
             return table;
         }
