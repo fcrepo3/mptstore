@@ -186,16 +186,16 @@
         <module name="ParameterNumber"/>
 
         <!--
-          Cyclomatic complexity should never exceed 20 (considered
+          Cyclomatic complexity should never exceed 25 (considered
           "high risk") for a given method.  
           Strive for 10 or below, which is considered "low risk".
         -->
         <module name="CyclomaticComplexity">
-          <property name="max" value="20"/>
+          <property name="max" value="25"/>
         </module>
         <module name="CyclomaticComplexity">
           <property name="severity" value="warning"/>
-          <property name="max" value="10"/>
+          <property name="max" value="15"/>
         </module>
 
         <!--//////////////////////////////////////////////////////////////
