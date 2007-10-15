@@ -37,7 +37,14 @@ public class PostgresDDLGenerator extends AbstractDDLGenerator {
         _groups = splitProperty("mptstore.postgres.autoGrantGroups");
     }
 
-    public PostgresDDLGenerator(String[] users, String[] groups) {
+    /**
+     * Construct a PostgresDDLGenerator that will grant access on new tables to
+     * specified users or groups.
+     *
+     * @param users Users to assign privileges to when creating new tables.
+     * @param groups Groups to assign privileges to when creating new tables.
+     */
+    public PostgresDDLGenerator(final String[] users, final String[] groups) {
         if (users == null) {
             _users = new String[0];
         } else {
@@ -50,7 +57,7 @@ public class PostgresDDLGenerator extends AbstractDDLGenerator {
         }
     }
 
-    private static String[] splitProperty(String name) {
+    private static String[] splitProperty(final String name) {
         String val = System.getProperty(name);
         if (val == null || val.trim().length() == 0) {
             return new String[0];
@@ -59,7 +66,7 @@ public class PostgresDDLGenerator extends AbstractDDLGenerator {
         }
     }
 
-    private void addSelectGrants(List<String> cmds, String table) {
+    private void addSelectGrants(final List<String> cmds, final String table) {
         for (String name : _users) {
             cmds.add("GRANT SELECT ON TABLE " + table + " TO " + name);
         }
