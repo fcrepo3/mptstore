@@ -176,6 +176,7 @@ public class SQLUnionQueryResults implements QueryResults {
             }
             _statement = _conn.createStatement();
             _statement.setFetchSize(_fetchSize);
+            _statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             String query = _queries.next();
             LOG.info("Executing query:\n" + query);
             _results = _statement.executeQuery(query);
