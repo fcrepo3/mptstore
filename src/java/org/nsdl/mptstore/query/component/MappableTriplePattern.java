@@ -111,6 +111,7 @@ public class MappableTriplePattern implements TriplePattern {
         return parts;
     }
 
+    /** {@inheritDoc} */
     public boolean equals(final Object o) {
         if (o == null) {
             return false;
@@ -127,6 +128,7 @@ public class MappableTriplePattern implements TriplePattern {
                 && this.object.equals(pattern.object));
     }
 
+    /** {@inheritDoc} */
     public int hashCode() {
         return this.toString().hashCode();
     }

@@ -2,7 +2,6 @@ package org.nsdl.mptstore.core;
 
 import java.util.List;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 

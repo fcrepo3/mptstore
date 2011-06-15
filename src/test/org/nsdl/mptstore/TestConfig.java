@@ -50,9 +50,10 @@ public abstract class TestConfig {
         if (!_initialized) {
 
             try {
-
+System.out.println("testDir"+getTestDir());
                 // put everything in test.properties into system properties
                 File testPropFile = new File(getTestDir(), "test.properties");
+System.out.println("path "+testPropFile.getAbsolutePath());
                 System.getProperties().load(new FileInputStream(testPropFile));
 
                 // tell derby where to store stuff 
