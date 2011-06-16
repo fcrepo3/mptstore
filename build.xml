@@ -27,6 +27,7 @@
     <pathelement location="build/classes"/>
     <pathelement location="${test.dir}/classes"/>
     <pathelement location="src/config"/>
+    <pathelement location="${lib.oracle}"/>
   </path>
 
   <!-- classes -->
@@ -194,6 +195,7 @@
                            org.nsdl.mptstore.impl.derby,
                            org.nsdl.mptstore.impl.h2,
                            org.nsdl.mptstore.impl.postgres,
+                           org.nsdl.mptstore.impl.oracle,
                            org.nsdl.mptstore.query,
                            org.nsdl.mptstore.query.component,
                            org.nsdl.mptstore.query.provider,
