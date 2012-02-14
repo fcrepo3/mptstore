@@ -181,7 +181,7 @@
   <scm>
     <connection>scm:git:git://github.com/fcrepo/${project.artifactId}.git
     </connection>
-    <developerConnection>scm:git:git@fcrepo/${project.artifactId}.git
+    <developerConnection>scm:git:git@github.com:fcrepo/${project.artifactId}.git
     </developerConnection>
     <url>http://github.com/fcrepo/${project.artifactId}</url>
   </scm>
@@ -206,7 +206,7 @@
   <distributionManagement>
     <site>
       <id>gh-pages</id>
-      <url>gitsite:git@github/fcrepo/${project.artifactId}.git</url>
+      <url>gitsite:git@github.com/fcrepo/${project.artifactId}.git</url>
     </site>
   </distributionManagement>
   
