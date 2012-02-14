@@ -1,0 +1,10 @@
+org.nsdl.mptstore
+org.nsdl.mptstore.core
+org.nsdl.mptstore.impl.derby
+org.nsdl.mptstore.impl.h2
+org.nsdl.mptstore.impl.oracle
+org.nsdl.mptstore.impl.postgres
+org.nsdl.mptstore.perftest
+org.nsdl.mptstore.query.lang.spo
+org.nsdl.mptstore.rdf
+org.nsdl.mptstore.util
