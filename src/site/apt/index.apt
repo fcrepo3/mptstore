@@ -1,0 +1,300 @@
+    ---
+    MPTStore Documentation
+    ---
+    
+What is MPTStore?
+
+    MPTStore is a Java library for projects that need persistent, 
+    transaction-capable storage and querying of very large quantities 
+    of RDF data.
+
+    The primary areas of focus are scalability and transaction
+    safety with simple query support.  Complex query support
+    (a subset of SPARQL features) is in development and looks
+    very promising.  Out of scope features include reasoning 
+    (inference) and quads.
+
+    MPTStore is implemented as a lightweight layer on top of JDBC.
+    It was originally developed using Postgres as the underlying
+    database, but be easily made to work with other databases
+    by writing a {{{./xref/org/nsdl/mptstore/core/DDLGenerator.html}DDLGenerator}}. 
+
+How does it differ from existing approaches?
+
+    The traditional way of storing RDF in a relational database
+    is to use a "big table of triples".  Variations on this basic 
+    approach are employed by popular RDF storage engines including 
+    {{{http://jena.sourceforge.net/}Jena}}, 
+    {{{http://www.openrdf.org/}Sesame}},
+    and {{{http://sourceforge.net/projects/threestore/}3store}}.
+
+    Our approach, MPT ("Mapped Predicate Tables"),
+    is different.  Recognizing that the number of
+    relationship types in real RDF data is much
+    lower than the number of nodes, MPT distributes
+    triples across several tables, each holding all
+    the relationships of a certain type.  This 
+    design offers efficient query plans for complex
+    queries as well as an opportunity to scale 
+    across storage devices.
+    
+Downloading and Installing
+
+    * Download the latest release from {{{https://github.com/fcrepo/mptstore}GitHub}} 
+    or via {{{search.maven.org/#search|ga|1|mptstore}Maven Central}}.
+    
+    * {{{./release-notes.txt}View the release notes}}.
+    
+    * Make sure <<<mptstore-@mptstore.version@.jar>>> and
+    <<<log4j>>> are in your <<<CLASSPATH>>>.
+
+        To configure logging:
+        
+            1. If you don't already have Log4J set up for your project,
+               edit the included <code>log4j.xml</code> and make sure 
+               it's in your CLASSPATH.  For some help with Log4J configuration,
+               see the {{{http://wiki.apache.org/logging-log4j/Log4jXmlFormat}
+               Log4J XML Configuration Primer}}.
+               
+            2. If you're already using Log4J, add MPTStore logging
+               categories to your existing configuration, if desired.
+
+API Documentation
+
+    The main interface you work with is the
+    {{{./xref/org/nsdl/mptstore/core/DatabaseAdaptor.html}DatabaseAdaptor}}.
+    This interface allows you to add and delete triples and execute RDF queries.
+
+    The only current implementation of this interface is 
+    {{{./xref/org/nsdl/mptstore/core/GenericDatabaseAdaptor.html}GenericDatabaseAdaptor}}.
+    In order to construct one, you'll need a 
+    {{{http://docs.oracle.com/javase/6/docs/api/javax/sql/DataSource.html}JDBC 
+    DataSource}} (which your application must provide on its own), and a
+    {{{./xref/org/nsdl/mptstore/core/DDLGenerator.html}DDLGenerator}}.
+
+    A <<<DDLGenerator>>> tells MPTStore how to create and drop tables for
+    a particular database type.  Existing implementations include:
+
+    * {{{./xref/org/nsdl/mptstore/impl/derby/DerbyDDLGenerator.html}DerbyDDLGenerator}}
+    
+    * {{{./xref/org/nsdl/mptstore/impl/h2/H2DDLGenerator.html}H2DDLGenerator}}
+    
+    * {{{./xref/org/nsdl/mptstore/impl/postgres/PostgresDDLGenerator.html}PostgresDDLGenerator}}
+
+    Once you have a <<<DataSource>>> and a <<<DDLGenerator>>>,
+    you can construct a {{{./xref/org/nsdl/mptstore/core/BasicTableManager.html}BasicTableManager}},
+    which can then be used to construct a <<<GenericDatabaseAdaptor>>>.
+    Here is an example of putting the above pieces together and exercising the
+    functionality of the <<<DatabaseAdaptor>>> interface.
+
++--
+  // initialize the tablemanager+adaptor with an existing javax.sql.DataSource
+  // note: apps only have to do this once
+  TableManager tableMan = new BasicTableManager(dataSource,
+                                                new PostgresDDLGenerator(),
+                                                "tMap",
+                                                "t");
+  DatabaseAdaptor adaptor = new GenericDatabaseAdaptor(tableMan, true);
+
+  // instantiate a couple triples
+  Set&lt;Triple&gt; triples = new HashSet&lt;Triple&gt;();
+  triples.add(new Triple(new URIReference("urn:resource:1"),
+                         new URIReference("urn:title"),
+                         new Literal("Resource One")));
+  triples.add(new Triple(new URIReference("urn:resource:2"),
+                         new URIReference("urn:title"),
+                         new Literal("Resource Two")));
+
+  // add the triples in a transaction
+  Connection conn = dataSource.getConnection();
+  conn.setAutoCommit(false);
+  adaptor.addTriples(conn, triples.iterator());
+  conn.commit();
+  conn.setAutoCommit(true);
+  conn.close();
+
+  // query for all titles
+  QueryResults results = adaptor.query(dataSource.getConnection(),
+                                       QueryLanguage.SPO,
+                                       0, true, "* &lt;urn:title&gt; *");
+  while (results.hasNext()) {
+      List&lt;Node&gt; row = results.next();
+      System.out.println("The title of " + row.get(0).toString()
+              + " is " + row.get(2).toString());
+  }
+  results.close();
+
+  // delete the triples in a transaction
+  conn = dataSource.getConnection();
+  conn.setAutoCommit(false);
+  adaptor.deleteTriples(conn, triples.iterator());
+  conn.commit();
+  conn.setAutoCommit(true);
+  conn.close();
+
++--
+
+    Once you have a populated triplestore, more advanced queries are possible.
+    However, we don't yet have a SPARQL parser, so you must work at a lower 
+    level to perform these kinds of queries.  The basic steps are:
+
+    1. Instantiate a {{{./xref/org/nsdl/mptstore/query/component/GraphQuery.html}GraphQuery}}
+       object.
+         
+    2. Add optional and required {{{./xref/org/nsdl/mptstore/query/component/QueryElement.html}QueryElement}}s to it.
+
+    3. Instantiate a {{{./xref/org/nsdl/mptstore/query/provider/GraphQuerySQLProvider.html}GraphQuerySQLProvider}} 
+       using your <code>GraphQuery</code> and a <code>TableManager</code> instance.
+
+    4. Set the names of the values that are being selected by using <<<setTargets(List&lt;String&gt;)>>>
+
+    5. Instantiate a {{{./xref/org/nsdl/mptstore/query/SQLUnionQueryResults.html}SQLUnionQueryResults}} 
+       object by passing your <<<GraphQuerySQLProvider>>> and a <<<Connection>>> 
+       in the constructor.
+
+    6. Iterate the results as in the example above. The values in the result rows
+       will be {{{./xref/org/nsdl/mptstore/rdf/Node.html}Node}} objects (or <<<null>>>).
+
+    Here's an example that performs a query to get the URIs and titles of all resources with content type "book" and status "pending", in reverse alphabetical order by title.
+
++--
+  // initialize the tablemanager with an existing javax.sql.DataSource
+  // note: apps only have to do this once
+  TableManager tableMan = new BasicTableManager(dataSource,
+                                                new PostgresDDLGenerator(),
+                                                "tMap",
+                                                "t");
+
+  //
+  // build the graph query and translate it to SQL
+  //
+
+  GraphQuery gQuery = new GraphQuery();
+  GraphPattern gPattern = new GraphPattern();
+
+  // ?resource &lt;urn:example:contentType&gt; "book"
+  TriplePattern firstPart = new BasicTriplePattern(
+          new BasicNodePattern("resource"),
+          new BasicNodePattern(new URIReference("urn:example:contentType")),
+          new BasicNodePattern(new Literal("book")));
+
+  // ?resource &lt;urn:example:status&gt; "pending"
+  TriplePattern secondPart = new BasicTriplePattern(
+          new BasicNodePattern("resource"),
+          new BasicNodePattern(new URIReference("urn:example:status")),
+          new BasicNodePattern(new Literal("pending")));
+
+  // ?resource &lt;urn:example:title&gt; ?title
+  TriplePattern thirdPart = new BasicTriplePattern(
+          new BasicNodePattern("resource"),
+          new BasicNodePattern(new URIReference("urn:example:title")),
+          new BasicNodePattern("title"));
+
+  gPattern.addTriplePattern(firstPart);
+  gPattern.addTriplePattern(secondPart);
+  gPattern.addTriplePattern(thirdPart);
+
+  // gPattern is a required component of our query
+  gQuery.addRequired(gPattern);
+
+  // translate to SQL and indicate we want descending order by title
+  GraphQuerySQLProvider provider = new GraphQuerySQLProvider(tableMan, gQuery);
+  provider.setTargets(Arrays.asList(new String[] {"resource", "title"}));
+  provider.orderBy("title", true);
+
+
+  //
+  // execute and print the results
+  //
+
+  QueryResults results = new SQLUnionQueryResults(
+          dataSource.getConnection(), provider, 0, true);
+
+  while (results.hasNext()) {
+      List&lt;Node&gt; row = results.next();
+      System.out.println("Match: " + row.get(0).toString()
+              + ", title : " + row.get(1).toString());
+  }
+  results.close();
++--
+
+    See the <a href="api/index.html">Full API Javadocs</a> for more details.
+
+Known Issues / Bugs
+
+    * Unique constraints are not enabled in the included DDLGenerator
+    implementations.  So when using these, it's possible to add 
+    duplicate triples without recieving a warning.  We plan
+    to make unique constraints an optional setting for the
+    bundled <code>DDLGenerator</code> implementations.  
+    When enabled, the idea is that an attempt to re-add a 
+    triple will throw a <code>ModificationException</code>.
+
+    * Literal values are not normalized.  Applications should take
+    care to pre-normalize the value parts of the literals before
+    adding them, if normalization is required.
+
+    * Unbound predicate queries are relatively slow when the graph
+    contains statements using many (hundreds of) distinct predicates.
+    Here are some ideas we might employ to address this.
+
+        1. Storage of every triple in a complete triple
+           table in addition to the predicate-specific tables.
+           This would increase storage requirements 2x to 3x.
+           In addition, update throughput would be reduced
+           to at least half to a third.  Portions of queries
+           with unbound predicates would use this table,
+           while bound predicate portions would still get
+           the performance benefit of going against the
+           predicate-specific tables.
+
+        2. In an environment where overhead of a complete triple 
+           table is not desired, another option is to parallelize the 
+           queries on each table.
+           In the general case, this requires a connection per
+           execution thread and thus, consistency would
+           be difficult to enforce at the database level
+           using transactions.  One solution to this problem
+           is to block writes while the necessary group of 
+           reading connections are beginning their transactions.
+
+        3. Another idea is to have something like a complete triple table,
+        except it would contain references to predicates (not the actual
+        text), and references to the row# in the predicate for each triple.
+        This information could be used to know the exact subset of 
+        predicate tables that need to be queried to form the list of
+        triples for a particular subject.
+        Call this the "S,P,row" approach.  The advantage over #1
+        would be reduced storage space.  The disadvantage would be
+        more overhead for updates.
+
+    * {{{http://www.w3.org/TR/rdf-mt/#unlabel}Blank nodes}} 
+    are not supported.  This is not a priority.
+
+Coding Standards
+
+    Coding standards for the project are documented in 
+    <a href="coding-standards.xml">coding-standards.xml</a>.
+
+    These can be automatically checked using the "ant checkstyle"
+    task.  Committed code in subversion should pass the tests
+    but may generate warnings.  Most tests generate errors.
+    Warnings are generated for the following:
+    
+    * Javadoc problems.  These must be fixed before a release.
+    
+    * Inline TODO comments.  
+      These should be addressed before a (1.0+) point release by either 
+      fixing the issue or documenting it in Known Issues.</li>
+      
+    * Per method {{{http://en.wikipedia.org/wiki/Cyclomatic_complexity}cyclomatic 
+      complexity}} over 10.
+
+License Information
+
+    MPTStore is distributed under the Educational Community License (ECL), v1.0.  
+
+    The distribution also includes several third-party, open-source libraries,
+    each with its own license terms.
+
+    
