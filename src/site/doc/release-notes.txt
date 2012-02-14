@@ -1,0 +1,45 @@
+
+                         MPTStore Release Notes
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Version 0.9.1 - December 10th, 2006
+===================================
+
+ o Fixed bug that was probably introduced on 10/3 or 10/4 in complex query 
+   processing.
+
+ o Log4J library updated to 1.2.14 (supports TRACE level).
+
+ o Additional logging at DEBUG and TRACE levels.
+
+ o Added known issue to documentation re:unique constraint checking.
+
+ o Source distribution no longer bundles H2.
+
+ o Tests updated to use Junit 4.
+
+ o Naming convention for package-level suites changed to All...Tests
+
+ o Tests now send log messages to build/test/test.log.
+
+
+Version 0.9 - October 6th, 2006
+===============================
+
+ o This is the first official release of MPTStore.
+
+ o Derby and H2 have not been tested with MPTStore as thoroughly as Postgres.
+   Users of PostgreSQL might read http://www.powerpostgresql.com/PerfList/
+   for various tuning options.
+
+ o This version is compatible with Java 1.4.
+
+   - The binary distribution has a jar file compiled for Java 1.5 
+     (mptstore-0.9.jar) and a legacy jar for 1.4 (mptstore-0.9.jar14)
+
+   - The source must be compiled with a 1.5 JDK.
+
+   - Starting with version 1.0, we will not maintain Java 1.4 
+     compatibility.
+

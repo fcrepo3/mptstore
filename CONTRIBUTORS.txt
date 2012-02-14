@@ -1,2 +1,0 @@
-Victor Gimeno and David Giral
-    Added OracleDDLGenerator (commit 4e5f85022f2cc092d288857dbb0a19263cd6002c)
