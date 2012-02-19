@@ -13,7 +13,7 @@ MPTStore is distributed under the Educational Community License (ECL), v1.0.
 Use of this software indicates your acceptance of the terms of this license.
 The distribution includes several third-party, open-source libraries with 
 thier own license terms.  Specific terms of the ECL and all third-party
-licenses can be found in the src/doc/license/ directory.
+licenses can be found in the online documentation (see below).
 
 
 DOCUMENTATION
