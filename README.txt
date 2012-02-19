@@ -1,10 +1,9 @@
-
                         MPTStore RDF Storage Engine
                               Version @mptstore.version@
 
                            Source Distribution
 
-                  Copyright (c) 2006, Cornell University
+                  Copyright (c) 2006-2012, Cornell University, DuraSpace
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -20,19 +19,10 @@ licenses can be found in the src/doc/license/ directory.
 DOCUMENTATION
 =============
 Online documentation for the latest version of MPTStore can be found at 
-http://mptstore.sf.net/
-
-Offline documentation for this version of MPTStore can be found in the 
-dist/doc/ directory after doing a documentation build. (see below)
+http://fcrepo.github.com/mptstore/
 
 
 BUILDING
 ========
-To compile MPTStore, make sure you have Ant installed, and type:
-  ant dist
-
-To build the documentation, type:
-  ant doc
-
-For other useful build targets, type:
-  ant -p
+To compile MPTStore, make sure you have Maven installed, and type:
+  mvn package
