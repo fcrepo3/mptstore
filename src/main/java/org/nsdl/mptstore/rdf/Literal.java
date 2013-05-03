@@ -15,6 +15,9 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  *      RDF Concepts and Abstract Syntax, Section 6.5</a>
  */
 public class Literal implements ObjectNode {
+    
+    /* Max length of the literal including language and datatype suffix. This should not be greater than the varchar size of the table column (uless the server truncates the string automatically). */
+    private static final int LITERAL_MAXLEN = 255;
 
     /**
      * The lexical value of this literal.
@@ -100,7 +103,24 @@ public class Literal implements ObjectNode {
     public String toString() {
         StringBuffer out = new StringBuffer();
         out.append('"');
-        out.append(NTriplesUtil.escapeLiteralValue(_value));
+        
+        // 2 is the length of "" and ...
+        int suffixLenght = 5;
+        if(_language != null){
+            // it might be 2 or 3 letter code
+        	suffixLenght += 1 + _language.length();
+        }
+        if(_datatype != null){
+        	suffixLenght += 2 + _datatype.toString().length();
+        }
+        
+        String escaped = NTriplesUtil.escapeLiteralValue(_value);
+        if(LITERAL_MAXLEN > 0 && escaped.length() > (LITERAL_MAXLEN-suffixLenght)){ 
+        	out.append(escaped.substring(0,(LITERAL_MAXLEN-suffixLenght))+"...");
+        }else{
+        	out.append(escaped);
+        }
+        
         out.append('"');
         if (_language != null) {
             out.append("@" + _language);
