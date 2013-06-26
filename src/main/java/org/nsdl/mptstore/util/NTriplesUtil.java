@@ -27,7 +27,7 @@ public abstract class NTriplesUtil {
      * Maximum characters for a language code subtag.
      */
     private static final int SUBTAG_MAXLEN = 8;
-
+    
     private static final int HIGHEST_ASCII_CHAR = 127;
     private static final int HEX = 16;
     private static final int SHORT_ESCAPE_LENGTH = 5;
@@ -634,32 +634,43 @@ public abstract class NTriplesUtil {
      * @param s The input string.
      * @return The escaped string.
      */
-    public static String escapeLiteralValue(final String s) {
+    public static String escapeAndTruncateLiteralValue(final String s, final int stringMaxLenght) {
 
         int len = s.length();
-        StringBuffer out = new StringBuffer(len * 2);
-
+        StringBuffer out = new StringBuffer(len * 2);        
+        
         for (int i = 0; i < len; i++) {
+        	
+        	if(stringMaxLenght > 0 && (out.length() == stringMaxLenght)){
+        		return out.toString() + "...";
+        	}
+        	
+        	String app = "";
             char c = s.charAt(i);
             int cNum = (int) c;
             if (c == '\\') {
-                out.append("\\\\");
+            	app = "\\\\";
             } else if (c == '"') {
-                out.append("\\\"");
+            	app = "\\\"";
             } else if (c == '\n') {
-                out.append("\\n");
+            	app = "\\n";
             } else if (c == '\r') {
-                out.append("\\r");
+            	app = "\\r";
             } else if (c == '\t') {
-                out.append("\\t");
+            	app = "\\t";
             } else if (isLowUnicode(cNum)) {
-                out.append("\\u");
-                out.append(hexString(cNum, SHORT_ESCAPE_LENGTH - 1));
+            	app = "\\u" + hexString(cNum, SHORT_ESCAPE_LENGTH - 1);
             } else if (isHighUnicode(cNum)) {
-                out.append("\\U");
-                out.append(hexString(cNum, LONG_ESCAPE_LENGTH - 2));
-            } else {
-                out.append(c);
+            	app = "\\U" + hexString(cNum, LONG_ESCAPE_LENGTH - 2);
+            } else {            	
+            	out.append(c);
+            	continue;
+            }
+            
+            if(stringMaxLenght > 0 && (out.length() + app.length() > stringMaxLenght)){
+            	return out.toString() + "...";
+            }else{            
+            	out.append(app);            
             }
         }
 
