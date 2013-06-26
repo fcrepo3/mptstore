@@ -14,7 +14,7 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  * @see <a href="http://www.w3.org/TR/rdf-concepts/#section-Graph-Literal">
  *      RDF Concepts and Abstract Syntax, Section 6.5</a>
  */
-public class Literal implements ObjectNode {
+public class Literal implements ObjectNode {  
 
 	public static final int LITERAL_MAXLEN = 255;
 	
@@ -102,7 +102,7 @@ public class Literal implements ObjectNode {
     public String toString() {
         StringBuffer out = new StringBuffer();
         out.append('"');
-        
+         
         // 5 is the length of "" and ...
         int suffixLenght = 5;
         if(_language != null){
