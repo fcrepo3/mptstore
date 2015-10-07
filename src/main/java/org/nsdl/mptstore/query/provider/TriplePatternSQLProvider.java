@@ -118,7 +118,7 @@ public class TriplePatternSQLProvider implements SQLProvider {
             }
 
             String sqlString = select.toString();
-            LOG.info("Generated query:\n" + sqlString);
+            LOG.debug("Generated query:\n" + sqlString);
             _sql.add(sqlString);
         }
     }
