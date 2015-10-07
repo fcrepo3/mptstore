@@ -178,10 +178,10 @@ public class SQLUnionQueryResults implements QueryResults {
             _statement.setFetchSize(_fetchSize);
             _statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             String query = _queries.next();
-            LOG.info("Executing query:\n" + query);
+            LOG.debug("Executing query:\n" + query);
             _results = _statement.executeQuery(query);
         } else {
-            LOG.info("Finished executing all queries");
+            LOG.debug("Finished executing all queries");
             close(); // proactively close if no more queries
             _results = null;
         }
