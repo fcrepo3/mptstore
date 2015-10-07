@@ -21,6 +21,14 @@
     <!-- workaround for http://jira.codehaus.org/browse/MRESOURCES-99 -->
     <buildDate>${maven.build.timestamp}</buildDate>
   </properties>
+  
+  <repositories>
+    <repository>
+      <id>codelds</id>
+      <url>https://maven.nuxeo.org/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
+
 
   <dependencyManagement>
     <dependencies>
