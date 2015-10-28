@@ -891,12 +891,12 @@ public class GraphQuerySQLProvider implements SQLBuilder, SQLProvider {
             if (tableName == null) {
                 /* No predicate found.. create table that returns no results */
                 alias = "np_" + nonexistantMappings.size();
-                tableName = "(SELECT p AS s, p AS o from tmap where 1=0)";
+                tableName = "(SELECT p AS s, p AS o from tMap where 1=0)";
                 if (!nonexistantMappings.containsKey(predicate.getNode())) {
                     alias = "np_" + nonexistantMappings.size();
                     LOG.debug("No table for '" + predicate.getNode()
                             + "'.  Using empty table as " + alias);
-                    tableName = "(SELECT p AS s, p AS o from tmap where 1=0)";
+                    tableName = "(SELECT p AS s, p AS o from tMap where 1=0)";
                     nonexistantMappings.put(predicate.getNode(), new MPTable(
                             tableName, alias));
                     predicateMap.put(predicate.getNode().toString(),

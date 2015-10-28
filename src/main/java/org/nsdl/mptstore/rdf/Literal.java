@@ -14,8 +14,10 @@ import org.nsdl.mptstore.util.NTriplesUtil;
  * @see <a href="http://www.w3.org/TR/rdf-concepts/#section-Graph-Literal">
  *      RDF Concepts and Abstract Syntax, Section 6.5</a>
  */
-public class Literal implements ObjectNode {
+public class Literal implements ObjectNode {  
 
+	public static final int LITERAL_MAXLEN = 255;
+	
     /**
      * The lexical value of this literal.
      */
@@ -100,13 +102,31 @@ public class Literal implements ObjectNode {
     public String toString() {
         StringBuffer out = new StringBuffer();
         out.append('"');
-        out.append(NTriplesUtil.escapeLiteralValue(_value));
+         
+        // 5 is the length of "" and ...
+        int suffixLenght = 5;
+        if(_language != null){
+        	// it might be 2 or 3 letter code
+        	suffixLenght += 1 + _language.length();
+        }
+        if(_datatype != null){
+        	suffixLenght += 2 + _datatype.toString().length();
+        }
+        
+        int stringMaxLenght = 0;
+        if(LITERAL_MAXLEN > 0){
+        	stringMaxLenght = LITERAL_MAXLEN-suffixLenght;
+        }
+
+        out.append(NTriplesUtil.escapeAndTruncateLiteralValue(_value, stringMaxLenght));      
+        
         out.append('"');
         if (_language != null) {
             out.append("@" + _language);
         } else if (_datatype != null) {
             out.append("^^" + _datatype.toString());
         }
+
         return out.toString();
     }
 
